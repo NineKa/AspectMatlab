@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Matlab.Parser">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/Matlab.Parser.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

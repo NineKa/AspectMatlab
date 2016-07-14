@@ -1,5 +1,8 @@
 package abstractPattern;
 
+import Matlab.Utils.IReport;
+import Matlab.Utils.Message;
+import Matlab.Utils.Report;
 import ast.*;
 import matcher.Alphabet;
 import matcher.DimAlphabetCompareFunc;
@@ -14,7 +17,7 @@ import util.Namespace;
 import java.util.*;
 import java.util.List;
 
-public class Call {
+public class Call implements IValidation{
     private final String trueReturn = "true";
     private final String falseReturn = "false";
 
@@ -94,6 +97,35 @@ public class Call {
         /* reject call pattern - function name using ".." wildcard */
         boolean nameValid = !this.getFunctionName().equals("..");
         return nameValid && inputPramValid && outputPramValid;
+    }
+
+    public IReport getValidationReport(String pFilePath) {
+        IReport retReport = new Report();
+        /* recursively analysis the input parameters */
+        for (ArgumentSignature iter : this.getInputPramList()) {
+            IReport mergingReport = iter.getValidationReport(pFilePath);
+            for (Message megIter : mergingReport) {
+                retReport.Add(megIter);
+            }
+        }
+        /* recursively analysis the output parameters */
+        for (ArgumentSignature iter : this.getOutputPramList()) {
+            IReport mergingReport = iter.getValidationReport(pFilePath);
+            for (Message megIter : mergingReport) {
+                retReport.Add(megIter);
+            }
+        }
+        /* validation on function name */
+        if (this.getFunctionName().equals("..")) {
+            retReport.AddError(
+                    pFilePath,
+                    astNodes.getStartLine(),
+                    astNodes.getStartColumn(),
+                    "Invalid Call Pattern - .. is not a valid matcher on function name"
+            );
+        }
+
+        return retReport;
     }
 
     public Alphabet<Integer> generateDimAlphabet() {
@@ -275,7 +307,14 @@ public class Call {
                 )
         )));
         checkTokenIfBlock.addStmt(new ContinueStmt());
-        checkingStmts.add(new IfStmt(new ast.List<>(checkTokenIfBlock), new Opt<ElseBlock>()));
+        /* if the length check is need or not */
+        boolean isLengthCheckNeeded = false;
+        for (ArgumentSignature iter : signatures)
+            if (iter.getTypeSignature().getID().equals("..")) isLengthCheckNeeded = true;
+
+        if (isLengthCheckNeeded) {
+            checkingStmts.add(new IfStmt(new ast.List<>(checkTokenIfBlock), new Opt<ElseBlock>()));
+        }
 
         /* prepare check matrix */
         String checkMatrixName = varNamespace.generateNewName();
@@ -301,7 +340,7 @@ public class Call {
 
         /* generate checking statements */
         /* preparing variable access map */
-        Map<Integer, Expr> variableAccessMap = new HashMap<>(); //TODO
+        Map<Integer, Expr> variableAccessMap = new HashMap<>();
         for (int iter = 0; iter < signatures.size(); iter++) {
             variableAccessMap.put(iter, new CellIndexExpr(
                     new NameExpr(new Name(inPramName)),

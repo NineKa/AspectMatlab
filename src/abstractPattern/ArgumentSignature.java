@@ -1,11 +1,17 @@
 package abstractPattern;
 
+import Matlab.Utils.IReport;
+import Matlab.Utils.Report;
 import ast.*;
 import ast.List;
 
 import java.util.*;
 
-public class ArgumentSignature {
+public class ArgumentSignature implements IValidation{
+    private String path = "";
+    private int line = 0;
+    private int column = 0;
+
     private FullSignature signature = null;
 
     public ArgumentSignature(FullSignature init) {
@@ -56,10 +62,28 @@ public class ArgumentSignature {
 
     public boolean isValid() {
         List<Name> dimensionSignature = this.getDimensionSignature();
-        Name typeSignature = this.getTypeSignature();
         /* reject dimension pattern such as [] */
         if (dimensionSignature.getNumChild() == 0) return false;
         return true;
+    }
+
+    public IReport getValidationReport(String pFilePath) {
+        Report retReport = new Report();
+        /* add waring pattern such as [.., ..] */
+        for (int iter = 0; iter < this.getDimensionSignature().getNumChild() - 1; iter++) {
+            Name currentSign = this.getDimensionSignature().getChild(iter);
+            Name nextSign = this.getDimensionSignature().getChild(iter + 1);
+            if (currentSign.getID().equals("..") && nextSign.getID().equals("..")) {
+                retReport.AddWarning(
+                        pFilePath,
+                        signature.getStartLine(),
+                        signature.getStartColumn(),
+                        "redundant pattern [.., ..], using [..] instead"
+                );
+            }
+        }
+
+        return retReport;
     }
 
     @Override public String toString() {

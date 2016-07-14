@@ -5,6 +5,7 @@ import matcher.Alphabet;
 import matcher.DimAlphabetCompareFunc;
 import matcher.TypeAlphabetCompareFunc;
 import matcher.dfa.DFA;
+import matcher.dfa.DFANode;
 import matcher.nfa.NFA;
 import matcher.nfa.NFAFactory;
 import natlab.DecIntNumericLiteralValue;
@@ -156,6 +157,13 @@ public class Call {
         return this.generateMatlabMatcherFull(this.getInputPramList(), funcNamespace, varNamespace);
     }
 
+    @SuppressWarnings("dep-ann") public Function generateOutputMatlabMatcher(Namespace funcNamespace, Namespace varNamespace) {
+        if (this.outputPramList.isEmpty()) return this.generateMatlabMatcherEmpty(funcNamespace, varNamespace);
+        if (this.canGenerateMatlabMatcherSimple(this.getOutputPramList()))
+            return this.generateMatlabMatcherSimple(this.getOutputPramList(), funcNamespace, varNamespace);
+        return this.generateMatlabMatcherFull(this.getOutputPramList(), funcNamespace, varNamespace);
+    }
+
     @Deprecated private Function generateMatlabMatcherSimple(
             List<ArgumentSignature> signatures,
             Namespace funcNamespace,
@@ -164,7 +172,7 @@ public class Call {
         Alphabet<String> alphabet = this.generateTypeAlphabet();
         ast.List<Name> types = new ast.List<>();
         for (ArgumentSignature iter : signatures) types.add(iter.getTypeSignature());
-        NFA patternNFA = NFAFactory.buildDFAfromType(alphabet, types);
+        NFA patternNFA = NFAFactory.buildNFAfromType(alphabet, types);
         DFA patternDFA = new DFA(patternNFA);
         Function alphabetFunc = alphabet.generateMatlabFunc(new TypeAlphabetCompareFunc(), funcNamespace, varNamespace);
         Function returnFunc = patternDFA.getMatlabMatchFunction(alphabetFunc, funcNamespace, varNamespace);

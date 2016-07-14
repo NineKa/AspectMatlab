@@ -50,7 +50,7 @@ public class NFAFactory {
         return retNFA;
     }
 
-    public static NFA buildDFAfromType(Alphabet<String> alphabet, List<Name> signature) {
+    public static NFA buildNFAfromType(Alphabet<String> alphabet, List<Name> signature) {
         NFA retNFA = new NFA(alphabet);
         NFAStateAlloc allocator = retNFA.getAllocator();
         for (Name iter : signature) {

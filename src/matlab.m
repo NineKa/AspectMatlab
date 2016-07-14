@@ -1,11 +1,9 @@
-aspect_ myAspect
-    actions
-        a1 : before call(foo() : int[3, ..]) : (name)
-
-        end
-
-        a2 : after call(foo(..[3,3]) : int[2,.., .. ,2]) : ()
-
+function [] = test()
+    for x = 1 : 10
+        %loopname x
+        for y = 1 : 10
+            %code insert here
+             m = 10;
         end
     end
 end

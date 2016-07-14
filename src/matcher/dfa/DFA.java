@@ -1,6 +1,7 @@
 package matcher.dfa;
 
 import ast.*;
+import ast.List;
 import matcher.Alphabet;
 import matcher.nfa.NFA;
 import matcher.nfa.NFANode;
@@ -9,9 +10,7 @@ import util.MergeableCollection;
 import util.MergeableHashSet;
 import util.Namespace;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 
 public class DFA implements Iterable<DFANode>{
     private final String genTrueReturn = "true";
@@ -216,5 +215,21 @@ public class DFA implements Iterable<DFANode>{
         retFunction.addStmt(new ReturnStmt());
 
         return retFunction;
+    }
+
+    public boolean validate(java.util.List validationList) {
+        DFANode statePos = this.entryState;
+        for (Object iter : validationList) {
+            int stateTransferCode = this.alphabet.getLetterCode(iter);
+            statePos = statePos.transfer(stateTransferCode);
+        }
+        if (this.acceptStates.contains(statePos)) return true;
+        return false;
+    }
+
+    public boolean validate(List validationList) {
+        java.util.List transformList = new LinkedList();
+        for (Object iter : validationList) transformList.add(iter);
+        return this.validate(transformList);
     }
 }

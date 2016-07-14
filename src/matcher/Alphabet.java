@@ -3,6 +3,7 @@ package matcher;
 import ast.*;
 import ast.List;
 import natlab.DecIntNumericLiteralValue;
+import util.MergeableCollection;
 import util.Namespace;
 
 import java.util.*;

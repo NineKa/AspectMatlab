@@ -5,6 +5,8 @@ import Matlab.Utils.IReport;
 import Matlab.Utils.Message;
 import Matlab.Utils.Result;
 import abstractPattern.Call;
+import abstractPattern.Loop;
+import abstractPattern.LoopHead;
 import abstractPattern.Operator;
 import ast.*;
 import util.FunctionNamespace;
@@ -15,10 +17,14 @@ import java.util.*;
 public class Main {
     private static java.util.List<Operator> operators = new LinkedList<>();
     private static java.util.List<Call> calls = new LinkedList<>();
+    private static java.util.List<Loop> loops = new LinkedList<>();
+    private static java.util.List<LoopHead> loopHeads = new LinkedList<>();
 
     public static void recFind(ASTNode node) {
         if (node instanceof PatternCall) calls.add(new Call((PatternCall)node));
         if (node instanceof PatternOperator) operators.add(new Operator((PatternOperator)node));
+        if (node instanceof PatternLoop) loops.add(new Loop((PatternLoop)node));
+        if (node instanceof PatternLoopHead) loopHeads.add(new LoopHead((PatternLoopHead)node));
         for (int iter = 0; iter < node.getNumChild(); iter++) {
             recFind(node.getChild(iter));
         }
@@ -53,8 +59,12 @@ public class Main {
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
         recFind(units);
 
-        printReport(calls.get(0).getValidationReport(matlabFilePath));
-        printReport(operators.get(0).getValidationReport(matlabFilePath));
+        //printReport(calls.get(0).getValidationReport(matlabFilePath));
+        //printReport(operators.get(0).getValidationReport(matlabFilePath));
+
+        printReport(loopHeads.get(0).getValidationReport(matlabFilePath));
+        System.out.println(loopHeads.get(0).getLoopNameSignature());
+        System.out.println(loopHeads.get(0).getLoopType());
 
         //System.out.println(op.getType().getID());
 

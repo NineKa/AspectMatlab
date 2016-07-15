@@ -115,6 +115,34 @@ public class Call implements IValidation{
                 retReport.Add(megIter);
             }
         }
+        /* check type patterns */
+        List<String> inTypeList = new LinkedList<>();
+        List<String> outTypeList = new LinkedList<>();
+
+        for (ArgumentSignature iter : this.getInputPramList()) inTypeList.add(iter.getTypeSignature().getID());
+        for (ArgumentSignature iter : this.getOutputPramList()) outTypeList.add(iter.getTypeSignature().getID());
+
+        for (int iter = 0; iter < inTypeList.size() - 1; iter++) {
+            if (inTypeList.get(iter).equals("..") && inTypeList.get(iter + 1).equals("..")) {
+                retReport.AddWarning(
+                        pFilePath,
+                        astNodes.getInput().getFullSignature(iter).getStartLine(),
+                        astNodes.getInput().getFullSignature(iter).getStartColumn(),
+                        "redundant pattern [.., ..], use [..] instead"
+                );
+            }
+        }
+        for (int iter = 0; iter < outTypeList.size() - 1; iter++) {
+            if (outTypeList.get(iter).equals("..") && outTypeList.get(iter).equals("..")) {
+                retReport.AddWarning(
+                        pFilePath,
+                        astNodes.getOutput().getFullSignature(iter).getStartLine(),
+                        astNodes.getOutput().getFullSignature(iter).getStartColumn(),
+                        "redundant pattern [.., ..], use [..] instead"
+                );
+            }
+        }
+
         /* validation on function name */
         if (this.getFunctionName().equals("..")) {
             retReport.AddError(

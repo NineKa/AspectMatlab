@@ -78,7 +78,7 @@ public class ArgumentSignature implements IValidation{
                         pFilePath,
                         signature.getStartLine(),
                         signature.getStartColumn(),
-                        "redundant pattern [.., ..], using [..] instead"
+                        "redundant pattern [.., ..], use [..] instead"
                 );
             }
         }

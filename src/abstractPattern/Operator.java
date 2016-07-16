@@ -4,13 +4,14 @@ import Matlab.Utils.IReport;
 import Matlab.Utils.Message;
 import Matlab.Utils.Report;
 import abstractPattern.types.OperatorType;
+import ast.ASTNode;
 import ast.FullSignature;
 import ast.PatternOperator;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class Operator implements IValidation {
+public class Operator implements IPattern {
     private PatternOperator astNodes = null;
     private OperatorType operatorType;
     private List<ArgumentSignature> signatures = new LinkedList<>();
@@ -66,6 +67,8 @@ public class Operator implements IValidation {
 
         return retReport;
     }
+
+    public Class<? extends ASTNode> getASTNodeClass() { return PatternOperator.class; }
 
     @Override public String toString() {
         return this.operatorType.toString() + this.signatures.toString();

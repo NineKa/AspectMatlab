@@ -8,7 +8,6 @@ import matcher.Alphabet;
 import matcher.DimAlphabetCompareFunc;
 import matcher.TypeAlphabetCompareFunc;
 import matcher.dfa.DFA;
-import matcher.dfa.DFANode;
 import matcher.nfa.NFA;
 import matcher.nfa.NFAFactory;
 import natlab.DecIntNumericLiteralValue;
@@ -17,7 +16,7 @@ import util.Namespace;
 import java.util.*;
 import java.util.List;
 
-public class Call implements IValidation{
+public class Call implements IPattern {
     private final String trueReturn = "true";
     private final String falseReturn = "false";
 
@@ -155,6 +154,8 @@ public class Call implements IValidation{
 
         return retReport;
     }
+
+    public Class<? extends ASTNode> getASTNodeClass(){ return PatternCall.class; }
 
     public Alphabet<Integer> generateDimAlphabet() {
         return this.dimAlphabet;

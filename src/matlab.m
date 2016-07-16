@@ -1,7 +1,7 @@
 aspect_ myAspect
 
 actions
-    a : before loophead(while : iter) : ()
+    a : before get(..) : ()
 
     end
 end

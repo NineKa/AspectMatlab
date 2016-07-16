@@ -3,9 +3,10 @@ package abstractPattern;
 import Matlab.Utils.IReport;
 import Matlab.Utils.Report;
 import abstractPattern.types.LoopType;
+import ast.ASTNode;
 import ast.PatternLoopHead;
 
-public class LoopHead implements IValidation{
+public class LoopHead implements IPattern {
     private PatternLoopHead astNodes = null;
     private LoopType loopType = null;
     private String loopNameSignature = null;
@@ -40,5 +41,15 @@ public class LoopHead implements IValidation{
         }
 
         return retReport;
+    }
+
+    public Class<? extends ASTNode> getASTNodeClass() { return PatternLoopHead.class; }
+
+    @Override public String toString() {
+        return String.format(
+                "LoopHead(%s,%s)",
+                this.getLoopType().toString(),
+                this.getLoopNameSignature()
+        );
     }
 }

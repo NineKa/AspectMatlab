@@ -7,11 +7,7 @@ import ast.List;
 
 import java.util.*;
 
-public class ArgumentSignature implements IValidation{
-    private String path = "";
-    private int line = 0;
-    private int column = 0;
-
+public class ArgumentSignature implements IPattern{
     private FullSignature signature = null;
 
     public ArgumentSignature(FullSignature init) {
@@ -85,6 +81,8 @@ public class ArgumentSignature implements IValidation{
 
         return retReport;
     }
+
+    public Class<? extends ASTNode> getASTNodeClass() { return FullSignature.class; }
 
     @Override public String toString() {
         java.util.List<String> dimensionList = new LinkedList();

@@ -2,7 +2,7 @@ package matcher.dfa;
 
 import ast.*;
 import ast.List;
-import matcher.Alphabet;
+import matcher.alphabet.Alphabet;
 import matcher.nfa.NFA;
 import matcher.nfa.NFANode;
 import natlab.DecIntNumericLiteralValue;

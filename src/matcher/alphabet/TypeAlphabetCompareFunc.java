@@ -1,9 +1,11 @@
-package matcher;
+package matcher.alphabet;
 
 import ast.*;
 
-public class TypeAlphabetCompareFunc extends AbstractAlphabetCompareFunc<String> {
-    public Expr getCompareFunc(Expr pCompareIter, String pCompareTarget) {
+import java.util.function.BiFunction;
+
+public class TypeAlphabetCompareFunc implements BiFunction<Expr, String, Expr>{
+    public Expr apply(Expr pCompareIter, String pCompareTarget) {
         /* isa([pCompareIter], [pCompareTarget]) */
         ParameterizedExpr returnExpr = new ParameterizedExpr();
         returnExpr.setTarget(new NameExpr(new Name("isa")));

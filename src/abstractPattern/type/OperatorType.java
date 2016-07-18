@@ -1,4 +1,4 @@
-package abstractPattern.types;
+package abstractPattern.type;
 
 public enum OperatorType {
     Plus    (2),       /* "+"  */

@@ -1,6 +1,6 @@
 package matcher.nfa;
 
-import matcher.Alphabet;
+import matcher.alphabet.Alphabet;
 
 import java.util.Collection;
 import java.util.HashSet;

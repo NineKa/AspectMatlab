@@ -1,6 +1,6 @@
 package matcher.dfa;
 
-import matcher.Alphabet;
+import matcher.alphabet.Alphabet;
 import matcher.nfa.NFANode;
 
 import java.util.Collection;

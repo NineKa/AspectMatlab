@@ -2,7 +2,7 @@ package matcher.nfa;
 
 import ast.List;
 import ast.Name;
-import matcher.Alphabet;
+import matcher.alphabet.Alphabet;
 
 public class NFAFactory {
     public static NFANode getLastGeneratedNode(NFA nfa) {

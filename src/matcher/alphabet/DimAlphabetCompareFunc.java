@@ -1,12 +1,14 @@
-package matcher;
+package matcher.alphabet;
 
 import ast.EQExpr;
 import ast.Expr;
 import ast.IntLiteralExpr;
 import natlab.DecIntNumericLiteralValue;
 
-public class DimAlphabetCompareFunc extends AbstractAlphabetCompareFunc<Integer>{
-    public Expr getCompareFunc(Expr pCompareIter, Integer pCompareTarget) {
+import java.util.function.BiFunction;
+
+public class DimAlphabetCompareFunc implements BiFunction<Expr, Integer, Expr> {
+    public Expr apply(Expr pCompareIter, Integer pCompareTarget) {
         /* [pCompareIter] == [pCompareTarget] */
         EQExpr returnExpr = new EQExpr();
         returnExpr.setLHS(pCompareIter.treeCopy());

@@ -1,12 +1,13 @@
-package matcher;
+package matcher.alphabet;
 
 import ast.*;
+import ast.Function;
 import ast.List;
 import natlab.DecIntNumericLiteralValue;
-import util.MergeableCollection;
 import util.Namespace;
 
 import java.util.*;
+import java.util.function.*;
 
 public class Alphabet<T> implements Iterable<T>{
     private int stateCounter = 0;
@@ -34,7 +35,7 @@ public class Alphabet<T> implements Iterable<T>{
     public Collection<T> getLetters() { return  this.alphabetTable.keySet(); }
 
     public Function generateMatlabFunc(
-            AbstractAlphabetCompareFunc pComparator,
+            java.util.function.BiFunction<Expr, T, Expr> pComparator,
             Namespace pFuncNamespace,
             Namespace pVarNamespace) {
         Function returnFunction = new Function();
@@ -54,7 +55,7 @@ public class Alphabet<T> implements Iterable<T>{
         Expr compareIterExpr = new NameExpr(new Name(inPramName));
         for (T compareTargetIter : this) {
             int alphabetCode = this.getLetterCode(compareTargetIter);
-            Expr compareExpr = pComparator.getCompareFunc(compareIterExpr.treeCopy(), compareTargetIter);
+            Expr compareExpr = pComparator.apply(compareIterExpr.treeCopy(), compareTargetIter);
             AssignStmt returnAssignmentStmt = new AssignStmt();
             returnAssignmentStmt.setLHS(new NameExpr(new Name(outPramName)));
             returnAssignmentStmt.setRHS(new IntLiteralExpr(new DecIntNumericLiteralValue(Integer.toString(alphabetCode))));

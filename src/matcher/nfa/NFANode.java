@@ -1,6 +1,6 @@
 package matcher.nfa;
 
-import matcher.Alphabet;
+import matcher.alphabet.Alphabet;
 import util.MergeableCollection;
 import util.MergeableHashSet;
 

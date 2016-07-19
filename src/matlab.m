@@ -1,7 +1,7 @@
 aspect_ myAspect
 
 actions
-    a : before call(foo(double[3,3], .., logical[3,..,7,*])) : ()
+    a : before (get(*) & set(*)) & (within(aspect : a) & within(function : b)) : ()
 
     end
 end

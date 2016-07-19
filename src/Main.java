@@ -1,31 +1,60 @@
 import Matlab.Nodes.UnitNode;
 import Matlab.Recognizer.MRecognizer;
 import Matlab.Transformer.NodeToAstTransformer;
+import Matlab.Utils.IReport;
+import Matlab.Utils.Message;
 import Matlab.Utils.Result;
 import abstractPattern.Call;
+import abstractPattern.Execution;
+import abstractPattern.analysis.Analysis;
 import ast.*;
-import matcher.parameter.AutoMatcher;
-import matcher.parameter.EmptyMatcher;
-import matcher.parameter.FullMatcher;
-import matcher.parameter.SimpleMatcher;
-import util.FunctionNamespace;
-import util.VarNamespace;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.*;
 
 public class Main {
-    public static Collection<Call> calls = new HashSet<>();
+    public static java.util.List<Call> calls = new LinkedList<>();
+    public static java.util.List<Execution> executions = new LinkedList<>();
 
     public static void recFind(ASTNode node) {
         if (node instanceof PatternCall) calls.add(new Call((PatternCall)node));
+        if (node instanceof PatternExecution) executions.add(new Execution((PatternExecution)node));
         for (int iter = 0; iter < node.getNumChild(); iter++) recFind(node.getChild(iter));
+    }
+    public static void printReport(IReport report) {
+        for (Message message : report) {
+            System.out.println(String.format(
+                    "[%s][%d:%d]%s",
+                    message.GetSeverity().toString(),
+                    message.GetLine(),
+                    message.GetColumn(),
+                    message.GetText()
+            ));
+        }
+    }
+    public static void recPrintValidationReport(String pFilepath) {
+        for (Call call : calls) {
+            System.out.println(call);
+            printReport(call.getValidationReport(pFilepath));
+        }
+        for (Execution execution : executions) {
+            System.out.println(execution);
+            printReport(execution.getValidationReport(pFilepath));
+        }
+    }
+    public static void recPrintStructure(ASTNode node, int indent) {
+        for (int iter = 0; iter < indent; iter++) System.out.print('\t');
+        System.out.println(String.format(
+                "[%d : %d] %s",
+                node.getStartLine(),
+                node.getStartColumn(),
+                node.getClass().getName()
+        ));
+        for (int iter = 0; iter < node.getNumChild(); iter++) {
+            recPrintStructure(node.getChild(iter), indent + 1);
+        }
     }
 
     public static void main(String argv[]) {
-        String k[] = new String[0];
-
         String matlabFilePath = "/Users/k9/Documents/AspectMatlab/src/matlab.m";
         Result<UnitNode> result = MRecognizer.RecognizeFile(
                 matlabFilePath,
@@ -34,19 +63,16 @@ public class Main {
         );
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
-        recFind(units);
 
-        for (Call iter : calls) System.out.println(iter.toString());
+        AspectDef def = (AspectDef)units.getProgram(0);
+        Actions actions = def.getActions().getChild(0);
+        Action action = actions.getAction(0);
+        Expr pattern = action.getExpr();
 
-        for (Call iter : calls) {
-            AutoMatcher matcher = new AutoMatcher(
-                    iter.getInputSignatures(),
-                    new FunctionNamespace(),
-                    new VarNamespace()
-            );
-            Function func = matcher.getFunction();
-            func.setName(new Name("AspectMatlabMatcher"));
-            System.out.println(func.getPrettyPrinted());
-        }
+        Analysis analysis = new Analysis(pattern);
+        System.out.println(analysis.getResult(pattern));
+
+        //recPrintValidationReport(matlabFilePath);
+        recPrintStructure(units, 0);
     }
 }

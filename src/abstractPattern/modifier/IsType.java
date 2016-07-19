@@ -1,0 +1,47 @@
+package abstractPattern.modifier;
+
+import Matlab.Utils.IReport;
+import abstractPattern.Modifier;
+import abstractPattern.utility.SignatureType;
+import ast.ASTNode;
+import ast.PatternIsType;
+
+public class IsType extends Modifier {
+    private PatternIsType astNodes = null;
+
+    private SignatureType signature = null;
+
+    public IsType(PatternIsType isType) {
+        this.astNodes = isType;
+
+        assert this.astNodes.getTypeSignature() != null;
+        this.signature = new SignatureType(this.astNodes.getTypeSignature());
+    }
+
+    public SignatureType getSignature() {
+        return signature;
+    }
+
+    @Override
+    public boolean isValid() {
+        return this.signature.isValid();
+    }
+
+    @Override
+    public IReport getValidationReport(String pFilepath) {
+        return this.signature.getValidationReport(pFilepath);
+    }
+
+    @Override
+    public Class<? extends ASTNode> getASTPatternClass() {
+        return PatternIsType.class;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "istype(%s)",
+                this.signature.toString()
+        );
+    }
+}

@@ -9,75 +9,77 @@ import ast.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Call extends Primitive{
-    private PatternCall astNodes = null;
+public class Execution extends Primitive{
+    private PatternExecution astNodes = null;
 
     private List<Signature> inputSignatures = new LinkedList<>();
     private List<Signature> outputSignatures = new LinkedList<>();
     private String functionName = null;
 
-    public Call(PatternCall call) {
-        this.astNodes = call;
-        // --- refactor ---
-        assert(this.astNodes.getIdentifier() != null);
+    public Execution(PatternExecution execution) {
+        this.astNodes = execution;
+        /* --- refactor --- */
+        assert this.astNodes.getIdentifier() != null;
         if (this.astNodes.getInput() == null) this.astNodes.setInput(new Input(new ast.List<FullSignature>()));
         if (this.astNodes.getOutput() == null) this.astNodes.setOutput(new Output(new ast.List<FullSignature>()));
-        // ----------------
-
+        /* ---------------- */
         for (int iter = 0; iter < this.astNodes.getInput().getNumFullSignature(); iter++) {
-            inputSignatures.add(new Signature(this.astNodes.getInput().getFullSignature(iter)));
+            this.inputSignatures.add(new Signature(this.astNodes.getInput().getFullSignature(iter)));
         }
         for (int iter = 0; iter < this.astNodes.getOutput().getNumFullSignature(); iter++) {
-            outputSignatures.add(new Signature(this.astNodes.getOutput().getFullSignature(iter)));
+            this.outputSignatures.add(new Signature(this.astNodes.getOutput().getFullSignature(iter)));
         }
         this.functionName = this.astNodes.getIdentifier().getID();
     }
 
     public List<Signature> getInputSignatures() {
-        return this.inputSignatures;
+        return inputSignatures;
     }
 
     public List<Signature> getOutputSignatures() {
-        return this.outputSignatures;
+        return outputSignatures;
     }
 
     public String getFunctionName() {
-        return this.functionName;
-    }
-
-    @Override
-    public boolean isValid() {
-        /* recursively check input prams */
-        for (Signature iter : inputSignatures) if (!iter.isValid()) return false;
-        /* recursively check output prams */
-        for (Signature iter : outputSignatures) if (!iter.isValid()) return false;
-        if (this.functionName.equals("..")) return false;
-        return true;
+        return functionName;
     }
 
     @Override
     public IReport getValidationReport(String pFilepath) {
         Report retReport = new Report();
-        for (Signature iter : inputSignatures) {
-            for (Message message : iter.getValidationReport(pFilepath)) retReport.Add(message);
+        for (Signature signature : this.inputSignatures) {
+            for (Message message : signature.getValidationReport(pFilepath)) {
+                retReport.Add(message);
+            }
         }
-
-        for (Signature iter : outputSignatures) {
-            for (Message message : iter.getValidationReport(pFilepath)) retReport.Add(message);
+        for (Signature signature : this.outputSignatures) {
+            for (Message message : signature.getValidationReport(pFilepath)) {
+                retReport.Add(message);
+            }
         }
-        if (this.functionName.equals("..")) retReport.AddError(
-                pFilepath,
-                this.astNodes.getIdentifier().getStartLine(),
-                this.astNodes.getIdentifier().getStartColumn(),
-                "wildcard [..] is not a valid matcher in call signature for function name, use [*] instead"
-        );
-
+        if (this.functionName.equals("..")) {
+            retReport.AddError(
+                    pFilepath,
+                    this.astNodes.getIdentifier().getStartLine(),
+                    this.astNodes.getIdentifier().getStartColumn(),
+                    "wildcard [..] is not a valid matcher in execution signature for function name, use [*] instead"
+            );
+        }
         return retReport;
     }
 
     @Override
+    public boolean isValid() {
+        for (Signature signature : this.inputSignatures) if (!signature.isValid()) return false;
+        for (Signature signature : this.outputSignatures) if (!signature.isValid()) return false;
+        if (this.functionName.equals("..")) return false;
+
+        return true;
+    }
+
+    @Override
     public Class<? extends ASTNode> getASTPatternClass() {
-        return PatternCall.class;
+        return PatternExecution.class;
     }
 
     @Override
@@ -93,9 +95,9 @@ public class Call extends Primitive{
             outputPramString = outputPramString + ((iter + 1< this.outputSignatures.size())?", ":"");
         }
         if (this.outputSignatures.isEmpty()) {
-            return String.format("call(%s(%s))", this.functionName, inputPramString);
+            return String.format("execution(%s(%s))", this.functionName, inputPramString);
         } else {
-            return String.format("call(%s(%s):%s)", this.functionName, inputPramString, outputPramString);
+            return String.format("execution(%s(%s):%s)", this.functionName, inputPramString, outputPramString);
         }
     }
 }

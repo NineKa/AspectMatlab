@@ -2,7 +2,8 @@ package abstractPattern.type;
 
 public enum LoopType {
     While ("While"),
-    For   ("For");
+    For   ("For"),
+    Any   ("*");
 
     private String loopNameString = "";
 
@@ -11,6 +12,7 @@ public enum LoopType {
     public static LoopType fromString(String loopString) {
         if (loopString.equals("while")) return While;
         if (loopString.equals("for")) return For;
+        if (loopString.equals("*")) return Any;
         throw new RuntimeException();
     }
 

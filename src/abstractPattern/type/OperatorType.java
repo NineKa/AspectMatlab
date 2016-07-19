@@ -11,7 +11,7 @@ public enum OperatorType {
     lDivide (2),       /* ".\" */
     mPower  (2),       /* "^"  */
     Power   (2),       /* ".^" */
-    Transpose(1)       /* ".'"  */;
+    Transpose(1)       /* ".'" */;
 
     private int maxArgs = 0;
 

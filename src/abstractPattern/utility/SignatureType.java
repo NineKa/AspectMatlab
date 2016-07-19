@@ -45,13 +45,6 @@ public class SignatureType extends Pattern {
     @Override
     public IReport getValidationReport(String pFilepath) {
         Report retReport = new Report();
-        if (signatureType.equals("..")) retReport.AddError(
-                pFilepath,
-                this.astNodes.getStartLine(),
-                this.astNodes.getStartColumn(),
-                "wildcard [..] is not a valid matcher in type signature, use [*] instead"
-        );
-
         return retReport;
     }
 

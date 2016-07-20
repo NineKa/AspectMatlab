@@ -4,6 +4,7 @@ import Matlab.Transformer.NodeToAstTransformer;
 import Matlab.Utils.IReport;
 import Matlab.Utils.Message;
 import Matlab.Utils.Result;
+import abstractPattern.primitive.Annotate;
 import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
 import abstractPattern.Modifier;
@@ -73,7 +74,7 @@ public class Main {
         Action action = actions.getAction(0);
         Expr pattern = action.getExpr();
 
-        try {
+        /*try {
             Analysis analysis = new Analysis(matlabFilePath, pattern);
             System.out.println(analysis.getResult());
             if (analysis.getResult() == PatternType.Modifier) {
@@ -82,7 +83,7 @@ public class Main {
             }
         } catch (Backtrace backtrace) {
             System.out.println(backtrace.toString());
-        }
+        }*/
 
         // recPrintValidationReport(matlabFilePath);
         // recPrintStructure(units, 0);

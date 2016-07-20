@@ -1,7 +1,7 @@
 aspect_ myAspect
 
 actions
-    a : before op(+) : ()
+    a : before mainexecution() : ()
 
     end
 end

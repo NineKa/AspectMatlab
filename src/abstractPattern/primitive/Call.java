@@ -1,15 +1,16 @@
-package abstractPattern;
+package abstractPattern.primitive;
 
 import Matlab.Utils.IReport;
 import Matlab.Utils.Message;
 import Matlab.Utils.Report;
+import abstractPattern.Primitive;
 import abstractPattern.utility.Signature;
 import ast.*;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class Call extends Primitive{
+public class Call extends Primitive {
     private PatternCall astNodes = null;
 
     private List<Signature> inputSignatures = new LinkedList<>();

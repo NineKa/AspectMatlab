@@ -8,6 +8,9 @@ import abstractPattern.analysis.PatternClassifier;
 import ast.ASTNode;
 import ast.AndExpr;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 public class ModifierAnd extends Modifier{
     private AndExpr astNodes = null;
 
@@ -26,6 +29,14 @@ public class ModifierAnd extends Modifier{
 
     public Modifier getRHS() {
         return rhs;
+    }
+
+    @Override
+    public Collection<Modifier> getAllModfiierSet() {
+        Collection<Modifier> collection = new HashSet<>();
+        collection.addAll(this.lhs.getAllModfiierSet());
+        collection.addAll(this.rhs.getAllModfiierSet());
+        return collection;
     }
 
     @Override

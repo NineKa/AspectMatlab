@@ -8,6 +8,9 @@ import abstractPattern.analysis.PatternClassifier;
 import ast.ASTNode;
 import ast.OrExpr;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 public class ModifierOr extends Modifier{
     private OrExpr astNodes = null;
 
@@ -18,6 +21,14 @@ public class ModifierOr extends Modifier{
         this.astNodes = orExpr;
         this.lhs = PatternClassifier.buildModifier(orExpr.getLHS());
         this.rhs = PatternClassifier.buildModifier(orExpr.getRHS());
+    }
+
+    @Override
+    public Collection<Modifier> getAllModfiierSet() {
+        Collection<Modifier> collection = new HashSet<>();
+        collection.addAll(this.lhs.getAllModfiierSet());
+        collection.addAll(this.rhs.getAllModfiierSet());
+        return collection;
     }
 
     public Modifier getLHS() {

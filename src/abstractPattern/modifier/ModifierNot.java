@@ -6,6 +6,8 @@ import abstractPattern.analysis.PatternClassifier;
 import ast.ASTNode;
 import ast.NotExpr;
 
+import java.util.Collection;
+
 public class ModifierNot extends Modifier{
     private NotExpr astNodes = null;
 
@@ -18,6 +20,11 @@ public class ModifierNot extends Modifier{
 
     public Modifier getOperand() {
         return operand;
+    }
+
+    @Override
+    public Collection<Modifier> getAllModfiierSet() {
+        return this.operand.getAllModfiierSet();
     }
 
     @Override

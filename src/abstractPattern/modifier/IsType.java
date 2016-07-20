@@ -6,6 +6,9 @@ import abstractPattern.utility.SignatureType;
 import ast.ASTNode;
 import ast.PatternIsType;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 public class IsType extends Modifier {
     private PatternIsType astNodes = null;
 
@@ -20,6 +23,13 @@ public class IsType extends Modifier {
 
     public SignatureType getSignature() {
         return signature;
+    }
+
+    @Override
+    public Collection<Modifier> getAllModfiierSet() {
+        Collection<Modifier> collection = new HashSet<>();
+        collection.add(this);
+        return collection;
     }
 
     @Override

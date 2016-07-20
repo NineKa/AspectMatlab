@@ -6,6 +6,10 @@ import abstractPattern.utility.SignatureDimension;
 import ast.ASTNode;
 import ast.PatternDimension;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+
 public class Dimension extends Modifier {
     private PatternDimension astNodes = null;
 
@@ -16,6 +20,13 @@ public class Dimension extends Modifier {
 
         assert this.astNodes.getDimensionSignature() != null;
         this.signature = new SignatureDimension(this.astNodes.getDimensionSignature());
+    }
+
+    @Override
+    public Collection<Modifier> getAllModfiierSet() {
+        Collection<Modifier> collection = new HashSet<>();
+        collection.add(this);
+        return collection;
     }
 
     @Override

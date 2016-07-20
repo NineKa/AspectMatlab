@@ -7,6 +7,9 @@ import abstractPattern.type.ScopeType;
 import ast.ASTNode;
 import ast.PatternWithin;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 public class Within extends Modifier {
     private PatternWithin astNodes = null;
 
@@ -27,6 +30,13 @@ public class Within extends Modifier {
 
     public String getIdentifier() {
         return identifier;
+    }
+
+    @Override
+    public Collection<Modifier> getAllModfiierSet() {
+        Collection<Modifier> collection = new HashSet<>();
+        collection.add(this);
+        return collection;
     }
 
     @Override

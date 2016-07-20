@@ -93,10 +93,21 @@ public class Call extends Primitive {
             outputPramString = outputPramString + this.outputSignatures.get(iter).toString();
             outputPramString = outputPramString + ((iter + 1< this.outputSignatures.size())?", ":"");
         }
+        String callStr = "";
         if (this.outputSignatures.isEmpty()) {
-            return String.format("call(%s(%s))", this.functionName, inputPramString);
+            callStr =  String.format("call(%s(%s))", this.functionName, inputPramString);
         } else {
-            return String.format("call(%s(%s):%s)", this.functionName, inputPramString, outputPramString);
+            callStr =  String.format("call(%s(%s):%s)", this.functionName, inputPramString, outputPramString);
+        }
+        if (this.isModified()) {
+            String appendingStr = "";
+            for (int iter = 0; iter < this.getModifiers().size(); iter++) {
+                appendingStr = appendingStr + this.getModifiers().get(iter);
+                if (iter + 1 < this.getModifiers().size()) appendingStr = appendingStr + " & ";
+            }
+            return String.format("(%s & %s)", callStr, appendingStr);
+        } else {
+            return callStr;
         }
     }
 }

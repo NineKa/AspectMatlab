@@ -10,6 +10,7 @@ import ast.ASTNode;
 import ast.FullSignature;
 import ast.PatternOperator;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class Operator extends Primitive{
@@ -25,6 +26,7 @@ public class Operator extends Primitive{
         if (this.astNodes.getFullSignatureList() == null) this.astNodes.setFullSignatureList(new ast.List<>());
         /* ---------------- */
         this.operatorType = OperatorType.fromString(this.astNodes.getType().getID());
+        this.operands = new LinkedList<>();
         for (int iter = 0; iter < this.astNodes.getFullSignatureList().getNumChild(); iter++) {
             FullSignature fullSignature = this.astNodes.getFullSignature(iter);
             this.operands.add(new Signature(fullSignature));
@@ -87,10 +89,16 @@ public class Operator extends Primitive{
                 operandStr = operandStr + ", ";
             }
         }
-        return String.format(
-                "op(%s : %s)",
-                this.operatorType.toString(),
-                operandStr
-        );
+        String operatorStr = String.format("op(%s : %s)", this.operatorType.toString(), operandStr);
+        if (this.isModified()) {
+            String appendingStr = "";
+            for (int iter = 0; iter < this.getModifiers().size(); iter++) {
+                appendingStr = appendingStr + this.getModifiers().get(iter);
+                if (iter + 1 < this.getModifiers().size()) appendingStr = appendingStr + " & ";
+            }
+            return String.format("(%s & %s)", operatorStr, appendingStr);
+        } else {
+            return operatorStr;
+        }
     }
 }

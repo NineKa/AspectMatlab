@@ -4,6 +4,8 @@ import Matlab.Transformer.NodeToAstTransformer;
 import Matlab.Utils.IReport;
 import Matlab.Utils.Message;
 import Matlab.Utils.Result;
+import abstractPattern.Builder;
+import abstractPattern.Primitive;
 import abstractPattern.primitive.Annotate;
 import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
@@ -73,6 +75,9 @@ public class Main {
         Actions actions = def.getActions().getChild(0);
         Action action = actions.getAction(0);
         Expr pattern = action.getExpr();
+
+        Builder builder = new Builder(matlabFilePath, pattern);
+        System.out.println(builder.getPattern());
 
         /*try {
             Analysis analysis = new Analysis(matlabFilePath, pattern);

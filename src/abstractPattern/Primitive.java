@@ -3,10 +3,11 @@ package abstractPattern;
 import abstractPattern.modifier.ModifierAnd;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class Primitive extends Pattern{
-    private Collection<Modifier> modifiers = new HashSet<>();
+    private List<Modifier> modifiers = new LinkedList<>();
 
     public void addModifier(Modifier modifier) {
         if (modifier instanceof ModifierAnd) {
@@ -21,7 +22,7 @@ public abstract class Primitive extends Pattern{
         return !this.modifiers.isEmpty();
     }
 
-    public Collection<Modifier> getModifiers(){
+    public List<Modifier> getModifiers(){
         return this.modifiers;
     }
 }

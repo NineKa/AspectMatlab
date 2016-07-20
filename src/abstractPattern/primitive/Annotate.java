@@ -125,10 +125,15 @@ public class Annotate extends Primitive {
             }
             if (listIter + 1 < this.signature.size()) annotationStr = annotationStr + ", ";
         }
-        return String.format(
-                "annotate(%s(%s))",
-                this.annotateName,
-                annotationStr
-        );
+        if (this.isModified()) {
+            String appendingStr = "";
+            for (int iter = 0; iter < this.getModifiers().size(); iter++) {
+                appendingStr = appendingStr + this.getModifiers().get(iter);
+                if (iter + 1 < this.getModifiers().size()) appendingStr = appendingStr + " & ";
+            }
+            return String.format("(annotate(%s(%s)) & %s)", this.annotateName, annotationStr, appendingStr);
+        } else {
+            return String.format("annotate(%s(%s))", this.annotateName, annotationStr);
+        }
     }
 }

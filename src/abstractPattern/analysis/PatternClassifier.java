@@ -75,11 +75,18 @@ public class PatternClassifier {
         throw new RuntimeException();
     }
 
-    public static Primitive buildPrimitive(Expr expr) {
+    public static Primitive buildBasicPrimitive(Expr expr) {
+        if (expr instanceof PatternAnnotate) return new Annotate((PatternAnnotate)expr);
         if (expr instanceof PatternCall) return new Call((PatternCall)expr);
         if (expr instanceof PatternExecution) return new Execution((PatternExecution)expr);
         if (expr instanceof PatternGet) return new Get((PatternGet)expr);
-        //TODO
+        if (expr instanceof PatternLoop) return new Loop((PatternLoop)expr);
+        if (expr instanceof PatternLoopBody) return new LoopBody((PatternLoopBody)expr);
+        if (expr instanceof PatternLoopHead) return new LoopHead((PatternLoopHead)expr);
+        if (expr instanceof PatternMainExecution) return new MainExecution((PatternMainExecution)expr);
+        if (expr instanceof PatternOperator) return new Operator((PatternOperator)expr);
+        if (expr instanceof PatternSet) return new Set((PatternSet)expr);
+
         throw new RuntimeException();
     }
 }

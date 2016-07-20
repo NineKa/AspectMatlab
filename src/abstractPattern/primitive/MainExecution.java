@@ -30,6 +30,16 @@ public class MainExecution extends Primitive{
 
     @Override
     public String toString() {
-        return "mainexecution()";
+        String mainexecutonStr = "mainexecution()";
+        if (this.isModified()) {
+            String appendingStr = "";
+            for (int iter = 0; iter < this.getModifiers().size(); iter++) {
+                appendingStr = appendingStr + this.getModifiers().get(iter);
+                if (iter + 1 < this.getModifiers().size()) appendingStr = appendingStr + " & ";
+            }
+            return String.format("(%s & %s)", mainexecutonStr, appendingStr);
+        } else {
+            return mainexecutonStr;
+        }
     }
 }

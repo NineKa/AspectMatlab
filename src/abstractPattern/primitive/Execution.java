@@ -95,10 +95,21 @@ public class Execution extends Primitive {
             outputPramString = outputPramString + this.outputSignatures.get(iter).toString();
             outputPramString = outputPramString + ((iter + 1< this.outputSignatures.size())?", ":"");
         }
+        String executinStr;
         if (this.outputSignatures.isEmpty()) {
-            return String.format("execution(%s(%s))", this.functionName, inputPramString);
+            executinStr = String.format("execution(%s(%s))", this.functionName, inputPramString);
         } else {
-            return String.format("execution(%s(%s):%s)", this.functionName, inputPramString, outputPramString);
+            executinStr = String.format("execution(%s(%s):%s)", this.functionName, inputPramString, outputPramString);
+        }
+        if (this.isModified()) {
+            String appendingStr = "";
+            for (int iter = 0; iter < this.getModifiers().size(); iter++) {
+                appendingStr = appendingStr + this.getModifiers().get(iter);
+                if (iter + 1 < this.getModifiers().size()) appendingStr = appendingStr + " & ";
+            }
+            return String.format("(%s & %s)", executinStr, appendingStr);
+        } else {
+            return executinStr;
         }
     }
 }

@@ -37,7 +37,7 @@ public enum OperatorType {
 
     @Override public String toString() {
         switch (this) {
-            case Plus:     return "*";
+            case Plus:     return "+";
             case Minus:    return "-";
             case mTimes:   return "*";
             case Times:    return ".*";

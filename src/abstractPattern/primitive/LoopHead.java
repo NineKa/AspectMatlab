@@ -59,10 +59,16 @@ public class LoopHead extends Primitive{
 
     @Override
     public String toString() {
-        return String.format(
-                "loophead(%s : %s)",
-                this.loopType.toString(),
-                this.loopName
-        );
+        String loopheadStr = String.format("loophead(%s : %s)", this.loopType.toString(), this.loopName);
+        if (this.isModified()) {
+            String appendingStr = "";
+            for (int iter = 0; iter < this.getModifiers().size(); iter++) {
+                appendingStr = appendingStr + this.getModifiers().get(iter);
+                if (iter + 1 < this.getModifiers().size()) appendingStr = appendingStr + " & ";
+            }
+            return String.format("(%s & %s)", loopheadStr, appendingStr);
+        } else {
+            return loopheadStr;
+        }
     }
 }

@@ -63,10 +63,16 @@ public class Get extends Primitive{
 
     @Override
     public String toString() {
-        return String.format(
-                "get(%s : %s)",
-                this.variableName,
-                this.signature.toString()
-        );
+        String getStr =  String.format("get(%s : %s)", this.variableName, this.signature.toString());
+        if (this.isModified()) {
+            String appendingStr = "";
+            for (int iter = 0; iter < this.getModifiers().size(); iter++) {
+                appendingStr = appendingStr + this.getModifiers().get(iter);
+                if (iter + 1 < this.getModifiers().size()) appendingStr = appendingStr + " & ";
+            }
+            return String.format("(%s & %s)", getStr, appendingStr);
+        } else {
+            return getStr;
+        }
     }
 }

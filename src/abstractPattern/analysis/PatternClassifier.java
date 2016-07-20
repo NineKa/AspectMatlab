@@ -1,5 +1,7 @@
 package abstractPattern.analysis;
 
+import abstractPattern.Modifier;
+import abstractPattern.modifier.*;
 import ast.*;
 
 public class PatternClassifier {
@@ -45,6 +47,7 @@ public class PatternClassifier {
         if (expr instanceof PatternWithin)        return true;
         if (expr instanceof PatternIsType)        return true;
         if (expr instanceof PatternDimension)     return true;
+
         if (expr instanceof PatternCall)          return true;
         if (expr instanceof PatternExecution)     return true;
         if (expr instanceof PatternLoop)          return true;
@@ -57,5 +60,16 @@ public class PatternClassifier {
         if (expr instanceof PatternMainExecution) return true;
 
         return false;
+    }
+
+    public static Modifier buildModifier(Expr expr) {
+        if (expr instanceof PatternIsType) return new IsType((PatternIsType)expr);
+        if (expr instanceof PatternDimension) return new Dimension((PatternDimension)expr);
+        if (expr instanceof PatternWithin) return new Within((PatternWithin)expr);
+        if (expr instanceof AndExpr) return new ModifierAnd((AndExpr)expr);
+        if (expr instanceof OrExpr) return new ModifierOr((OrExpr)expr);
+        if (expr instanceof NotExpr) return new ModifierNot((NotExpr)expr);
+        /* control flow should not reach here */
+        throw new RuntimeException();
     }
 }

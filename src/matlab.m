@@ -1,7 +1,7 @@
 aspect_ myAspect
 
 actions
-    a : before (get(*) & set(*)) & (within(aspect : a) & within(function : b)) : ()
+    a : before ~(within(function : foo) & istype(double)) | get(x) : ()
 
     end
 end

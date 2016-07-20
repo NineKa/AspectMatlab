@@ -6,7 +6,11 @@ import Matlab.Utils.Message;
 import Matlab.Utils.Result;
 import abstractPattern.Call;
 import abstractPattern.Execution;
+import abstractPattern.Modifier;
 import abstractPattern.analysis.Analysis;
+import abstractPattern.analysis.Backtrace;
+import abstractPattern.analysis.PatternClassifier;
+import abstractPattern.analysis.PatternType;
 import ast.*;
 
 import java.util.*;
@@ -69,10 +73,18 @@ public class Main {
         Action action = actions.getAction(0);
         Expr pattern = action.getExpr();
 
-        Analysis analysis = new Analysis(pattern);
-        System.out.println(analysis.getResult(pattern));
+        try {
+            Analysis analysis = new Analysis(matlabFilePath, pattern);
+            System.out.println(analysis.getResult());
+            if (analysis.getResult() == PatternType.Modifier) {
+                Modifier modifier = PatternClassifier.buildModifier(pattern);
+                System.out.println(modifier);
+            }
+        } catch (Backtrace backtrace) {
+            System.out.println(backtrace.toString());
+        }
 
-        //recPrintValidationReport(matlabFilePath);
-        recPrintStructure(units, 0);
+        // recPrintValidationReport(matlabFilePath);
+        // recPrintStructure(units, 0);
     }
 }

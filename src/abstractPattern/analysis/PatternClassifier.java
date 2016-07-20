@@ -1,7 +1,9 @@
 package abstractPattern.analysis;
 
 import abstractPattern.Modifier;
+import abstractPattern.Primitive;
 import abstractPattern.modifier.*;
+import abstractPattern.primitive.*;
 import ast.*;
 
 public class PatternClassifier {
@@ -70,6 +72,14 @@ public class PatternClassifier {
         if (expr instanceof OrExpr) return new ModifierOr((OrExpr)expr);
         if (expr instanceof NotExpr) return new ModifierNot((NotExpr)expr);
         /* control flow should not reach here */
+        throw new RuntimeException();
+    }
+
+    public static Primitive buildPrimitive(Expr expr) {
+        if (expr instanceof PatternCall) return new Call((PatternCall)expr);
+        if (expr instanceof PatternExecution) return new Execution((PatternExecution)expr);
+        if (expr instanceof PatternGet) return new Get((PatternGet)expr);
+        //TODO
         throw new RuntimeException();
     }
 }

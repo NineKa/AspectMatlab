@@ -37,17 +37,17 @@ public enum OperatorType {
 
     @Override public String toString() {
         switch (this) {
-            case Plus:     return "Plus(*)";
-            case Minus:    return "Minus(-)";
-            case mTimes:   return "Matrix Multiplication(*)";
-            case Times:    return "Multiplication(.*)";
-            case mrDivide: return "Matrix Right Division(/)";
-            case rDivide:  return "Right Division(./)";
-            case mlDivide: return "Matrix Left Division(\\)";
-            case lDivide:  return "Left Division(.\\)";
-            case mPower:   return "Matrix Power(^)";
-            case Power:    return "Power(.^)";
-            case Transpose:return "Transpose(.')";
+            case Plus:     return "*";
+            case Minus:    return "-";
+            case mTimes:   return "*";
+            case Times:    return ".*";
+            case mrDivide: return "/";
+            case rDivide:  return "./";
+            case mlDivide: return "\\";
+            case lDivide:  return ".\\";
+            case mPower:   return "^";
+            case Power:    return ".^";
+            case Transpose:return ".'";
             default:       throw new RuntimeException();
         }
     }

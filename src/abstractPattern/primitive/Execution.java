@@ -63,7 +63,7 @@ public class Execution extends Primitive {
                     pFilepath,
                     this.astNodes.getIdentifier().getStartLine(),
                     this.astNodes.getIdentifier().getStartColumn(),
-                    "wildcard [..] is not a valid matcher in execution signature for function name, use [*] instead"
+                    "wildcard [..] is not a valid matcher in execution pattern for function name, use [*] instead"
             );
         }
         return retReport;

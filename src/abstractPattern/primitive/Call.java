@@ -70,7 +70,7 @@ public class Call extends Primitive {
                 pFilepath,
                 this.astNodes.getIdentifier().getStartLine(),
                 this.astNodes.getIdentifier().getStartColumn(),
-                "wildcard [..] is not a valid matcher in call signature for function name, use [*] instead"
+                "wildcard [..] is not a valid matcher in call pattern for function name, use [*] instead"
         );
 
         return retReport;

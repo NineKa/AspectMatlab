@@ -2,7 +2,6 @@ package abstractPattern;
 
 import abstractPattern.modifier.ModifierAnd;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 

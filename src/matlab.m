@@ -1,7 +1,11 @@
 aspect_ myAspect
 
+patterns
+    pCallFoo : call(foo()) & within(loop : *)
+end
+
 actions
-    a : before (get(x) | set(x)) & (istype(type) & dimension([3,3])) & within(function : foo) : ()
+    a : before pCallFoo | execution(foo()) : ()
 
     end
 end

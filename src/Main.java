@@ -4,16 +4,9 @@ import Matlab.Transformer.NodeToAstTransformer;
 import Matlab.Utils.IReport;
 import Matlab.Utils.Message;
 import Matlab.Utils.Result;
-import abstractPattern.Builder;
-import abstractPattern.Primitive;
-import abstractPattern.primitive.Annotate;
+import abstractPattern.AbstractBuilder;
 import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
-import abstractPattern.Modifier;
-import abstractPattern.analysis.Analysis;
-import abstractPattern.analysis.Backtrace;
-import abstractPattern.analysis.PatternClassifier;
-import abstractPattern.analysis.PatternType;
 import ast.*;
 
 import java.util.*;
@@ -71,13 +64,28 @@ public class Main {
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
 
+        // recPrintStructure(units, 0);
+
         AspectDef def = (AspectDef)units.getProgram(0);
         Actions actions = def.getActions().getChild(0);
+        Map<String, Expr> definedMap = new HashMap<>();
+        for (Pattern pattern : def.getPatternList().getChild(0).getPatternList()) {
+            definedMap.put(pattern.getName(), pattern.getExpr());
+        }
         Action action = actions.getAction(0);
         Expr pattern = action.getExpr();
 
-        Builder builder = new Builder(matlabFilePath, pattern);
-        System.out.println(builder.getPattern());
+        AbstractBuilder abstractBuilder = new AbstractBuilder(matlabFilePath, pattern, definedMap);
+        System.out.println(abstractBuilder.getPattern());
+        for (Message message : abstractBuilder.getReport()) {
+            System.out.println(String.format(
+                    "[%s][%d : %d] %s",
+                    message.GetSeverity(),
+                    message.GetLine(),
+                    message.GetColumn(),
+                    message.GetText()
+            ));
+        }
 
         /*try {
             Analysis analysis = new Analysis(matlabFilePath, pattern);
@@ -91,6 +99,6 @@ public class Main {
         }*/
 
         // recPrintValidationReport(matlabFilePath);
-        // recPrintStructure(units, 0);
+
     }
 }

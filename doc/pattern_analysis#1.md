@@ -18,6 +18,7 @@ Unlike primitive patterns, modifier patterns do not provide joint points for act
  - Scope pattern *(restrict the scope of pattern searching)*
 ### Compound Patterns
 AspectMATLAB compiler further allow us to use *And(&)*, *Or(|)* and *Not(~)* operation to construct much more complex pattern. We define the type of the compound patterns as follows:
+
 | And               | primitive pattern | modifier pattern  |
 |-------------------|-------------------|-------------------|
 | primitive pattern | primitive pattern | primitive pattern |

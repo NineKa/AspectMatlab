@@ -112,4 +112,19 @@ public class Execution extends Primitive {
             return executinStr;
         }
     }
+
+    @Override
+    public ASTNode getASTExpr() {
+        return this.astNodes;
+    }
+
+    @Override
+    public boolean isProperlyModified() {   // TODO
+        return false;
+    }
+
+    @Override
+    public IReport getModifierValidationReport(String pFilepath) {  // TODO
+        return null;
+    }
 }

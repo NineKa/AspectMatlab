@@ -57,4 +57,9 @@ public class SignatureType extends Pattern {
     public String toString() {
         return this.signatureType;
     }
+
+    @Override
+    public ASTNode getASTExpr() {
+        return astNodes;
+    }
 }

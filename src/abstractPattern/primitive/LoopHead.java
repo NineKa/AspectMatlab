@@ -71,4 +71,19 @@ public class LoopHead extends Primitive{
             return loopheadStr;
         }
     }
+
+    @Override
+    public ASTNode getASTExpr() {
+        return this.astNodes;
+    }
+
+    @Override
+    public boolean isProperlyModified() {   // TODO
+        return false;
+    }
+
+    @Override
+    public IReport getModifierValidationReport(String pFilepath) {  // TODO
+        return null;
+    }
 }

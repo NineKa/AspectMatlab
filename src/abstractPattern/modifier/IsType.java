@@ -33,6 +33,11 @@ public class IsType extends Modifier {
     }
 
     @Override
+    public ASTNode getASTExpr() {
+        return this.astNodes;
+    }
+
+    @Override
     public boolean isValid() {
         return this.signature.isValid();
     }

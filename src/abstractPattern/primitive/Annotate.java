@@ -2,11 +2,12 @@ package abstractPattern.primitive;
 
 import Matlab.Utils.IReport;
 import Matlab.Utils.Report;
+import abstractPattern.Modifier;
 import abstractPattern.Primitive;
-import ast.ASTNode;
-import ast.Name;
-import ast.PatternAnnotate;
-import ast.Selector;
+import abstractPattern.modifier.Dimension;
+import abstractPattern.modifier.IsType;
+import abstractPattern.modifier.Within;
+import ast.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +41,11 @@ public class Annotate extends Primitive {
 
     public List<List<String>> getSignature() {
         return signature;
+    }
+
+    @Override
+    public ASTNode getASTExpr() {
+        return this.astNodes;
     }
 
     @Override
@@ -135,5 +141,57 @@ public class Annotate extends Primitive {
         } else {
             return String.format("annotate(%s(%s))", this.annotateName, annotationStr);
         }
+    }
+
+    @Override
+    public boolean isProperlyModified() {
+        for (Modifier modifier : this.getBadicModifierSet()) {
+            if (modifier instanceof IsType)     return false;
+            if (modifier instanceof Dimension)  return false;
+            if (modifier instanceof Within)     continue;
+            /* control flow should not reach here */
+            throw new RuntimeException();
+        }
+        return true;
+    }
+
+    @Override
+    public IReport getModifierValidationReport(String pFilepath) {
+        Report report = new Report();
+
+        for (Modifier modifier : this.getBadicModifierSet()) {
+            if (modifier instanceof IsType) {
+                report.AddError(
+                        pFilepath,
+                        this.astNodes.getStartLine(),
+                        this.astNodes.getStartColumn(),
+                        String.format(
+                                "cannot apply type pattern (%s@[%d : %d]) to annotation pattern",
+                                modifier.toString(),
+                                modifier.getASTExpr().getStartLine(),
+                                modifier.getASTExpr().getStartColumn()
+                        )
+                );
+                continue;
+            }
+            if (modifier instanceof Dimension) {
+                report.AddError(
+                        pFilepath,
+                        this.astNodes.getStartLine(),
+                        this.astNodes.getStartColumn(),
+                        String.format(
+                                "cannot apply dimension patern (%s[%d : %d]) to annotation pattern",
+                                modifier.toString(),
+                                modifier.getASTExpr().getStartLine(),
+                                modifier.getASTExpr().getStartColumn()
+                        )
+                );
+                continue;
+            }
+            if (modifier instanceof Within) continue;
+            /* control flow should not reach here */
+            throw new RuntimeException();
+        }
+        return report;
     }
 }

@@ -40,6 +40,11 @@ public class ModifierAnd extends Modifier{
     }
 
     @Override
+    public ASTNode getASTExpr() {
+        return this.astNodes;
+    }
+
+    @Override
     public boolean isValid() {
         return this.lhs.isValid() && this.rhs.isValid();
     }

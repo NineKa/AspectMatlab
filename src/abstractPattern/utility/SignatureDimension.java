@@ -93,4 +93,9 @@ public class SignatureDimension extends Pattern implements Iterable<String>{
     public String toString() {
         return Arrays.toString(this.signatureDimension);
     }
+
+    @Override
+    public ASTNode getASTExpr() {
+        return this.astNode;
+    }
 }

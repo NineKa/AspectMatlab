@@ -65,4 +65,9 @@ public class Signature extends Pattern{
     public String toString() {
         return this.type.toString() + this.dimension.toString();
     }
+
+    @Override
+    public ASTNode getASTExpr() {
+        return this.astNodes;
+    }
 }

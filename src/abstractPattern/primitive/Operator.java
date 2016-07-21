@@ -101,4 +101,19 @@ public class Operator extends Primitive{
             return operatorStr;
         }
     }
+
+    @Override
+    public ASTNode getASTExpr() {
+        return this.astNodes;
+    }
+
+    @Override
+    public boolean isProperlyModified() {   // TODO
+        return false;
+    }
+
+    @Override
+    public IReport getModifierValidationReport(String pFilepath) {  // TODO
+        return null;
+    }
 }

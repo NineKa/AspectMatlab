@@ -28,6 +28,11 @@ public class ModifierNot extends Modifier{
     }
 
     @Override
+    public ASTNode getASTExpr() {
+        return this.astNodes;
+    }
+
+    @Override
     public boolean isValid() {
         return this.operand.isValid();
     }

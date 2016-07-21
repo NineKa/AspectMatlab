@@ -36,6 +36,11 @@ public class Or extends Primitive{
     }
 
     @Override
+    public ASTNode getASTExpr() {
+        return this.astNodes;
+    }
+
+    @Override
     public boolean isValid() {
         return this.lhs.isValid() && this.rhs.isValid();
     }
@@ -72,5 +77,18 @@ public class Or extends Primitive{
     public void addModifier(Modifier modifier) {
         this.lhs.addModifier(modifier);
         this.rhs.addModifier(modifier);
+    }
+
+    @Override
+    public boolean isProperlyModified() {
+        return this.lhs.isProperlyModified() && this.rhs.isProperlyModified();
+    }
+
+    @Override
+    public IReport getModifierValidationReport(String pFilepath) {
+        Report report = new Report();
+        for (Message message : this.lhs.getModifierValidationReport(pFilepath)) report.Add(message);
+        for (Message message : this.rhs.getModifierValidationReport(pFilepath)) report.Add(message);
+        return report;
     }
 }

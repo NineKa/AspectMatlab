@@ -31,6 +31,11 @@ public class ModifierOr extends Modifier{
         return collection;
     }
 
+    @Override
+    public ASTNode getASTExpr() {
+        return this.astNodes;
+    }
+
     public Modifier getLHS() {
         return lhs;
     }

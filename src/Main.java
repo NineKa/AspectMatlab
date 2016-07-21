@@ -5,6 +5,7 @@ import Matlab.Utils.IReport;
 import Matlab.Utils.Message;
 import Matlab.Utils.Result;
 import abstractPattern.AbstractBuilder;
+import abstractPattern.Primitive;
 import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
 import ast.*;
@@ -78,6 +79,17 @@ public class Main {
         AbstractBuilder abstractBuilder = new AbstractBuilder(matlabFilePath, pattern, definedMap);
         System.out.println(abstractBuilder.getPattern());
         for (Message message : abstractBuilder.getReport()) {
+            System.out.println(String.format(
+                    "[%s][%d : %d] %s",
+                    message.GetSeverity(),
+                    message.GetLine(),
+                    message.GetColumn(),
+                    message.GetText()
+            ));
+        }
+
+        Primitive primitive = (Primitive)abstractBuilder.getPattern();
+        for (Message message : primitive.getModifierValidationReport(matlabFilePath)) {
             System.out.println(String.format(
                     "[%s][%d : %d] %s",
                     message.GetSeverity(),

@@ -40,6 +40,11 @@ public class Within extends Modifier {
     }
 
     @Override
+    public ASTNode getASTExpr() {
+        return this.astNodes;
+    }
+
+    @Override
     public boolean isValid() {
         if (this.identifier.equals("..")) return false;
 

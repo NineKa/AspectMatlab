@@ -63,4 +63,19 @@ public class LoopBody extends Primitive{
             return loopbodyStr;
         }
     }
+
+    @Override
+    public ASTNode getASTExpr() {
+        return this.astNodes;
+    }
+
+    @Override
+    public boolean isProperlyModified() {   // TODO
+        return false;
+    }
+
+    @Override
+    public IReport getModifierValidationReport(String pFilepath) {  // TODO
+        return null;
+    }
 }

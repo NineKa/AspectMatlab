@@ -3,7 +3,11 @@ package abstractPattern.primitive;
 import Matlab.Utils.IReport;
 import Matlab.Utils.Message;
 import Matlab.Utils.Report;
+import abstractPattern.Modifier;
 import abstractPattern.Primitive;
+import abstractPattern.modifier.Dimension;
+import abstractPattern.modifier.IsType;
+import abstractPattern.modifier.Within;
 import abstractPattern.utility.Signature;
 import ast.*;
 
@@ -44,6 +48,20 @@ public class Call extends Primitive {
 
     public String getFunctionName() {
         return this.functionName;
+    }
+
+    public boolean needInputDimensionValidation() {
+        for (Signature signature : inputSignatures) {
+            if (signature.getDimension().needValidation()) return true;
+        }
+        return false;
+    }
+
+    public boolean needOutputDimensionValidation() {
+        for (Signature signature : outputSignatures) {
+            if (signature.getDimension().needValidation()) return true;
+        }
+        return false;
     }
 
     @Override
@@ -117,12 +135,55 @@ public class Call extends Primitive {
     }
 
     @Override
-    public boolean isProperlyModified() {   // TODO
-        return false;
+    public boolean isProperlyModified() {
+        for (Modifier modifier : this.getBadicModifierSet()) {
+            if (modifier instanceof Dimension)  continue;
+            if (modifier instanceof IsType)     continue;
+            if (modifier instanceof Within)     continue;
+            /* control flow should not reach here */
+            throw new RuntimeException();
+        }
+        return true;
     }
 
     @Override
     public IReport getModifierValidationReport(String pFilepath) {  // TODO
-        return null;
+        Report report = new Report();
+        for (Modifier modifier : this.getBadicModifierSet()) {
+            if (modifier instanceof Dimension) {
+                if (this.outputSignatures.isEmpty()) continue;
+                report.AddWarning(
+                        pFilepath,
+                        this.astNodes.getStartLine(),
+                        this.astNodes.getStartColumn(),
+                        String.format(
+                                "apply dimension (%s[%d : %d]) pattern to such pattern, may result in no match",
+                                modifier.toString(),
+                                modifier.getASTExpr().getStartLine(),
+                                modifier.getASTExpr().getStartColumn()
+                        )
+                );
+                continue;
+            }
+            if (modifier instanceof IsType) {
+                if (this.outputSignatures.isEmpty()) continue;
+                report.AddWarning(
+                        pFilepath,
+                        this.astNodes.getStartLine(),
+                        this.astNodes.getStartColumn(),
+                        String.format(
+                                "apply type (%s[%d : %d]) pattern to such pattern, may result in no match",
+                                modifier.toString(),
+                                modifier.getASTExpr().getStartLine(),
+                                modifier.getASTExpr().getStartColumn()
+                        )
+                );
+                continue;
+            }
+            if (modifier instanceof Within)     continue;
+            /* control flow should not reach here */
+            throw new RuntimeException();
+        }
+        return report;
     }
 }

@@ -3,7 +3,7 @@ aspect_ demo
 		p : p  %pattern p is depend on itself
 	end
 	actions
-		a : before (annotate(x(var)) | get(x)) & istype(double) : ()
+		a : before (annotate(x(var)) | call(x() : int[3,3])) & istype(double) : ()
 			% codes here
 		end
 	end

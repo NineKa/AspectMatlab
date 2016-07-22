@@ -2,7 +2,11 @@ package abstractPattern.primitive;
 
 import Matlab.Utils.IReport;
 import Matlab.Utils.Report;
+import abstractPattern.Modifier;
 import abstractPattern.Primitive;
+import abstractPattern.modifier.Dimension;
+import abstractPattern.modifier.IsType;
+import abstractPattern.modifier.Within;
 import abstractPattern.type.LoopType;
 import ast.ASTNode;
 import ast.Name;
@@ -78,12 +82,53 @@ public class LoopHead extends Primitive{
     }
 
     @Override
-    public boolean isProperlyModified() {   // TODO
-        return false;
+    public boolean isProperlyModified() {
+        for (Modifier modifier : this.getBadicModifierSet()) {
+            if (modifier instanceof Dimension)  return false;
+            if (modifier instanceof IsType)     return false;
+            if (modifier instanceof Within)     continue;
+            /* control flow should not reach here */
+            throw new AssertionError();
+        }
+        return true;
     }
 
     @Override
-    public IReport getModifierValidationReport(String pFilepath) {  // TODO
-        return null;
+    public IReport getModifierValidationReport(String pFilepath) {
+        Report report = new Report();
+        for (Modifier modifier : this.getBadicModifierSet()) {
+            if (modifier instanceof Dimension) {
+                report.AddError(
+                        pFilepath,
+                        this.astNodes.getStartLine(),
+                        this.astNodes.getStartColumn(),
+                        String.format(
+                                "cannot apply dimension pattern (%s@[%d : %d]) to loop head pattern",
+                                modifier.toString(),
+                                modifier.getASTExpr().getStartLine(),
+                                modifier.getASTExpr().getStartColumn()
+                        )
+                );
+                continue;
+            }
+            if (modifier instanceof IsType) {
+                report.AddError(
+                        pFilepath,
+                        this.astNodes.getStartLine(),
+                        this.astNodes.getStartColumn(),
+                        String.format(
+                                "cannot apply type pattern (%s@[%d : %d]) to loop head pattern",
+                                modifier.toString(),
+                                modifier.getASTExpr().getStartLine(),
+                                modifier.getASTExpr().getStartColumn()
+                        )
+                );
+                continue;
+            }
+            if (modifier instanceof Within) continue;
+            /* control flow should not reach here */
+            throw new AssertionError();
+        }
+        return report;
     }
 }

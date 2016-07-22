@@ -3,7 +3,11 @@ package abstractPattern.primitive;
 import Matlab.Utils.IReport;
 import Matlab.Utils.Message;
 import Matlab.Utils.Report;
+import abstractPattern.Modifier;
 import abstractPattern.Primitive;
+import abstractPattern.modifier.Dimension;
+import abstractPattern.modifier.IsType;
+import abstractPattern.modifier.Within;
 import abstractPattern.type.OperatorType;
 import abstractPattern.utility.Signature;
 import ast.ASTNode;
@@ -108,12 +112,29 @@ public class Operator extends Primitive{
     }
 
     @Override
-    public boolean isProperlyModified() {   // TODO
-        return false;
+    public boolean isProperlyModified() {
+        for (Modifier modifier : this.getBadicModifierSet()) {
+            if (modifier instanceof Dimension)  continue;
+            if (modifier instanceof IsType)     continue;
+            if (modifier instanceof Within)     continue;
+            /* control flow should not reach here */
+            throw new AssertionError();
+        }
+        return true;
     }
 
     @Override
-    public IReport getModifierValidationReport(String pFilepath) {  // TODO
-        return null;
+    public IReport getModifierValidationReport(String pFilepath) {
+        Report report = new Report();
+
+        for (Modifier modifier : this.getBadicModifierSet()) {
+            if (modifier instanceof Dimension)  continue;
+            if (modifier instanceof IsType)     continue;
+            if (modifier instanceof Within)     continue;
+            /* control flow should not reach here */
+            throw new AssertionError();
+        }
+
+        return report;
     }
 }

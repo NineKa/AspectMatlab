@@ -92,7 +92,7 @@ public class Get extends Primitive{
             if (modifier instanceof IsType)     continue;
             if (modifier instanceof Within)     continue;
             /* control flow should not reach here */
-            throw new RuntimeException();
+            throw new AssertionError();
         }
         return true;
     }
@@ -133,7 +133,7 @@ public class Get extends Primitive{
             }
             if (modifier instanceof Within) continue;
             /* control flow should not reach here */
-            throw new RuntimeException();
+            throw new AssertionError();
         }
 
         return report;

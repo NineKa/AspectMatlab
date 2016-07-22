@@ -150,7 +150,7 @@ public class Annotate extends Primitive {
             if (modifier instanceof Dimension)  return false;
             if (modifier instanceof Within)     continue;
             /* control flow should not reach here */
-            throw new RuntimeException();
+            throw new AssertionError();
         }
         return true;
     }
@@ -190,7 +190,7 @@ public class Annotate extends Primitive {
             }
             if (modifier instanceof Within) continue;
             /* control flow should not reach here */
-            throw new RuntimeException();
+            throw new AssertionError();
         }
         return report;
     }

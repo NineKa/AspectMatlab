@@ -3,11 +3,9 @@ package abstractPattern;
 import Matlab.Utils.IReport;
 import Matlab.Utils.Report;
 import abstractPattern.modifier.ModifierAnd;
+import abstractPattern.type.WeaveType;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public abstract class Primitive extends Pattern{
     private List<Modifier> modifiers = new LinkedList<>();
@@ -40,4 +38,6 @@ public abstract class Primitive extends Pattern{
     public abstract boolean isProperlyModified();
 
     public abstract IReport getModifierValidationReport(String pFilepath);
+
+    public abstract Map<WeaveType, Boolean> getWeaveInfo();
 }

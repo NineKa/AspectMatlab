@@ -7,10 +7,13 @@ import abstractPattern.Primitive;
 import abstractPattern.modifier.Dimension;
 import abstractPattern.modifier.IsType;
 import abstractPattern.modifier.Within;
+import abstractPattern.type.WeaveType;
 import ast.*;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class Annotate extends Primitive {
     private PatternAnnotate astNodes = null;
@@ -193,5 +196,14 @@ public class Annotate extends Primitive {
             throw new AssertionError();
         }
         return report;
+    }
+
+    @Override
+    public Map<WeaveType, Boolean> getWeaveInfo() {
+        Map<WeaveType, Boolean> weaveTypeBooleanMap = new HashMap<>();
+        weaveTypeBooleanMap.put(WeaveType.Before, true);
+        weaveTypeBooleanMap.put(WeaveType.After, true);
+        weaveTypeBooleanMap.put(WeaveType.Around, true);
+        return weaveTypeBooleanMap;
     }
 }

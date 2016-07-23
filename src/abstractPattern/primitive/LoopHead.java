@@ -8,9 +8,15 @@ import abstractPattern.modifier.Dimension;
 import abstractPattern.modifier.IsType;
 import abstractPattern.modifier.Within;
 import abstractPattern.type.LoopType;
+import abstractPattern.type.WeaveType;
 import ast.ASTNode;
 import ast.Name;
 import ast.PatternLoopHead;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 public class LoopHead extends Primitive{
     private PatternLoopHead astNodes = null;
@@ -130,5 +136,14 @@ public class LoopHead extends Primitive{
             throw new AssertionError();
         }
         return report;
+    }
+
+    @Override
+    public Map<WeaveType, Boolean> getWeaveInfo() {
+        Map<WeaveType, Boolean> weaveTypeBooleanMap = new IdentityHashMap<>();
+        weaveTypeBooleanMap.put(WeaveType.Before, true);
+        weaveTypeBooleanMap.put(WeaveType.After, true);
+        weaveTypeBooleanMap.put(WeaveType.Around, true);
+        return weaveTypeBooleanMap;
     }
 }

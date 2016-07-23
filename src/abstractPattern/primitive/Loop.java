@@ -8,9 +8,13 @@ import abstractPattern.modifier.Dimension;
 import abstractPattern.modifier.IsType;
 import abstractPattern.modifier.Within;
 import abstractPattern.type.LoopType;
+import abstractPattern.type.WeaveType;
 import ast.ASTNode;
 import ast.Name;
 import ast.PatternLoop;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Loop extends Primitive{
     private PatternLoop astNodes = null;
@@ -134,7 +138,15 @@ public class Loop extends Primitive{
             /* control flow should not reach here */
             throw new AssertionError();
         }
-
         return report;
+    }
+
+    @Override
+    public Map<WeaveType, Boolean> getWeaveInfo() {
+        Map<WeaveType, Boolean> weaveTypeBooleanMap = new HashMap<>();
+        weaveTypeBooleanMap.put(WeaveType.Before, true);
+        weaveTypeBooleanMap.put(WeaveType.After, true);
+        weaveTypeBooleanMap.put(WeaveType.Around, true);
+        return weaveTypeBooleanMap;
     }
 }

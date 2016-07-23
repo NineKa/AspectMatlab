@@ -98,6 +98,7 @@ public class Main {
                     message.GetText()
             ));
         }
+        System.out.println(primitive.getWeaveInfo());
 
         /*try {
             Analysis analysis = new Analysis(matlabFilePath, pattern);

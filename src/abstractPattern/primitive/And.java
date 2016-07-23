@@ -5,8 +5,13 @@ import Matlab.Utils.Message;
 import Matlab.Utils.Report;
 import abstractPattern.Modifier;
 import abstractPattern.Primitive;
+import abstractPattern.type.WeaveType;
 import ast.ASTNode;
 import ast.AndExpr;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class And extends Primitive{
     private AndExpr astNodes = null;
@@ -90,5 +95,28 @@ public class And extends Primitive{
         for (Message message : this.lhs.getModifierValidationReport(pFilepath)) report.Add(message);
         for (Message message : this.rhs.getModifierValidationReport(pFilepath)) report.Add(message);
         return report;
+    }
+
+    @Override
+    public Map<WeaveType, Boolean> getWeaveInfo() {
+        Map<WeaveType, Boolean> weaveTypeBooleanMap = new HashMap<>();
+        Map<WeaveType, Boolean> lhsMap = this.lhs.getWeaveInfo();
+        Map<WeaveType, Boolean> rhsMap = this.rhs.getWeaveInfo();
+        /* --- assertions --- */
+        assert lhsMap.keySet().containsAll(Arrays.asList(
+                WeaveType.Before,
+                WeaveType.After,
+                WeaveType.Around
+        ));
+        assert rhsMap.keySet().containsAll(Arrays.asList(
+                WeaveType.Before,
+                WeaveType.After,
+                WeaveType.Around
+        ));
+        /* ------------------ */
+        weaveTypeBooleanMap.put(WeaveType.Before, lhsMap.get(WeaveType.Before) && rhsMap.get(WeaveType.Before));
+        weaveTypeBooleanMap.put(WeaveType.After, lhsMap.get(WeaveType.After) && rhsMap.get(WeaveType.After));
+        weaveTypeBooleanMap.put(WeaveType.Around, lhsMap.get(WeaveType.Around) && rhsMap.get(WeaveType.Around));
+        return weaveTypeBooleanMap;
     }
 }

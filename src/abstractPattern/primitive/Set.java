@@ -8,10 +8,14 @@ import abstractPattern.Primitive;
 import abstractPattern.modifier.Dimension;
 import abstractPattern.modifier.IsType;
 import abstractPattern.modifier.Within;
+import abstractPattern.type.WeaveType;
 import abstractPattern.utility.Signature;
 import ast.ASTNode;
 import ast.FullSignature;
 import ast.PatternSet;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Set extends Primitive{
     private PatternSet astNodes = null;
@@ -137,5 +141,15 @@ public class Set extends Primitive{
         }
 
         return report;
+    }
+
+
+    @Override
+    public Map<WeaveType, Boolean> getWeaveInfo() {
+        Map<WeaveType, Boolean> weaveTypeBooleanMap = new HashMap<>();
+        weaveTypeBooleanMap.put(WeaveType.Before, true);
+        weaveTypeBooleanMap.put(WeaveType.After,  true);
+        weaveTypeBooleanMap.put(WeaveType.Around, true);
+        return weaveTypeBooleanMap;
     }
 }

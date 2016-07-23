@@ -8,11 +8,15 @@ import abstractPattern.Primitive;
 import abstractPattern.modifier.Dimension;
 import abstractPattern.modifier.IsType;
 import abstractPattern.modifier.Within;
+import abstractPattern.type.WeaveType;
 import abstractPattern.utility.Signature;
 import ast.*;
+import natlab.tame.builtin.Builtin;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class Call extends Primitive {
     private PatternCall astNodes = null;
@@ -185,5 +189,20 @@ public class Call extends Primitive {
             throw new AssertionError();
         }
         return report;
+    }
+
+    @Override
+    public Map<WeaveType, Boolean> getWeaveInfo() {
+        Map<WeaveType, Boolean> weaveTypeBooleanMap = new HashMap<>();
+        boolean needReturnValidation = false;
+        if (!this.outputSignatures.isEmpty()) needReturnValidation = true;
+        for (Modifier modifier : this.getBadicModifierSet()) {
+            if (modifier instanceof Dimension) needReturnValidation = true;
+            if (modifier instanceof IsType) needReturnValidation = true;
+        }
+        weaveTypeBooleanMap.put(WeaveType.Before, (needReturnValidation)?false:true);
+        weaveTypeBooleanMap.put(WeaveType.After, true);
+        weaveTypeBooleanMap.put(WeaveType.Around, (needReturnValidation)?false:true);
+        return weaveTypeBooleanMap;
     }
 }

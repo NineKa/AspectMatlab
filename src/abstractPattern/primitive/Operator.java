@@ -9,13 +9,16 @@ import abstractPattern.modifier.Dimension;
 import abstractPattern.modifier.IsType;
 import abstractPattern.modifier.Within;
 import abstractPattern.type.OperatorType;
+import abstractPattern.type.WeaveType;
 import abstractPattern.utility.Signature;
 import ast.ASTNode;
 import ast.FullSignature;
 import ast.PatternOperator;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class Operator extends Primitive{
     private PatternOperator astNodes = null;
@@ -136,5 +139,14 @@ public class Operator extends Primitive{
         }
 
         return report;
+    }
+
+    @Override
+    public Map<WeaveType, Boolean> getWeaveInfo() {
+        Map<WeaveType, Boolean> weaveTypeBooleanMap = new HashMap<>();
+        weaveTypeBooleanMap.put(WeaveType.Before, true);
+        weaveTypeBooleanMap.put(WeaveType.After, true);
+        weaveTypeBooleanMap.put(WeaveType.Around, true);
+        return weaveTypeBooleanMap;
     }
 }

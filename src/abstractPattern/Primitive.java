@@ -3,7 +3,10 @@ package abstractPattern;
 import Matlab.Utils.IReport;
 import Matlab.Utils.Report;
 import abstractPattern.modifier.ModifierAnd;
+import abstractPattern.type.ScopeType;
 import abstractPattern.type.WeaveType;
+import ast.ASTNode;
+import org.javatuples.Pair;
 
 import java.util.*;
 

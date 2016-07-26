@@ -1,0 +1,87 @@
+grammar Annotate ;
+
+@lexer::header {
+    package matcher.annotation;
+}
+@header {
+	package matcher.annotation;
+	import ast.*;
+	import natlab.*;
+}
+
+@members {
+	private ast.List<Expr> selectorLBuffer = new ast.List<>();
+	private ast.List<ast.List<Expr>> annotateBuffer = new ast.List();
+}
+
+tNum 		returns [Expr expr] 
+			:	REAL {
+				boolean isFloatPointNum = true;
+				String tempStr = $REAL.text ;
+				if (tempStr.indexOf('.') != -1) isFloatPointNum = false; 
+				if (isFloatPointNum) {
+					$expr = new IntLiteralExpr(new DecIntNumericLiteralValue($REAL.text, false));
+				} else {
+					$expr = new FPLiteralExpr(new FPNumericLiteralValue($REAL.text, false));
+				}
+			}
+			| 	IMAGINARY {
+				boolean isFloatPointNum = true;
+				String tempStr = $IMAGINARY.text ;
+				if (tempStr.indexOf('.') != -1) isFloatPointNum = false; 
+				if (isFloatPointNum) {
+					$expr = new IntLiteralExpr(new DecIntNumericLiteralValue($IMAGINARY.text, true));
+				} else {
+					$expr = new FPLiteralExpr(new FPNumericLiteralValue($IMAGINARY.text, true));
+				}
+			};
+tStr 		returns [Expr expr]	
+			:	STRING {
+				$expr = new StringLiteralExpr($STRING.text);
+			};
+tVar 		returns [Expr expr]
+			:	ID {
+				$expr = new NameExpr(new Name($ID.text));
+			};
+
+selectorE 	returns [Expr expr]	
+			:	tNum { $expr = $tNum.expr; }
+			| 	tStr { $expr = $tStr.expr; }
+			| 	tVar { $expr = $tVar.expr; };
+
+selectorL 	returns [ast.List<Expr> exprs]
+			:	'[' 
+					(
+						e=selectorE {selectorLBuffer.add($e.expr);} 
+						(',' a=selectorE {selectorLBuffer.add($a.expr);})*
+					)? 
+				']' { 
+				$exprs = selectorLBuffer;
+				selectorLBuffer = new ast.List<>();
+			};
+
+selector 	returns [ast.List<Expr> exprs]
+			:	selectorE { $exprs = new ast.List<>($selectorE.expr); }
+			| 	selectorL { $exprs = $selectorL.exprs; };
+
+annotate	returns [AbstractAnnotation absAnnotate]
+			:	'%@' ID 
+				(
+					e=selector {annotateBuffer.add(e);} 
+					(',' a=selector {annotateBuffer.add(a);})* 
+				)? {
+				$absAnnotate = new AbstractAnnotation($ID.text, annotateBuffer);
+			};
+
+WHITESPACE 	: 	( '\t' | ' ' | '\u000C' )+    { $channel = HIDDEN; } ;
+STRING 		: 	'\'' ('\'\'' | ~('\'' | '\r' | '\n'))* '\'' ;
+REAL 		: 	NUMBER ;
+IMAGINARY 	: 	NUMBER IMG ;
+ID 			: 	LETTER ('_' | LETTER | DIGIT)* ;
+
+fragment LETTER 		: 	'a' .. 'z' | 'A' .. 'Z' ;
+fragment DIGIT 			: 	'0' .. '9' ;
+fragment EXP 			: 	'e' | 'E' | 'd' | 'D' ;
+fragment IMG 			: 	'i' | 'j' ;
+fragment SIGN 			: 	'+' | '-' ;
+fragment NUMBER 		: 	((DIGIT)+ ('.' (DIGIT)*)? | '.' (DIGIT)+) (EXP (SIGN)? (DIGIT)+)? ;

@@ -4,15 +4,26 @@ import Matlab.Transformer.NodeToAstTransformer;
 import Matlab.Utils.IReport;
 import Matlab.Utils.Message;
 import Matlab.Utils.Result;
-import abstractPattern.AbstractBuilder;
-import abstractPattern.Primitive;
 import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
 import ast.*;
+import ast.Action;
+import matcher.annotation.AbstractAnnotation;
+import matcher.annotation.AnnotateLexer;
+import matcher.annotation.AnnotateParser;
+import natlab.DecIntNumericLiteralValue;
+import natlab.FPNumericLiteralValue;
+import natlab.toolkits.analysis.varorfun.VFAnalysis;
+import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
 
 import java.util.*;
+import java.util.List;
 
 public class Main {
+    public static VFAnalysis analysis = null;
     public static java.util.List<Call> calls = new LinkedList<>();
     public static java.util.List<Execution> executions = new LinkedList<>();
 
@@ -32,86 +43,61 @@ public class Main {
             ));
         }
     }
-    public static void recPrintValidationReport(String pFilepath) {
-        for (Call call : calls) {
-            System.out.println(call);
-            printReport(call.getValidationReport(pFilepath));
-        }
-        for (Execution execution : executions) {
-            System.out.println(execution);
-            printReport(execution.getValidationReport(pFilepath));
-        }
-    }
     public static void recPrintStructure(ASTNode node, int indent) {
         for (int iter = 0; iter < indent; iter++) System.out.print('\t');
-        System.out.println(String.format(
-                "[%d : %d] %s",
-                node.getStartLine(),
-                node.getStartColumn(),
-                node.getClass().getName()
-        ));
+        try {
+            if (node instanceof Name) {
+                System.out.print(String.format(
+                        "[%d : %d] [%b] %s : ",
+                        node.getStartLine(),
+                        node.getStartColumn(),
+                        node.hasComments(),
+                        node.getClass().getName()
+                ));
+                if (analysis.getResult((Name) node) == null) {
+                    System.out.println("null");
+                } else {
+                    System.out.println(analysis.getResult((ast.Name) node));
+                }
+
+            } else {
+                System.out.println(String.format(
+                        "[%d : %d] [%b] %s",
+                        node.getStartLine(),
+                        node.getStartColumn(),
+                        node.hasComments(),
+                        node.getClass().getName()
+                ));
+            }
+        } catch (NullPointerException exception) {
+            System.out.println("here");
+        }
         for (int iter = 0; iter < node.getNumChild(); iter++) {
             recPrintStructure(node.getChild(iter), indent + 1);
         }
     }
 
     public static void main(String argv[]) {
+        /*
         String matlabFilePath = "/Users/k9/Documents/AspectMatlab/src/matlab.m";
+        String functionFilePath = "/Users/k9/Documents/AspectMatlab/src/function.m";
+
         Result<UnitNode> result = MRecognizer.RecognizeFile(
-                matlabFilePath,
+                functionFilePath,
                 true,
                 new Notifier()
         );
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
-
-        // recPrintStructure(units, 0);
-
-        AspectDef def = (AspectDef)units.getProgram(0);
-        Actions actions = def.getActions().getChild(0);
-        Map<String, Expr> definedMap = new HashMap<>();
-        for (Pattern pattern : def.getPatternList().getChild(0).getPatternList()) {
-            definedMap.put(pattern.getName(), pattern.getExpr());
+        */
+        AnnotateLexer lexer = new AnnotateLexer(new ANTLRStringStream("%@abc 10.0i, ['asdf', var2]"));
+        AnnotateParser parser = new AnnotateParser(new CommonTokenStream(lexer));
+        try {
+            AbstractAnnotation abstractAnnotation = parser.annotate();
+            System.out.println(abstractAnnotation.toString());
+        } catch (RecognitionException e) {
+            e.printStackTrace();
         }
-        Action action = actions.getAction(0);
-        Expr pattern = action.getExpr();
-
-        AbstractBuilder abstractBuilder = new AbstractBuilder(matlabFilePath, pattern, definedMap);
-        System.out.println(abstractBuilder.getPattern());
-        for (Message message : abstractBuilder.getReport()) {
-            System.out.println(String.format(
-                    "[%s][%d : %d] %s",
-                    message.GetSeverity(),
-                    message.GetLine(),
-                    message.GetColumn(),
-                    message.GetText()
-            ));
-        }
-
-        Primitive primitive = (Primitive)abstractBuilder.getPattern();
-        for (Message message : primitive.getModifierValidationReport(matlabFilePath)) {
-            System.out.println(String.format(
-                    "[%s][%d : %d] %s",
-                    message.GetSeverity(),
-                    message.GetLine(),
-                    message.GetColumn(),
-                    message.GetText()
-            ));
-        }
-        System.out.println(primitive.getWeaveInfo());
-
-        /*try {
-            Analysis analysis = new Analysis(matlabFilePath, pattern);
-            System.out.println(analysis.getResult());
-            if (analysis.getResult() == PatternType.Modifier) {
-                Modifier modifier = PatternClassifier.buildModifier(pattern);
-                System.out.println(modifier);
-            }
-        } catch (Backtrace backtrace) {
-            System.out.println(backtrace.toString());
-        }*/
-
-        // recPrintValidationReport(matlabFilePath);
 
     }
 }

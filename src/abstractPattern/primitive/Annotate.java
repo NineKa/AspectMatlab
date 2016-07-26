@@ -54,6 +54,7 @@ public class Annotate extends Primitive {
     @Override
     public boolean isValid() {
         if (this.annotateName.equals("..")) return false;
+        if (this.annotateName.equals("loopname")) return false;
         for (List<String> list : this.signature) {
             for (String string : list) {
                 if (string.equals("var")) continue;
@@ -105,6 +106,14 @@ public class Annotate extends Primitive {
                     this.astNodes.getIdentifier().getStartLine(),
                     this.astNodes.getIdentifier().getStartColumn(),
                     "wildcard [..] is not a valid matcher in annotation pattern for annotation name, use [*] instead"
+            );
+        }
+        if (this.annotateName.equals("loopname")) {
+            report.AddError(
+                    pFilepath,
+                    this.astNodes.getIdentifier().getStartLine(),
+                    this.astNodes.getIdentifier().getStartColumn(),
+                    "annotation loopname is reserved in AspectMATLAB"
             );
         }
 

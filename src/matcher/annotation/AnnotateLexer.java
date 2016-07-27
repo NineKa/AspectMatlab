@@ -1,4 +1,4 @@
-// $ANTLR 3.4 Annotate.g3 2016-07-26 07:17:15
+// $ANTLR 3.4 Annotate.g3 2016-07-26 20:27:24
 
     package matcher.annotation;
 
@@ -27,6 +27,12 @@ public class AnnotateLexer extends Lexer {
     public static final int STRING=13;
     public static final int WHITESPACE=14;
 
+        @Override
+        public void reportError(RecognitionException e){
+            throw new RuntimeException();
+        }
+
+
     // delegates
     // delegators
     public Lexer[] getDelegates() {
@@ -47,8 +53,8 @@ public class AnnotateLexer extends Lexer {
         try {
             int _type = T__15;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Annotate.g3:6:7: ( '%@' )
-            // Annotate.g3:6:9: '%@'
+            // Annotate.g3:12:7: ( '%@' )
+            // Annotate.g3:12:9: '%@'
             {
             match("%@"); 
 
@@ -70,8 +76,8 @@ public class AnnotateLexer extends Lexer {
         try {
             int _type = T__16;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Annotate.g3:7:7: ( ',' )
-            // Annotate.g3:7:9: ','
+            // Annotate.g3:13:7: ( ',' )
+            // Annotate.g3:13:9: ','
             {
             match(','); 
 
@@ -91,8 +97,8 @@ public class AnnotateLexer extends Lexer {
         try {
             int _type = T__17;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Annotate.g3:8:7: ( '[' )
-            // Annotate.g3:8:9: '['
+            // Annotate.g3:14:7: ( '[' )
+            // Annotate.g3:14:9: '['
             {
             match('['); 
 
@@ -112,8 +118,8 @@ public class AnnotateLexer extends Lexer {
         try {
             int _type = T__18;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Annotate.g3:9:7: ( ']' )
-            // Annotate.g3:9:9: ']'
+            // Annotate.g3:15:7: ( ']' )
+            // Annotate.g3:15:9: ']'
             {
             match(']'); 
 
@@ -133,10 +139,10 @@ public class AnnotateLexer extends Lexer {
         try {
             int _type = WHITESPACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Annotate.g3:76:13: ( ( '\\t' | ' ' | '\\u000C' )+ )
-            // Annotate.g3:76:16: ( '\\t' | ' ' | '\\u000C' )+
+            // Annotate.g3:86:13: ( ( '\\t' | ' ' | '\\u000C' )+ )
+            // Annotate.g3:86:16: ( '\\t' | ' ' | '\\u000C' )+
             {
-            // Annotate.g3:76:16: ( '\\t' | ' ' | '\\u000C' )+
+            // Annotate.g3:86:16: ( '\\t' | ' ' | '\\u000C' )+
             int cnt1=0;
             loop1:
             do {
@@ -193,12 +199,12 @@ public class AnnotateLexer extends Lexer {
         try {
             int _type = STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Annotate.g3:77:10: ( '\\'' ( '\\'\\'' |~ ( '\\'' | '\\r' | '\\n' ) )* '\\'' )
-            // Annotate.g3:77:13: '\\'' ( '\\'\\'' |~ ( '\\'' | '\\r' | '\\n' ) )* '\\''
+            // Annotate.g3:87:10: ( '\\'' ( '\\'\\'' |~ ( '\\'' | '\\r' | '\\n' ) )* '\\'' )
+            // Annotate.g3:87:13: '\\'' ( '\\'\\'' |~ ( '\\'' | '\\r' | '\\n' ) )* '\\''
             {
             match('\''); 
 
-            // Annotate.g3:77:18: ( '\\'\\'' |~ ( '\\'' | '\\r' | '\\n' ) )*
+            // Annotate.g3:87:18: ( '\\'\\'' |~ ( '\\'' | '\\r' | '\\n' ) )*
             loop2:
             do {
                 int alt2=3;
@@ -220,7 +226,7 @@ public class AnnotateLexer extends Lexer {
 
                 switch (alt2) {
             	case 1 :
-            	    // Annotate.g3:77:19: '\\'\\''
+            	    // Annotate.g3:87:19: '\\'\\''
             	    {
             	    match("''"); 
 
@@ -229,7 +235,7 @@ public class AnnotateLexer extends Lexer {
             	    }
             	    break;
             	case 2 :
-            	    // Annotate.g3:77:28: ~ ( '\\'' | '\\r' | '\\n' )
+            	    // Annotate.g3:87:28: ~ ( '\\'' | '\\r' | '\\n' )
             	    {
             	    if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t')||(input.LA(1) >= '\u000B' && input.LA(1) <= '\f')||(input.LA(1) >= '\u000E' && input.LA(1) <= '&')||(input.LA(1) >= '(' && input.LA(1) <= '\uFFFF') ) {
             	        input.consume();
@@ -268,8 +274,8 @@ public class AnnotateLexer extends Lexer {
         try {
             int _type = REAL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Annotate.g3:78:8: ( NUMBER )
-            // Annotate.g3:78:11: NUMBER
+            // Annotate.g3:88:8: ( NUMBER )
+            // Annotate.g3:88:11: NUMBER
             {
             mNUMBER(); 
 
@@ -290,8 +296,8 @@ public class AnnotateLexer extends Lexer {
         try {
             int _type = IMAGINARY;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Annotate.g3:79:12: ( NUMBER IMG )
-            // Annotate.g3:79:15: NUMBER IMG
+            // Annotate.g3:89:12: ( NUMBER IMG )
+            // Annotate.g3:89:15: NUMBER IMG
             {
             mNUMBER(); 
 
@@ -315,13 +321,13 @@ public class AnnotateLexer extends Lexer {
         try {
             int _type = ID;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Annotate.g3:80:7: ( LETTER ( '_' | LETTER | DIGIT )* )
-            // Annotate.g3:80:10: LETTER ( '_' | LETTER | DIGIT )*
+            // Annotate.g3:90:7: ( LETTER ( '_' | LETTER | DIGIT )* )
+            // Annotate.g3:90:10: LETTER ( '_' | LETTER | DIGIT )*
             {
             mLETTER(); 
 
 
-            // Annotate.g3:80:17: ( '_' | LETTER | DIGIT )*
+            // Annotate.g3:90:17: ( '_' | LETTER | DIGIT )*
             loop3:
             do {
                 int alt3=2;
@@ -369,7 +375,7 @@ public class AnnotateLexer extends Lexer {
     // $ANTLR start "LETTER"
     public final void mLETTER() throws RecognitionException {
         try {
-            // Annotate.g3:82:19: ( 'a' .. 'z' | 'A' .. 'Z' )
+            // Annotate.g3:92:19: ( 'a' .. 'z' | 'A' .. 'Z' )
             // Annotate.g3:
             {
             if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z')||(input.LA(1) >= 'a' && input.LA(1) <= 'z') ) {
@@ -395,7 +401,7 @@ public class AnnotateLexer extends Lexer {
     // $ANTLR start "DIGIT"
     public final void mDIGIT() throws RecognitionException {
         try {
-            // Annotate.g3:83:19: ( '0' .. '9' )
+            // Annotate.g3:93:19: ( '0' .. '9' )
             // Annotate.g3:
             {
             if ( (input.LA(1) >= '0' && input.LA(1) <= '9') ) {
@@ -421,7 +427,7 @@ public class AnnotateLexer extends Lexer {
     // $ANTLR start "EXP"
     public final void mEXP() throws RecognitionException {
         try {
-            // Annotate.g3:84:17: ( 'e' | 'E' | 'd' | 'D' )
+            // Annotate.g3:94:17: ( 'e' | 'E' | 'd' | 'D' )
             // Annotate.g3:
             {
             if ( (input.LA(1) >= 'D' && input.LA(1) <= 'E')||(input.LA(1) >= 'd' && input.LA(1) <= 'e') ) {
@@ -447,7 +453,7 @@ public class AnnotateLexer extends Lexer {
     // $ANTLR start "IMG"
     public final void mIMG() throws RecognitionException {
         try {
-            // Annotate.g3:85:17: ( 'i' | 'j' )
+            // Annotate.g3:95:17: ( 'i' | 'j' )
             // Annotate.g3:
             {
             if ( (input.LA(1) >= 'i' && input.LA(1) <= 'j') ) {
@@ -473,7 +479,7 @@ public class AnnotateLexer extends Lexer {
     // $ANTLR start "SIGN"
     public final void mSIGN() throws RecognitionException {
         try {
-            // Annotate.g3:86:18: ( '+' | '-' )
+            // Annotate.g3:96:18: ( '+' | '-' )
             // Annotate.g3:
             {
             if ( input.LA(1)=='+'||input.LA(1)=='-' ) {
@@ -499,10 +505,10 @@ public class AnnotateLexer extends Lexer {
     // $ANTLR start "NUMBER"
     public final void mNUMBER() throws RecognitionException {
         try {
-            // Annotate.g3:87:19: ( ( ( DIGIT )+ ( '.' ( DIGIT )* )? | '.' ( DIGIT )+ ) ( EXP ( SIGN )? ( DIGIT )+ )? )
-            // Annotate.g3:87:22: ( ( DIGIT )+ ( '.' ( DIGIT )* )? | '.' ( DIGIT )+ ) ( EXP ( SIGN )? ( DIGIT )+ )?
+            // Annotate.g3:97:19: ( ( ( DIGIT )+ ( '.' ( DIGIT )* )? | '.' ( DIGIT )+ ) ( EXP ( SIGN )? ( DIGIT )+ )? )
+            // Annotate.g3:97:22: ( ( DIGIT )+ ( '.' ( DIGIT )* )? | '.' ( DIGIT )+ ) ( EXP ( SIGN )? ( DIGIT )+ )?
             {
-            // Annotate.g3:87:22: ( ( DIGIT )+ ( '.' ( DIGIT )* )? | '.' ( DIGIT )+ )
+            // Annotate.g3:97:22: ( ( DIGIT )+ ( '.' ( DIGIT )* )? | '.' ( DIGIT )+ )
             int alt8=2;
             int LA8_0 = input.LA(1);
 
@@ -521,9 +527,9 @@ public class AnnotateLexer extends Lexer {
             }
             switch (alt8) {
                 case 1 :
-                    // Annotate.g3:87:23: ( DIGIT )+ ( '.' ( DIGIT )* )?
+                    // Annotate.g3:97:23: ( DIGIT )+ ( '.' ( DIGIT )* )?
                     {
-                    // Annotate.g3:87:23: ( DIGIT )+
+                    // Annotate.g3:97:23: ( DIGIT )+
                     int cnt4=0;
                     loop4:
                     do {
@@ -562,7 +568,7 @@ public class AnnotateLexer extends Lexer {
                     } while (true);
 
 
-                    // Annotate.g3:87:32: ( '.' ( DIGIT )* )?
+                    // Annotate.g3:97:32: ( '.' ( DIGIT )* )?
                     int alt6=2;
                     int LA6_0 = input.LA(1);
 
@@ -571,11 +577,11 @@ public class AnnotateLexer extends Lexer {
                     }
                     switch (alt6) {
                         case 1 :
-                            // Annotate.g3:87:33: '.' ( DIGIT )*
+                            // Annotate.g3:97:33: '.' ( DIGIT )*
                             {
                             match('.'); 
 
-                            // Annotate.g3:87:37: ( DIGIT )*
+                            // Annotate.g3:97:37: ( DIGIT )*
                             loop5:
                             do {
                                 int alt5=2;
@@ -618,11 +624,11 @@ public class AnnotateLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // Annotate.g3:87:50: '.' ( DIGIT )+
+                    // Annotate.g3:97:50: '.' ( DIGIT )+
                     {
                     match('.'); 
 
-                    // Annotate.g3:87:54: ( DIGIT )+
+                    // Annotate.g3:97:54: ( DIGIT )+
                     int cnt7=0;
                     loop7:
                     do {
@@ -667,7 +673,7 @@ public class AnnotateLexer extends Lexer {
             }
 
 
-            // Annotate.g3:87:64: ( EXP ( SIGN )? ( DIGIT )+ )?
+            // Annotate.g3:97:64: ( EXP ( SIGN )? ( DIGIT )+ )?
             int alt11=2;
             int LA11_0 = input.LA(1);
 
@@ -676,12 +682,12 @@ public class AnnotateLexer extends Lexer {
             }
             switch (alt11) {
                 case 1 :
-                    // Annotate.g3:87:65: EXP ( SIGN )? ( DIGIT )+
+                    // Annotate.g3:97:65: EXP ( SIGN )? ( DIGIT )+
                     {
                     mEXP(); 
 
 
-                    // Annotate.g3:87:69: ( SIGN )?
+                    // Annotate.g3:97:69: ( SIGN )?
                     int alt9=2;
                     int LA9_0 = input.LA(1);
 
@@ -708,7 +714,7 @@ public class AnnotateLexer extends Lexer {
                     }
 
 
-                    // Annotate.g3:87:77: ( DIGIT )+
+                    // Annotate.g3:97:77: ( DIGIT )+
                     int cnt10=0;
                     loop10:
                     do {

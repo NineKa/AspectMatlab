@@ -1,26 +1,16 @@
-import Matlab.Nodes.UnitNode;
-import Matlab.Recognizer.MRecognizer;
-import Matlab.Transformer.NodeToAstTransformer;
 import Matlab.Utils.IReport;
 import Matlab.Utils.Message;
-import Matlab.Utils.Result;
 import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
-import ast.*;
-import ast.Action;
-import matcher.annotation.AbstractAnnotation;
-import matcher.annotation.AnnotateLexer;
-import matcher.annotation.AnnotateParser;
-import natlab.DecIntNumericLiteralValue;
-import natlab.FPNumericLiteralValue;
+import ast.ASTNode;
+import ast.Name;
+import ast.PatternCall;
+import ast.PatternExecution;
+import matcher.annotation.AnnotationMatcher;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
-import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
 
-import java.util.*;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Scanner;
 
 public class Main {
     public static VFAnalysis analysis = null;
@@ -90,14 +80,12 @@ public class Main {
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
         */
-        AnnotateLexer lexer = new AnnotateLexer(new ANTLRStringStream("%@abc 10.0i, ['asdf', var2]"));
-        AnnotateParser parser = new AnnotateParser(new CommonTokenStream(lexer));
-        try {
-            AbstractAnnotation abstractAnnotation = parser.annotate();
-            System.out.println(abstractAnnotation.toString());
-        } catch (RecognitionException e) {
-            e.printStackTrace();
+        Scanner inScan = new Scanner(System.in);
+        AnnotationMatcher matcher = new AnnotationMatcher(inScan.nextLine());
+        if (matcher.isValid()) {
+            System.out.println(matcher.getAbstractAnnotation().toString());
+        } else {
+            System.out.println("false");
         }
-
     }
 }

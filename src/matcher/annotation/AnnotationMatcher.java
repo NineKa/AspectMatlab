@@ -2,7 +2,6 @@ package matcher.annotation;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
 
 public class AnnotationMatcher {
     private String rawComment = "";
@@ -17,11 +16,8 @@ public class AnnotationMatcher {
             this.lexer = new AnnotateLexer(new ANTLRStringStream(this.rawComment));
             this.parser = new AnnotateParser(new CommonTokenStream(this.lexer));
             this.abstractAnnotation = this.parser.annotate();
-        } catch (RecognitionException exception) {
+        } catch (Exception except) {
             this.isValid = false;
-            this.lexer = null;
-            this.parser = null;
-            this.abstractAnnotation = null;
         }
     }
 

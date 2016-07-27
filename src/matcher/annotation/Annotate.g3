@@ -3,15 +3,25 @@ grammar Annotate ;
 @lexer::header {
     package matcher.annotation;
 }
-@header {
+@parser::header {
 	package matcher.annotation;
 	import ast.*;
 	import natlab.*;
 }
-
-@members {
+@parser::members {
 	private ast.List<Expr> selectorLBuffer = new ast.List<>();
 	private ast.List<ast.List<Expr>> annotateBuffer = new ast.List();
+
+    @Override
+    public void reportError(RecognitionException e){
+        throw new RuntimeException();
+    }
+}
+@lexer::members {
+    @Override
+    public void reportError(RecognitionException e){
+        throw new RuntimeException();
+    }
 }
 
 tNum 		returns [Expr expr] 
@@ -68,7 +78,7 @@ annotate	returns [AbstractAnnotation absAnnotate]
 			:	'%@' ID 
 				(
 					e=selector {annotateBuffer.add(e);} 
-					(',' a=selector {annotateBuffer.add(a);})* 
+					(a=selector {annotateBuffer.add(a);})*
 				)? {
 				$absAnnotate = new AbstractAnnotation($ID.text, annotateBuffer);
 			};

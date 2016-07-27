@@ -44,6 +44,6 @@ public class AbstractAnnotation implements Iterable<List<Expr>>{
                 argsStr = argsStr + ", ";
             }
         }
-        return String.format("%%@ %s %s", this.annotationName, argsStr);
+        return String.format("%%@%s %s", this.annotationName, argsStr);
     }
 }

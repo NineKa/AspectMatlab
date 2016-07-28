@@ -1,14 +1,11 @@
 package abstractPattern;
 
 import Matlab.Utils.IReport;
-import Matlab.Utils.Report;
-import abstractPattern.modifier.ModifierAnd;
-import abstractPattern.type.ScopeType;
+import abstractPattern.modifier.*;
 import abstractPattern.type.WeaveType;
-import ast.ASTNode;
-import org.javatuples.Pair;
 
 import java.util.*;
+import java.util.function.Function;
 
 public abstract class Primitive extends Pattern{
     private List<Modifier> modifiers = new LinkedList<>();
@@ -43,4 +40,40 @@ public abstract class Primitive extends Pattern{
     public abstract IReport getModifierValidationReport(String pFilepath);
 
     public abstract Map<WeaveType, Boolean> getWeaveInfo();
+
+    public void reformatModifier() {
+        /* peephole reformat on tree (remove doubleNeg, logical reduction) */
+        Function<Modifier, Modifier> doubleNegReduce = new Function<Modifier, Modifier>() {
+            @Override
+            @SuppressWarnings("ann-dep")
+            public Modifier apply(Modifier modifier) {
+                /* check double negation */
+                if (modifier instanceof ModifierNot && ((ModifierNot) modifier).getOperand() instanceof ModifierNot) {
+                    return this.apply(((ModifierNot) ((ModifierNot) modifier).getOperand()).getOperand());
+                }
+                /* recursive */
+                if (modifier instanceof Dimension) return modifier;
+                if (modifier instanceof IsType) return modifier;
+                if (modifier instanceof Within) return modifier;
+                if (modifier instanceof ModifierAnd) {
+                    ((ModifierAnd) modifier).setLHS(this.apply(((ModifierAnd) modifier).getLHS()));
+                    ((ModifierAnd) modifier).setRHS(this.apply(((ModifierAnd) modifier).getRHS()));
+                    return modifier;
+                }
+                if (modifier instanceof ModifierOr) {
+                    ((ModifierOr) modifier).setLHS(this.apply(((ModifierOr) modifier).getLHS()));
+                    ((ModifierOr) modifier).setRHS(this.apply(((ModifierOr) modifier).getRHS()));
+                    return modifier;
+                }
+                if (modifier instanceof ModifierNot) {
+                    ((ModifierNot) modifier).setOperand(this.apply(((ModifierNot) modifier).getOperand()));
+                    return modifier;
+                }
+                /* control flow should not reach here */
+                throw new AssertionError();
+            }
+        };
+    }
+
+    // public abstract boolean isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo);
 }

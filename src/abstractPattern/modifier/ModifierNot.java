@@ -3,6 +3,7 @@ package abstractPattern.modifier;
 import Matlab.Utils.IReport;
 import abstractPattern.Modifier;
 import abstractPattern.analysis.PatternClassifier;
+import abstractPattern.utility.RuntimeInfo;
 import ast.ASTNode;
 import ast.NotExpr;
 
@@ -20,6 +21,10 @@ public class ModifierNot extends Modifier{
 
     public Modifier getOperand() {
         return operand;
+    }
+
+    public void setOperand(Modifier operand) {
+        this.operand = operand;
     }
 
     @Override
@@ -53,5 +58,15 @@ public class ModifierNot extends Modifier{
                 "~%s",
                 this.operand.toString()
         );
+    }
+
+    @Override
+    public boolean isPossibleWeave(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        /* after the modifier transformation we only allow not pattern attach to dimension / type / within */
+        if (this.operand instanceof IsType) return this.operand.isPossibleWeave(astNode, runtimeInfo);
+        if (this.operand instanceof Dimension) return this.operand.isPossibleWeave(astNode, runtimeInfo);
+        if (this.operand instanceof Within) return !this.operand.isPossibleWeave(astNode, runtimeInfo);
+        /* control flow should not reach here */
+        throw new AssertionError();
     }
 }

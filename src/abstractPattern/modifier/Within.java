@@ -4,6 +4,7 @@ import Matlab.Utils.IReport;
 import Matlab.Utils.Report;
 import abstractPattern.Modifier;
 import abstractPattern.type.ScopeType;
+import abstractPattern.utility.RuntimeInfo;
 import ast.ASTNode;
 import ast.PatternWithin;
 
@@ -75,5 +76,11 @@ public class Within extends Modifier {
                 this.scopeType.toString(),
                 this.identifier
         );
+    }
+
+    @Override
+    public boolean isPossibleWeave(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        /* query on runtime information */
+        return runtimeInfo.withinScope(this.scopeType, this.identifier);
     }
 }

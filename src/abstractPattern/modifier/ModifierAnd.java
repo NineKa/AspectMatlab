@@ -5,6 +5,7 @@ import Matlab.Utils.Message;
 import Matlab.Utils.Report;
 import abstractPattern.Modifier;
 import abstractPattern.analysis.PatternClassifier;
+import abstractPattern.utility.RuntimeInfo;
 import ast.ASTNode;
 import ast.AndExpr;
 
@@ -27,8 +28,18 @@ public class ModifierAnd extends Modifier{
         return lhs;
     }
 
+    @Deprecated
+    public void setLHS(Modifier lhs) {
+        this.lhs = lhs;
+    }
+
     public Modifier getRHS() {
         return rhs;
+    }
+
+    @Deprecated
+    public void setRHS(Modifier rhs) {
+        this.rhs = rhs;
     }
 
     @Override
@@ -69,5 +80,10 @@ public class ModifierAnd extends Modifier{
                 this.lhs.toString(),
                 this.rhs.toString()
         );
+    }
+
+    @Override
+    public boolean isPossibleWeave(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        return this.lhs.isPossibleWeave(astNode, runtimeInfo) && this.rhs.isPossibleWeave(astNode, runtimeInfo);
     }
 }

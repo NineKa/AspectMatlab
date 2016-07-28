@@ -1,20 +1,13 @@
-import Matlab.Nodes.FileNode;
 import Matlab.Nodes.UnitNode;
 import Matlab.Recognizer.MRecognizer;
 import Matlab.Transformer.NodeToAstTransformer;
 import Matlab.Utils.*;
 import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
-import abstractPattern.type.LoopType;
 import ast.*;
-import matcher.nameResolve.LoopNameSolver;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
-import org.javatuples.Pair;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
 
 public class Main {
     public static VFAnalysis analysis = null;
@@ -64,7 +57,7 @@ public class Main {
                 ));
             }
         } catch (NullPointerException exception) {
-            System.out.println("here");
+            System.out.println("null");
         }
         for (int iter = 0; iter < node.getNumChild(); iter++) {
             recPrintStructure(node.getChild(iter), indent + 1);
@@ -92,17 +85,8 @@ public class Main {
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
 
-        Iterator<FileNode> fileNodeIterator = result.GetValue().GetFiles().iterator();
-        Iterator<Program> programIterator = units.getProgramList().iterator();
 
-        while (fileNodeIterator.hasNext() && programIterator.hasNext()) {
-            Map<Stmt, Pair<LoopType, String>> map = null;
-            LoopNameSolver solver = new LoopNameSolver(programIterator.next(), fileNodeIterator.next());
-            map = solver.getSolveMap();
-            System.out.println(map);
-            printReport(solver.getReport());
-        }
 
-        // recPrintStructure(units, 0);
+         recPrintStructure(units, 0);
     }
 }

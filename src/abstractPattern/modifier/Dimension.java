@@ -2,6 +2,7 @@ package abstractPattern.modifier;
 
 import Matlab.Utils.IReport;
 import abstractPattern.Modifier;
+import abstractPattern.utility.RuntimeInfo;
 import abstractPattern.utility.SignatureDimension;
 import ast.ASTNode;
 import ast.PatternDimension;
@@ -54,5 +55,11 @@ public class Dimension extends Modifier {
                 "dimension(%s)",
                 this.signature.toString()
         );
+    }
+
+    @Override
+    public boolean isPossibleWeave(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        /* need run-time check, we assume every pattern with dimension pattern is true */
+        return true;
     }
 }

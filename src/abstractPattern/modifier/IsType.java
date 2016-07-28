@@ -2,6 +2,7 @@ package abstractPattern.modifier;
 
 import Matlab.Utils.IReport;
 import abstractPattern.Modifier;
+import abstractPattern.utility.RuntimeInfo;
 import abstractPattern.utility.SignatureType;
 import ast.ASTNode;
 import ast.PatternIsType;
@@ -58,5 +59,11 @@ public class IsType extends Modifier {
                 "istype(%s)",
                 this.signature.toString()
         );
+    }
+
+    @Override
+    public boolean isPossibleWeave(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        /* need run-time check, we assume every pattern with type pattern is true */
+        return true;
     }
 }

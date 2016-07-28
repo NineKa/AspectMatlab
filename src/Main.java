@@ -100,6 +100,7 @@ public class Main {
             LoopNameSolver solver = new LoopNameSolver(programIterator.next(), fileNodeIterator.next());
             map = solver.getSolveMap();
             System.out.println(map);
+            printReport(solver.getReport());
         }
 
         // recPrintStructure(units, 0);

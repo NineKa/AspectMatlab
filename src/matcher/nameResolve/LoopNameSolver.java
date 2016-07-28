@@ -7,6 +7,7 @@ import Matlab.Utils.Node;
 import Matlab.Utils.Report;
 import abstractPattern.type.LoopType;
 import ast.*;
+import matcher.annotation.AbstractAnnotation;
 import matcher.annotation.AnnotationMatcher;
 import org.javatuples.Pair;
 import util.MergeableHashSet;
@@ -40,12 +41,68 @@ public class LoopNameSolver {
                 deleteCollection.add(comment);
                 continue;   /* move on */
             }
+            if (!matcher.getAbstractAnnotation().getAnnotationName().equals("loopname")) {
+                /* oops, not loopname annotation */
+                deleteCollection.add(comment);
+                continue;   /* move on */
+            }
+            if (matcher.getAbstractAnnotation().getAnnotationArgs().getNumChild() != 1) {
+                /* invalid loopname annotation ignored and raise a warning */
+                this.report.AddWarning(
+                        this.rawNode.GetPath(),
+                        comment.getStartLine(),
+                        comment.getStartColumn(),
+                        String.format(
+                                "loopname should have exactly one argument, (%s) such annotation is ignored",
+                                comment.getText()
+                        )
+                );
+                deleteCollection.add(comment);
+                continue;   /* move on */
+            }
 
+            assert matcher.getAbstractAnnotation().getAnnotationArgs().getNumChild() == 1;
+            AbstractAnnotation annotation = matcher.getAbstractAnnotation();
+            if (annotation.getAnnotationArgs().getChild(0).getNumChild() != 1) {
+                this.report.AddWarning(
+                        this.rawNode.GetPath(),
+                        comment.getStartLine(),
+                        comment.getStartColumn(),
+                        String.format(
+                                "loopname should have identifier argument, but (%s) has a matrix argument. Such annotation is ignored.",
+                                comment.getText()
+                        )
+                );
+                deleteCollection.add(comment);
+                continue;
+            }
+            Expr nameExpr = annotation.getAnnotationArgs().getChild(0).getChild(0);
+            if (!(nameExpr instanceof NameExpr)) {
+                this.report.AddWarning(
+                        this.rawNode.GetPath(),
+                        comment.getStartLine(),
+                        comment.getStartColumn(),
+                        String.format(
+                                "loopname should have identifier argument, but (%s) has a %s argument. Such annotation is ignored.",
+                                comment.getText(),
+                                (nameExpr instanceof StringLiteralExpr)?"string literal" : "numeric literal"
+                        )
+                );
+                deleteCollection.add(comment);
+                continue;
+            }
+
+            /* valid pattern here */
         }
+        this.comments.removeAll(deleteCollection);
     }
 
     public Map<Stmt, Pair<LoopType, String>> getSolveMap() {
         return solveMap;
+    }
+
+    public IReport getReport() {
+        return report;
     }
 
     private static Collection<HelpComment> collectHelpCommentFromFileNode(FileNode fileNode) {

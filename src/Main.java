@@ -1,16 +1,20 @@
-import Matlab.Utils.IReport;
-import Matlab.Utils.Message;
+import Matlab.Nodes.FileNode;
+import Matlab.Nodes.UnitNode;
+import Matlab.Recognizer.MRecognizer;
+import Matlab.Transformer.NodeToAstTransformer;
+import Matlab.Utils.*;
 import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
-import ast.ASTNode;
-import ast.Name;
-import ast.PatternCall;
-import ast.PatternExecution;
-import matcher.annotation.AnnotationMatcher;
+import abstractPattern.type.LoopType;
+import ast.*;
+import matcher.nameResolve.LoopNameSolver;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
+import org.javatuples.Pair;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Scanner;
+import java.util.Map;
 
 public class Main {
     public static VFAnalysis analysis = null;
@@ -67,8 +71,16 @@ public class Main {
         }
     }
 
+    public static void printRawTree(Node node, int indent) {
+        for (int iter = 0; iter < indent; iter++) System.out.print('\t');
+        System.out.println(node.getClass().getName());
+        NodeCollection collection = node.GetChildren();
+        for (Node unitNode : node.GetChildren()) {
+            printRawTree(unitNode, indent+1);
+        }
+    }
+
     public static void main(String argv[]) {
-        /*
         String matlabFilePath = "/Users/k9/Documents/AspectMatlab/src/matlab.m";
         String functionFilePath = "/Users/k9/Documents/AspectMatlab/src/function.m";
 
@@ -79,13 +91,17 @@ public class Main {
         );
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
-        */
-        Scanner inScan = new Scanner(System.in);
-        AnnotationMatcher matcher = new AnnotationMatcher(inScan.nextLine());
-        if (matcher.isValid()) {
-            System.out.println(matcher.getAbstractAnnotation().toString());
-        } else {
-            System.out.println("false");
+
+        Iterator<FileNode> fileNodeIterator = result.GetValue().GetFiles().iterator();
+        Iterator<Program> programIterator = units.getProgramList().iterator();
+
+        while (fileNodeIterator.hasNext() && programIterator.hasNext()) {
+            Map<Stmt, Pair<LoopType, String>> map = null;
+            LoopNameSolver solver = new LoopNameSolver(programIterator.next(), fileNodeIterator.next());
+            map = solver.getSolveMap();
+            System.out.println(map);
         }
+
+        // recPrintStructure(units, 0);
     }
 }

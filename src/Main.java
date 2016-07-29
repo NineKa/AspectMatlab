@@ -7,6 +7,7 @@ import abstractPattern.primitive.Execution;
 import ast.*;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class Main {
@@ -78,15 +79,19 @@ public class Main {
         String functionFilePath = "/Users/k9/Documents/AspectMatlab/src/function.m";
 
         Result<UnitNode> result = MRecognizer.RecognizeFile(
-                functionFilePath,
+                matlabFilePath,
                 true,
                 new Notifier()
         );
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
 
+        assert  units.getProgram(0) instanceof AspectDef;
+        for (ASTNode action : ((AspectDef) units.getProgram(0)).getAction(0).getActionList()) {
+            assert action instanceof Action;
+            abstractPattern.Action action1 = new abstractPattern.Action((Action)action, new HashMap<>(), matlabFilePath);
+        }
 
-
-         recPrintStructure(units, 0);
+        recPrintStructure(units, 0);
     }
 }

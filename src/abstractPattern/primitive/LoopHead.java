@@ -12,9 +12,7 @@ import abstractPattern.type.WeaveType;
 import ast.ASTNode;
 import ast.Name;
 import ast.PatternLoopHead;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 

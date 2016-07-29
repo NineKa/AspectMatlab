@@ -5,9 +5,9 @@ import Matlab.Utils.Message;
 import Matlab.Utils.Report;
 import abstractPattern.Modifier;
 import abstractPattern.analysis.PatternClassifier;
-import abstractPattern.utility.RuntimeInfo;
 import ast.ASTNode;
 import ast.OrExpr;
+import transformer.RuntimeInfo;
 
 import java.util.Collection;
 import java.util.HashSet;

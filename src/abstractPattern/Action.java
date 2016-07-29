@@ -43,8 +43,8 @@ public class Action {
             if (analysis.getResult() != PatternType.Primitive) {
                 report.AddError(
                         this.filepath,
-                        this.astNodes.getExpr().getStartLine(),
-                        this.astNodes.getExpr().getStartColumn(),
+                        this.astNodes.getStartLine(),
+                        this.astNodes.getStartColumn(),
                         "unable to weave such pattern, a primitive pattern expected"
                 );
                 return;
@@ -61,6 +61,9 @@ public class Action {
             IReport modifierReport = ((Primitive) builder.getPattern()).getModifierValidationReport(this.filepath);
             for (Message message : modifierReport) this.report.Add(message);
             if (!modifierReport.GetIsOk()) return;
+            /* reformat modifier */
+            assert builder.getPattern() instanceof Primitive;
+            ((Primitive) builder.getPattern()).reformatModifier();
             /* weave type analysis */
             Map<WeaveType, Boolean> weaveTypeReprot = ((Primitive) builder.getPattern()).getWeaveInfo();
             if (!weaveTypeReprot.get(this.weaveType)) {
@@ -78,7 +81,6 @@ public class Action {
 
             this.pattern = builder.getPattern();
             this.actionBody = this.astNodes.getStmtList();
-
         } catch (Backtrace backtrace) {
             report.Add(backtrace.getBacktraceMsg());
             return;

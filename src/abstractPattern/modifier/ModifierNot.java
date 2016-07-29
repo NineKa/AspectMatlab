@@ -3,9 +3,9 @@ package abstractPattern.modifier;
 import Matlab.Utils.IReport;
 import abstractPattern.Modifier;
 import abstractPattern.analysis.PatternClassifier;
-import abstractPattern.utility.RuntimeInfo;
 import ast.ASTNode;
 import ast.NotExpr;
+import transformer.RuntimeInfo;
 
 import java.util.Collection;
 

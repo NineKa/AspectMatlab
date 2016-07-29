@@ -1,4 +1,4 @@
-package abstractPattern.utility;
+package transformer;
 
 import abstractPattern.type.ScopeType;
 import ast.Stmt;
@@ -12,17 +12,20 @@ public class RuntimeInfo {
     public VFAnalysis kindAnalysis = null;
     public Stack<Pair<ScopeType, String>> scopeTraceStack = null;
     public Map<Stmt, String> loopResolveMap = null;
+    public AccessMode accessMode = null;
 
     public RuntimeInfo() { /* default constructor */ }
 
     public RuntimeInfo(
             VFAnalysis kindAnalysis,
             Stack<Pair<ScopeType, String>> scopeTraceStack,
-            Map<Stmt, String> loopResolveMap
+            Map<Stmt, String> loopResolveMap,
+            AccessMode accessMode
     ) {
         this.kindAnalysis = kindAnalysis;
         this.scopeTraceStack = scopeTraceStack;
         this.loopResolveMap = loopResolveMap;
+        this.accessMode = accessMode;
     }
 
     public void setKindAnalysis(VFAnalysis kindAnalysis) {
@@ -35,6 +38,10 @@ public class RuntimeInfo {
 
     public void setLoopResolveMap(Map<Stmt, String> loopResolveMap) {
         this.loopResolveMap = loopResolveMap;
+    }
+
+    public void setAccessMode(AccessMode accessMode) {
+        this.accessMode = accessMode;
     }
 
     public boolean withinScope(ScopeType type, String name) {

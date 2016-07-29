@@ -8,6 +8,7 @@ import abstractPattern.Primitive;
 import abstractPattern.type.WeaveType;
 import ast.ASTNode;
 import ast.AndExpr;
+import transformer.RuntimeInfo;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -118,5 +119,12 @@ public class And extends Primitive{
         weaveTypeBooleanMap.put(WeaveType.After, lhsMap.get(WeaveType.After) && rhsMap.get(WeaveType.After));
         weaveTypeBooleanMap.put(WeaveType.Around, lhsMap.get(WeaveType.Around) && rhsMap.get(WeaveType.Around));
         return weaveTypeBooleanMap;
+    }
+
+    @Override
+    public boolean isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        boolean lhsResult = this.lhs.isPossibleJointPoint(astNode, runtimeInfo);
+        boolean rhsResult = this.rhs.isPossibleJointPoint(astNode, runtimeInfo);
+        return lhsResult && rhsResult;
     }
 }

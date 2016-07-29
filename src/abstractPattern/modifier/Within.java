@@ -4,9 +4,9 @@ import Matlab.Utils.IReport;
 import Matlab.Utils.Report;
 import abstractPattern.Modifier;
 import abstractPattern.type.ScopeType;
-import abstractPattern.utility.RuntimeInfo;
 import ast.ASTNode;
 import ast.PatternWithin;
+import transformer.RuntimeInfo;
 
 import java.util.Collection;
 import java.util.HashSet;

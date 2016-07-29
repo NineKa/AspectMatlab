@@ -6,8 +6,9 @@ import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
 import ast.*;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
+import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
+import transformer.RuntimeInfo;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 
 public class Main {
@@ -79,19 +80,49 @@ public class Main {
         String functionFilePath = "/Users/k9/Documents/AspectMatlab/src/function.m";
 
         Result<UnitNode> result = MRecognizer.RecognizeFile(
-                matlabFilePath,
+                functionFilePath,
                 true,
                 new Notifier()
         );
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
-
+        /*
         assert  units.getProgram(0) instanceof AspectDef;
         for (ASTNode action : ((AspectDef) units.getProgram(0)).getAction(0).getActionList()) {
             assert action instanceof Action;
             abstractPattern.Action action1 = new abstractPattern.Action((Action)action, new HashMap<>(), matlabFilePath);
+            if (!action1.getReport().GetIsOk()) {
+                printReport(action1.getReport());
+                continue;
+            }
+            assert action1.getPattern() instanceof Primitive;
+            Primitive primitive = (Primitive)action1.getPattern();
+            printReport(action1.getReport());
+            System.out.println(primitive.getModifiers());
         }
 
-        recPrintStructure(units, 0);
+        // recPrintStructure(units, 0);
+        */
+        PatternCall patternCall = new PatternCall(
+                new Name("foo"),
+                new Input(new List<>(
+                        new FullSignature(new Opt<>(new TypeSignature(new Name("*"))), new Opt<>()),
+                        new FullSignature(new Opt<>(new TypeSignature(new Name(".."))), new Opt<>())
+                )),
+                new Output(new List<>())
+        );
+        Call call = new Call(patternCall);
+
+        assert units.getProgram(0) instanceof FunctionList;
+        assert ((FunctionList) units.getProgram(0)).getFunction(0) instanceof Function;
+
+        ExprStmt stmt =(ExprStmt)((FunctionList) units.getProgram(0)).getFunction(0).getStmt(1);
+        RuntimeInfo runtimeInfo = new RuntimeInfo();
+        runtimeInfo.kindAnalysis = new VFFlowInsensitiveAnalysis(
+                ((FunctionList) units.getProgram(0)).getFunction(0),
+                ((FunctionList) units.getProgram(0)).getFunction(0).getFunctionOrScriptQuery()
+        );
+        runtimeInfo.kindAnalysis.analyze();
+        System.out.println(call.isPossibleJointPoint(stmt.getExpr(), runtimeInfo));
     }
 }

@@ -1,7 +1,7 @@
 package abstractPattern;
 
-import abstractPattern.utility.RuntimeInfo;
 import ast.ASTNode;
+import transformer.RuntimeInfo;
 
 import java.util.Collection;
 

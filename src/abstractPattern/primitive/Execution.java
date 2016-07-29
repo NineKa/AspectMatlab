@@ -11,6 +11,7 @@ import abstractPattern.modifier.Within;
 import abstractPattern.type.WeaveType;
 import abstractPattern.utility.Signature;
 import ast.*;
+import transformer.RuntimeInfo;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -191,5 +192,100 @@ public class Execution extends Primitive {
         weaveTypeBooleanMap.put(WeaveType.After, true);
         weaveTypeBooleanMap.put(WeaveType.Around, (needReturnValidation)?false:true);
         return weaveTypeBooleanMap;
+    }
+
+    @Override
+    public boolean isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        /* --- structure check --- */
+        if (!(astNode instanceof Function)) return false;
+        /* --- check the name of the function --- */
+        String candidateName = ((Function) astNode).getName().getID();
+        String matchName = this.functionName;
+        if (!matchName.equals("*") && !matchName.equals(candidateName)) return false;
+        /* --- check if the number of input arg could satisfy the pattern --- */
+        boolean isInFixNumMatch = true;
+        for (Signature signature : inputSignatures) {
+            if (signature.getType().getSignature().equals("..")) isInFixNumMatch = false;
+        }
+        boolean isInFixNumCandidate = true;
+        for (Name name : ((Function) astNode).getInputParamList()) {
+            if (name.getID().equals("varargin")) isInFixNumCandidate = false;
+        }
+        if (isInFixNumMatch) {
+            if (isInFixNumCandidate) {
+                /* fix number of matcher   */
+                /* fix number of candidate */
+                int numMatcher = this.inputSignatures.size();
+                int numCandidate = ((Function) astNode).getNumInputParam();
+                if (numMatcher != numCandidate) return false;
+            } else {
+                /* fix number of matcher        */
+                /* variable number of candidate */
+                int numMatcher = this.inputSignatures.size();
+                int minNumInCandidate = ((Function) astNode).getNumInputParam();
+                for (Name name : ((Function) astNode).getInputParamList()) {
+                    if (name.getID().equals("varargin")) minNumInCandidate  = minNumInCandidate - 1;
+                }
+                if (numMatcher < minNumInCandidate) return false;
+            }
+        } else {
+            if (isInFixNumCandidate) {
+                /* variable number of matcher */
+                /* fix number of candidate    */
+                int minNumInMatcher = this.inputSignatures.size();
+                int numInCandidate = ((Function) astNode).getNumInputParam();
+                for (Signature signature : this.inputSignatures) {
+                    if (signature.getType().getSignature().equals("..")) minNumInMatcher = minNumInMatcher - 1;
+                }
+                if (numInCandidate < minNumInMatcher) return false;
+            } else {
+                /* variable number of matcher   */
+                /* variable number of candidate */
+                /* IGNORE in the static decision, leave to dynamic check */
+            }
+        }
+        /* --- check if the number of output arg could satisfy the pattern --- */
+        boolean isOutFixNumMatch = true;
+        for (Signature signature : outputSignatures) {
+            if (signature.getType().getSignature().equals("..")) isOutFixNumMatch = false;
+        }
+        boolean isOutFixNumCandidate = true;
+        for (Name name : ((Function) astNode).getOutputParamList()) {
+            if (name.getID().equals("varargout")) isOutFixNumCandidate = false;
+        }
+        if (isOutFixNumMatch) {
+            if (isOutFixNumCandidate) {
+                /* fix number of matcher   */
+                /* fix number of candidate */
+                int numMatcher = this.outputSignatures.size();
+                int numCandidate = ((Function) astNode).getNumOutputParam();
+                if (numMatcher != numCandidate) return false;
+            } else {
+                /* fix number of matcher        */
+                /* variable number of candidate */
+                int minNumCandidate = ((Function) astNode).getNumOutputParam();
+                for (Name name : ((Function) astNode).getOutputParamList()) {
+                    if (name.getID().equals("varargout")) minNumCandidate = minNumCandidate - 1;
+                }
+                int numMatcher = this.outputSignatures.size();
+                if (minNumCandidate > numMatcher) return false;
+            }
+        } else {
+            if (isOutFixNumCandidate) {
+                /* variable number of matcher */
+                /* fix number of candidate    */
+                int numCandidate = ((Function) astNode).getNumOutputParam();
+                int minNumMatcher = outputSignatures.size();
+                for (Signature signature : outputSignatures) {
+                    if (signature.getType().getSignature().equals("..")) minNumMatcher = minNumMatcher - 1;
+                }
+                if (numCandidate < minNumMatcher) return false;
+            } else {
+                /* variable number of matcher   */
+                /* variable number of candidate */
+                /* IGNORE in the static decision, leave to dynamic check */
+            }
+        }
+        return true;
     }
 }

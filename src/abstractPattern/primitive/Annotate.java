@@ -8,7 +8,11 @@ import abstractPattern.modifier.Dimension;
 import abstractPattern.modifier.IsType;
 import abstractPattern.modifier.Within;
 import abstractPattern.type.WeaveType;
-import ast.*;
+import ast.ASTNode;
+import ast.Name;
+import ast.PatternAnnotate;
+import ast.Selector;
+import transformer.RuntimeInfo;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -214,5 +218,10 @@ public class Annotate extends Primitive {
         weaveTypeBooleanMap.put(WeaveType.After, true);
         weaveTypeBooleanMap.put(WeaveType.Around, true);
         return weaveTypeBooleanMap;
+    }
+
+    @Override
+    public boolean isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        return false;   /* TODO: need finish the empty stmt map*/
     }
 }

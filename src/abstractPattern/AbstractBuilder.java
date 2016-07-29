@@ -37,8 +37,6 @@ public class AbstractBuilder {
             }
             if (this.analysis.getResult() == PatternType.Primitive) {
                 this.pattern = this.buildPrimitive(this.patternExpr);
-                assert pattern instanceof Primitive;
-                ((Primitive) pattern).reformatModifier();
             }
         } catch (Backtrace backtrace) {
             report.Add(backtrace.getBacktraceMsg());

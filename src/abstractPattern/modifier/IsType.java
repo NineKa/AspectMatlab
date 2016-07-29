@@ -2,10 +2,10 @@ package abstractPattern.modifier;
 
 import Matlab.Utils.IReport;
 import abstractPattern.Modifier;
-import abstractPattern.utility.RuntimeInfo;
 import abstractPattern.utility.SignatureType;
 import ast.ASTNode;
 import ast.PatternIsType;
+import transformer.RuntimeInfo;
 
 import java.util.Collection;
 import java.util.HashSet;

@@ -1,6 +1,4 @@
-classdef c
-properties
-    x;
-end
-
+function [] = foo()
+    x = @disp;
+    foo(10);
 end

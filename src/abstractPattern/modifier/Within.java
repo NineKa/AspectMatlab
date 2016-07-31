@@ -6,7 +6,6 @@ import abstractPattern.Modifier;
 import abstractPattern.type.ScopeType;
 import ast.ASTNode;
 import ast.PatternWithin;
-import transformer.RuntimeInfo;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -76,11 +75,5 @@ public class Within extends Modifier {
                 this.scopeType.toString(),
                 this.identifier
         );
-    }
-
-    @Override
-    public boolean isPossibleWeave(ASTNode astNode, RuntimeInfo runtimeInfo) {
-        /* query on runtime information */
-        return runtimeInfo.withinScope(this.scopeType, this.identifier);
     }
 }

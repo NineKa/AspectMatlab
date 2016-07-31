@@ -5,7 +5,6 @@ import abstractPattern.Modifier;
 import abstractPattern.utility.SignatureDimension;
 import ast.ASTNode;
 import ast.PatternDimension;
-import transformer.RuntimeInfo;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -55,11 +54,5 @@ public class Dimension extends Modifier {
                 "dimension(%s)",
                 this.signature.toString()
         );
-    }
-
-    @Override
-    public boolean isPossibleWeave(ASTNode astNode, RuntimeInfo runtimeInfo) {
-        /* need run-time check, we assume every pattern with dimension pattern is true */
-        return true;
     }
 }

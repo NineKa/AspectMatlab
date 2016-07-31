@@ -5,7 +5,6 @@ import abstractPattern.Modifier;
 import abstractPattern.utility.SignatureType;
 import ast.ASTNode;
 import ast.PatternIsType;
-import transformer.RuntimeInfo;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -59,11 +58,5 @@ public class IsType extends Modifier {
                 "istype(%s)",
                 this.signature.toString()
         );
-    }
-
-    @Override
-    public boolean isPossibleWeave(ASTNode astNode, RuntimeInfo runtimeInfo) {
-        /* need run-time check, we assume every pattern with type pattern is true */
-        return true;
     }
 }

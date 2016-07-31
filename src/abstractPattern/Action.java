@@ -114,4 +114,9 @@ public class Action {
         }
         return stringExprMap;
     }
+
+    @Override
+    public String toString() {
+        return pattern.toString();
+    }
 }

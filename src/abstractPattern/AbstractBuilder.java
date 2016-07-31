@@ -43,7 +43,7 @@ public class AbstractBuilder {
         }
     }
 
-    @SuppressWarnings("ann-dep")
+    @SuppressWarnings("deprecation")
     private Primitive buildPrimitive(Expr expr) {
         if (PatternClassifier.isBasicPattern(expr) && PatternClassifier.isBasicPatternPrimitive(expr)) {
             return PatternClassifier.buildBasicPrimitive(expr);

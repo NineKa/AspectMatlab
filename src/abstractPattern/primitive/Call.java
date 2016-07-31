@@ -11,7 +11,6 @@ import abstractPattern.modifier.Within;
 import abstractPattern.type.WeaveType;
 import abstractPattern.utility.Signature;
 import ast.*;
-import transformer.RuntimeInfo;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -204,66 +203,5 @@ public class Call extends Primitive {
         weaveTypeBooleanMap.put(WeaveType.After, true);
         weaveTypeBooleanMap.put(WeaveType.Around, (needReturnValidation)?false:true);
         return weaveTypeBooleanMap;
-    }
-
-    @Override
-    public boolean isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
-        /* --- structure check --- */
-        if (!(astNode instanceof ParameterizedExpr)) return false;
-        if (!(((ParameterizedExpr) astNode).getTarget() instanceof NameExpr)) return false;
-        /* assert [id] ( [args] ) */
-        /* --- determine if indeed a function call --- */
-        Name identifier = ((NameExpr) ((ParameterizedExpr) astNode).getTarget()).getName();
-        boolean isFunctionCall = runtimeInfo.kindAnalysis.getResult(identifier).isFunction();
-        if (!isFunctionCall) return false;
-        /* --- check the name of the function --- */
-        if (!this.functionName.equals("*")) {
-            if (!this.functionName.equals(identifier.getID())) return false;
-        }
-        /* --- check if the number of arguments could satisfy the pattern --- */
-        boolean isFixNumMatch = true;
-        for (Signature signature : this.inputSignatures) {
-            if (signature.getType().getSignature().equals("..")) isFixNumMatch = false;
-        }
-        boolean isFixNumCandidiate = true;
-        for (Expr arg : ((ParameterizedExpr) astNode).getArgList()) {
-            if (arg instanceof CellIndexExpr) {
-                for (Expr index : ((CellIndexExpr) arg).getArgList()) {
-                    if (index instanceof ColonExpr) isFixNumCandidiate = false;
-                    if (index instanceof RangeExpr) isFixNumCandidiate = false;
-                }
-            }
-        }
-        if (isFixNumMatch) {
-            if (isFixNumCandidiate) {
-                /* fix number of accept    */
-                /* fix number of candidate */
-                if (this.getInputSignatures().size() != ((ParameterizedExpr) astNode).getNumArg()) return false;
-            } else {
-                /* fix number of accept         */
-                /* variable number of candidate */
-                int minNumArg = ((ParameterizedExpr) astNode).getNumArg();
-                for (Expr arg : ((ParameterizedExpr) astNode).getArgList()) {
-                    if (arg instanceof CellIndexExpr) minNumArg = minNumArg - 1;
-                }
-                if (minNumArg > this.getInputSignatures().size()) return false;
-            }
-        } else {
-            if (isFixNumCandidiate) {
-                /* variable number of accept */
-                /* fix number of candidate   */
-                int minNumberAccept = this.inputSignatures.size();
-                for (Signature signature : this.inputSignatures) {
-                    if (signature.getType().getSignature().equals("..")) minNumberAccept = minNumberAccept - 1;
-                }
-                if (((ParameterizedExpr) astNode).getNumArg() < minNumberAccept) return false;
-            } else {
-                /* variable number of accept    */
-                /* variable number of candidate */
-                /* IGNORE in the static decision, leave to dynamic check */
-            }
-        }
-        /* remain return output check, dimension and type check at runtime */
-        return true;
     }
 }

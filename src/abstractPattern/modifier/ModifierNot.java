@@ -5,7 +5,6 @@ import abstractPattern.Modifier;
 import abstractPattern.analysis.PatternClassifier;
 import ast.ASTNode;
 import ast.NotExpr;
-import transformer.RuntimeInfo;
 
 import java.util.Collection;
 
@@ -58,15 +57,5 @@ public class ModifierNot extends Modifier{
                 "~%s",
                 this.operand.toString()
         );
-    }
-
-    @Override
-    public boolean isPossibleWeave(ASTNode astNode, RuntimeInfo runtimeInfo) {
-        /* after the modifier transformation we only allow not pattern attach to dimension / type / within */
-        if (this.operand instanceof IsType) return this.operand.isPossibleWeave(astNode, runtimeInfo);
-        if (this.operand instanceof Dimension) return this.operand.isPossibleWeave(astNode, runtimeInfo);
-        if (this.operand instanceof Within) return !this.operand.isPossibleWeave(astNode, runtimeInfo);
-        /* control flow should not reach here */
-        throw new AssertionError();
     }
 }

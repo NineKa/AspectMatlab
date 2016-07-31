@@ -7,7 +7,6 @@ import abstractPattern.Modifier;
 import abstractPattern.analysis.PatternClassifier;
 import ast.ASTNode;
 import ast.OrExpr;
-import transformer.RuntimeInfo;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -80,10 +79,5 @@ public class ModifierOr extends Modifier{
                 this.lhs.toString(),
                 this.rhs.toString()
         );
-    }
-
-    @Override
-    public boolean isPossibleWeave(ASTNode astNode, RuntimeInfo runtimeInfo) {
-        return this.lhs.isPossibleWeave(astNode, runtimeInfo) || this.rhs.isPossibleWeave(astNode, runtimeInfo);
     }
 }

@@ -87,13 +87,23 @@ public class Debug_DFAAnnotation {
     @Test
     public void test5() {
         DFA dfa = buildDFAFromSignature(Arrays.asList("var", "..", "num"));
-        List<Class<? extends Expr>> candidateValid1 = getCandidate("%@test5 [x, 'str', 10]");
-        List<Class<? extends Expr>> candidateValid2 = getCandidate("%@test5 [x, 10.0]");
+        List<Class<? extends Expr>> candidateValid1   = getCandidate("%@test5 [x, 'str', 10]");
+        List<Class<? extends Expr>> candidateValid2   = getCandidate("%@test5 [x, 10.0]");
         List<Class<? extends Expr>> candidateInvalid1 = getCandidate("%@test5 [x, 'str', 'str']");
         List<Class<? extends Expr>> candidateInvalid2 = getCandidate("%@test5 ['x', 'str', 10]");
         Assert.assertTrue(dfa.validate(candidateValid1));
         Assert.assertTrue(dfa.validate(candidateValid2));
         Assert.assertFalse(dfa.validate(candidateInvalid1));
         Assert.assertFalse(dfa.validate(candidateInvalid2));
+    }
+
+    @Test
+    public void test6() {
+        /* matching for empty */
+        DFA dfa = buildDFAFromSignature(Arrays.asList());
+        List<Class<? extends Expr>> candidateValid   = getCandidate("%@test6 []");
+        List<Class<? extends Expr>> candidateInvalid = getCandidate("%@test6 x");
+        Assert.assertTrue(dfa.validate(candidateValid));
+        Assert.assertFalse(dfa.validate(candidateInvalid));
     }
 }

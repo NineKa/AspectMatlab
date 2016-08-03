@@ -13,6 +13,13 @@ public class NFAFactory {
     public static NFA buildNFAfromDimension(Alphabet<Integer> alphabet, List<Name> signature) {
         NFA retNFA = new NFA(alphabet);
         NFAStateAlloc allocator = retNFA.getAllocator();
+        if (signature.getNumChild() == 0) {
+            /* trivial construction */
+            NFANode entryAndAccespt = allocator.getNewState();
+            retNFA.setEntryState(entryAndAccespt);
+            retNFA.addAcceptState(entryAndAccespt);
+            return retNFA;
+        }
         for (Name iter : signature) {
             NFANode previousState = getLastGeneratedNode(retNFA);
             if (previousState == null) {
@@ -52,6 +59,13 @@ public class NFAFactory {
     public static NFA buildNFAfromType(Alphabet<String> alphabet, List<Name> signature) {
         NFA retNFA = new NFA(alphabet);
         NFAStateAlloc allocator = retNFA.getAllocator();
+        if (signature.getNumChild() == 0) {
+            /* trivial construction */
+            NFANode entryAndAccespt = allocator.getNewState();
+            retNFA.setEntryState(entryAndAccespt);
+            retNFA.addAcceptState(entryAndAccespt);
+            return retNFA;
+        }
         for (Name iter : signature) {
             NFANode previousState = getLastGeneratedNode(retNFA);
             if (previousState == null) {
@@ -97,6 +111,14 @@ public class NFAFactory {
 
         NFA retNFA = new NFA(alphabet);
         NFAStateAlloc allocator = retNFA.getAllocator();
+        if (selectorSignature.isEmpty()) {
+            /* trivial construction */
+            NFANode entryAndAccespt = allocator.getNewState();
+            retNFA.setEntryState(entryAndAccespt);
+            retNFA.addAcceptState(entryAndAccespt);
+            return retNFA;
+        }
+
         for (String iter : selectorSignature) {
             NFANode previousState = getLastGeneratedNode(retNFA);
             if (previousState == null) {

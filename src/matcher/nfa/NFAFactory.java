@@ -148,6 +148,7 @@ public class NFAFactory {
                 state2Node.addEdge(stateTransferCodeInt, state3Node);
                 state2Node.addEdge(stateTransferCodeFP, state3Node);
                 state2Node.addEdge(stateTransferCodeVar, state3Node);
+                state2Node.addEdge(alphabet.getEpsilonTransitionCode(), state3Node);
                 state3Node.addEdge(alphabet.getEpsilonTransitionCode(), state4Node);
                 state4Node.addEdge(alphabet.getEpsilonTransitionCode(), previousState);
                 continue;

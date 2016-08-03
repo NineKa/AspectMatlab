@@ -46,29 +46,54 @@ public class Debug_DFAAnnotation {
     public void test2() {
         /* matching for number literal */
         DFA dfa = buildDFAFromSignature(Arrays.asList("num"));
-        List<Class<? extends Expr>> candidate = getCandidate("%@test 10");
-        Assert.assertTrue(dfa.validate(candidate));
+        List<Class<? extends Expr>> candidateVar = getCandidate("%@test2 x");
+        List<Class<? extends Expr>> candidateInt = getCandidate("%@test2 10");
+        List<Class<? extends Expr>> candidateFP  = getCandidate("%@test2 10.0");
+        List<Class<? extends Expr>> candidateStr = getCandidate("%@test2 'str'");
+        Assert.assertFalse(dfa.validate(candidateVar));
+        Assert.assertTrue(dfa.validate(candidateInt));
+        Assert.assertTrue(dfa.validate(candidateFP));
+        Assert.assertFalse(dfa.validate(candidateStr));
     }
 
     @Test
     public void test3() {
-        NFA nfa = NFAFactory.buildNFAfromAnnotateSelector(Arrays.asList("num"));
-        DFA dfa = new DFA(nfa);
-        AnnotationMatcher matcher = new AnnotationMatcher("%@test3 10");
-        AbstractAnnotation annotation = matcher.getAbstractAnnotation();
-        List<Class<? extends Expr>> candidate = new LinkedList<>();
-        for (Expr expr : annotation.getAnnotationArgs().getChild(0)) candidate.add(expr.getClass());
-        Assert.assertTrue(dfa.validate(candidate));
+        /* matching for string literal */
+        DFA dfa = buildDFAFromSignature(Arrays.asList("str"));
+        List<Class<? extends Expr>> candidateVar = getCandidate("%@test3 x");
+        List<Class<? extends Expr>> candidateInt = getCandidate("%@test3 10");
+        List<Class<? extends Expr>> candidateFP  = getCandidate("%@test3 10.0");
+        List<Class<? extends Expr>> candidateStr = getCandidate("%@test3 'str'");
+        Assert.assertFalse(dfa.validate(candidateVar));
+        Assert.assertFalse(dfa.validate(candidateInt));
+        Assert.assertFalse(dfa.validate(candidateFP));
+        Assert.assertTrue(dfa.validate(candidateStr));
     }
 
     @Test
     public void test4() {
-        NFA nfa = NFAFactory.buildNFAfromAnnotateSelector(Arrays.asList("str"));
-        DFA dfa = new DFA(nfa);
-        AnnotationMatcher matcher = new AnnotationMatcher("%@test4 'str'");
-        AbstractAnnotation annotation = matcher.getAbstractAnnotation();
-        List<Class<? extends Expr>> candidate = new LinkedList<>();
-        for (Expr expr : annotation.getAnnotationArgs().getChild(0)) candidate.add(expr.getClass());
-        Assert.assertTrue(dfa.validate(candidate));
+        /* matching for wildcard */
+        DFA dfa = buildDFAFromSignature(Arrays.asList("*"));
+        List<Class<? extends Expr>> candidateVar = getCandidate("%@test4 x");
+        List<Class<? extends Expr>> candidateInt = getCandidate("%@test4 10");
+        List<Class<? extends Expr>> candidateFP  = getCandidate("%@test4 10.0");
+        List<Class<? extends Expr>> candidateStr = getCandidate("%@test4 'str'");
+        Assert.assertTrue(dfa.validate(candidateVar));
+        Assert.assertTrue(dfa.validate(candidateInt));
+        Assert.assertTrue(dfa.validate(candidateFP));
+        Assert.assertTrue(dfa.validate(candidateStr));
+    }
+
+    @Test
+    public void test5() {
+        DFA dfa = buildDFAFromSignature(Arrays.asList("var", "..", "num"));
+        List<Class<? extends Expr>> candidateValid1 = getCandidate("%@test5 [x, 'str', 10]");
+        List<Class<? extends Expr>> candidateValid2 = getCandidate("%@test5 [x, 10.0]");
+        List<Class<? extends Expr>> candidateInvalid1 = getCandidate("%@test5 [x, 'str', 'str']");
+        List<Class<? extends Expr>> candidateInvalid2 = getCandidate("%@test5 ['x', 'str', 10]");
+        Assert.assertTrue(dfa.validate(candidateValid1));
+        Assert.assertTrue(dfa.validate(candidateValid2));
+        Assert.assertFalse(dfa.validate(candidateInvalid1));
+        Assert.assertFalse(dfa.validate(candidateInvalid2));
     }
 }

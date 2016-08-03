@@ -6,6 +6,7 @@ import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
 import ast.*;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
+import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -97,6 +98,9 @@ public class Main {
                 System.out.println(abstractAction.toString());
             }
         }
+
+        VFAnalysis analysis = new VFFlowInsensitiveAnalysis(new CompilationUnits());
+        analysis.analyze();
         // recPrintStructure(units, 0);
     }
 }

@@ -12,6 +12,8 @@ import ast.ASTNode;
 import ast.Name;
 import ast.PatternAnnotate;
 import ast.Selector;
+import transformer.IsPossibleJointPointResult;
+import transformer.RuntimeInfo;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -217,5 +219,12 @@ public class Annotate extends Primitive {
         weaveTypeBooleanMap.put(WeaveType.After, true);
         weaveTypeBooleanMap.put(WeaveType.Around, true);
         return weaveTypeBooleanMap;
+    }
+
+    @Override
+    public IsPossibleJointPointResult isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        /* TODO */
+
+        return super.isPossibleJointPoint(astNode, runtimeInfo);
     }
 }

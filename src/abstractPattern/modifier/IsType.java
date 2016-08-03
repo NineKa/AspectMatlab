@@ -2,7 +2,7 @@ package abstractPattern.modifier;
 
 import Matlab.Utils.IReport;
 import abstractPattern.Modifier;
-import abstractPattern.utility.SignatureType;
+import abstractPattern.signature.SignatureType;
 import ast.ASTNode;
 import ast.PatternIsType;
 

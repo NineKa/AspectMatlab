@@ -1,8 +1,7 @@
 package matcher.parameter;
 
-import abstractPattern.utility.Signature;
+import abstractPattern.signature.Signature;
 import ast.*;
-import ast.Function;
 import matcher.alphabet.Alphabet;
 import matcher.alphabet.DimAlphabetCompareFunc;
 import matcher.dfa.DFA;

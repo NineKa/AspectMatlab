@@ -6,6 +6,8 @@ import abstractPattern.modifier.ModifierAnd;
 import abstractPattern.type.WeaveType;
 import ast.*;
 import org.javatuples.Pair;
+import transformer.IsPossibleJointPointResult;
+import transformer.RuntimeInfo;
 
 import java.util.*;
 import java.util.List;
@@ -199,4 +201,11 @@ public abstract class Primitive extends Pattern{
             this.addModifier(modifier);
         }
     }
+
+    /* --- transform --- */
+    public IsPossibleJointPointResult isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        /* TODO: abstract this method */
+        return new IsPossibleJointPointResult();
+    }
+    /* ----------------- */
 }

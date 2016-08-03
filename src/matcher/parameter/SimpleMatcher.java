@@ -1,6 +1,6 @@
 package matcher.parameter;
 
-import abstractPattern.utility.Signature;
+import abstractPattern.signature.Signature;
 import ast.Function;
 import ast.Name;
 import matcher.alphabet.Alphabet;

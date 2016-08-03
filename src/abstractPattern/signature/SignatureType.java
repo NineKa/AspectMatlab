@@ -1,4 +1,4 @@
-package abstractPattern.utility;
+package abstractPattern.signature;
 
 import Matlab.Utils.IReport;
 import Matlab.Utils.Report;

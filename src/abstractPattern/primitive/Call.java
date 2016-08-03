@@ -8,8 +8,8 @@ import abstractPattern.Primitive;
 import abstractPattern.modifier.Dimension;
 import abstractPattern.modifier.IsType;
 import abstractPattern.modifier.Within;
+import abstractPattern.signature.Signature;
 import abstractPattern.type.WeaveType;
-import abstractPattern.utility.Signature;
 import ast.*;
 
 import java.util.HashMap;

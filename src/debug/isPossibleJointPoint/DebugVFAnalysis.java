@@ -9,6 +9,7 @@ import natlab.toolkits.filehandling.FunctionOrScriptQuery;
 import java.util.HashMap;
 import java.util.Map;
 
+@Deprecated /* Debug usage only */
 public class DebugVFAnalysis extends VFFlowInsensitiveAnalysis{
     private Map<Name, VFDatum> overrideData = new HashMap<>();
 

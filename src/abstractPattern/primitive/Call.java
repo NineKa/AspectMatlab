@@ -227,7 +227,10 @@ public class Call extends Primitive {
         try {
             Name functionIdentifier = ((NameExpr) ((ParameterizedExpr) astNode).getTarget()).getName();
             VFDatum analysisResult = runtimeInfo.kindAnalysis.getResult(functionIdentifier);
-            if (!analysisResult.isFunction()) { /* function call impossible */
+            boolean possibleFuncCall = false;
+            if (analysisResult.isFunction()) possibleFuncCall = true; /* Kind analysis resolve as function */
+            if (analysisResult.isID()) possibleFuncCall = true; /* Kind analysis cannot resolve -> assume true */
+            if (!possibleFuncCall) { /* function call impossible */
                 IsPossibleJointPointResult result = new IsPossibleJointPointResult();
                 result.reset();
                 return result;

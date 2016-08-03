@@ -8,10 +8,8 @@ import abstractPattern.modifier.Dimension;
 import abstractPattern.modifier.IsType;
 import abstractPattern.modifier.Within;
 import abstractPattern.type.WeaveType;
-import ast.ASTNode;
-import ast.Name;
-import ast.PatternAnnotate;
-import ast.Selector;
+import ast.*;
+import matcher.annotation.AnnotationMatcher;
 import transformer.IsPossibleJointPointResult;
 import transformer.RuntimeInfo;
 
@@ -224,6 +222,25 @@ public class Annotate extends Primitive {
     @Override
     public IsPossibleJointPointResult isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
         /* TODO */
+        /* --- structure check --- */
+        if (!(astNode instanceof EmptyStmt)) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        assert astNode instanceof EmptyStmt;    /* should not fail */
+        /* --- retrieve HelpComment --- */
+        if (!runtimeInfo.annotationMap.keySet().contains(astNode)) {
+            /* such empty comment is not inserted by transformer, ignored */
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        HelpComment helpComment = runtimeInfo.annotationMap.get(astNode);
+        String annotate = helpComment.getText();
+        AnnotationMatcher matcher = new AnnotationMatcher(annotate);
+        assert matcher.isValid();   /* comment should be valid as it's in the comment map */
+
 
         return super.isPossibleJointPoint(astNode, runtimeInfo);
     }

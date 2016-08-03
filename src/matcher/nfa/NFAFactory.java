@@ -10,6 +10,7 @@ public class NFAFactory {
         return nfa.getState(allocator.size() - 1);
     }
 
+    @SuppressWarnings("deprecation")
     public static NFA buildNFAfromDimension(Alphabet<Integer> alphabet, List<Name> signature) {
         NFA retNFA = new NFA(alphabet);
         NFAStateAlloc allocator = retNFA.getAllocator();
@@ -56,6 +57,7 @@ public class NFAFactory {
         return retNFA;
     }
 
+    @SuppressWarnings("deprecation")
     public static NFA buildNFAfromType(Alphabet<String> alphabet, List<Name> signature) {
         NFA retNFA = new NFA(alphabet);
         NFAStateAlloc allocator = retNFA.getAllocator();
@@ -102,6 +104,7 @@ public class NFAFactory {
         return retNFA;
     }
 
+    @SuppressWarnings("deprecation")
     public static NFA buildNFAfromAnnotateSelector(java.util.List<String> selectorSignature) {
         Alphabet<Class<? extends Expr>> alphabet = new Alphabet<>();
         alphabet.add(FPLiteralExpr.class);

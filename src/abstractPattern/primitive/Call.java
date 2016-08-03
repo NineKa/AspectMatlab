@@ -11,6 +11,9 @@ import abstractPattern.modifier.Within;
 import abstractPattern.signature.Signature;
 import abstractPattern.type.WeaveType;
 import ast.*;
+import natlab.toolkits.analysis.varorfun.VFDatum;
+import transformer.IsPossibleJointPointResult;
+import transformer.RuntimeInfo;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -203,5 +206,98 @@ public class Call extends Primitive {
         weaveTypeBooleanMap.put(WeaveType.After, true);
         weaveTypeBooleanMap.put(WeaveType.Around, (needReturnValidation)?false:true);
         return weaveTypeBooleanMap;
+    }
+
+    @Override
+    public IsPossibleJointPointResult isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        /* structure check */
+        if (!(astNode instanceof ParameterizedExpr)) { /* false return */
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        assert astNode instanceof ParameterizedExpr;
+        if (!(((ParameterizedExpr) astNode).getTarget() instanceof NameExpr)) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        assert ((ParameterizedExpr) astNode).getTarget() instanceof NameExpr;
+        /* check if this indeed a function call (Query Kind Analysis) */
+        try {
+            Name functionIdentifier = ((NameExpr) ((ParameterizedExpr) astNode).getTarget()).getName();
+            VFDatum analysisResult = runtimeInfo.kindAnalysis.getResult(functionIdentifier);
+            if (!analysisResult.isFunction()) { /* function call impossible */
+                IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+                result.reset();
+                return result;
+            }
+        } catch (NullPointerException exception) {
+            /* such exception is caused by in proper kindAnalysis */
+            /* code revision required, if control flow reach here */
+            throw new AssertionError();
+        }
+        /* function name check */
+        String actualName = ((NameExpr) ((ParameterizedExpr) astNode).getTarget()).getName().getID();
+        if (!this.functionName.equals("*") && !this.functionName.equals(actualName)) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        /* static check input parameters (if number could possibly match the signature) */
+        boolean fixedNumberMatch = true; int minNumberExpected  = getInputSignatures().size();
+        boolean fixedNumberInput = true; int minNumberCandidate = ((ParameterizedExpr) astNode).getNumArg();
+        for (Signature signature : getInputSignatures()) {
+            /* [..] wildcards may consume more than one token -> not fixed number of match */
+            if (signature.getType().getSignature().equals("..")) {
+                fixedNumberMatch = false;
+                minNumberExpected = minNumberExpected - 1;
+            }
+        }
+        for (Expr arg : ((ParameterizedExpr) astNode).getArgList()) {
+            /* cell index expr with range expr or colon expr may provide extra tokens */
+            if (arg instanceof ParameterizedExpr) {
+                for (Expr candidate : ((ParameterizedExpr) arg).getArgList()) {
+                    if (candidate instanceof RangeExpr || candidate instanceof ColonExpr) {
+                        fixedNumberInput = false;
+                        minNumberCandidate = minNumberCandidate - 1;
+                    }
+                }
+            }
+            if (arg instanceof CellIndexExpr) {
+                for (Expr candidate : ((CellIndexExpr) arg).getArgList()) {
+                    if (candidate instanceof RangeExpr || candidate instanceof ColonExpr) {
+                        fixedNumberInput = false;
+                        minNumberCandidate = minNumberCandidate - 1;
+                    }
+                }
+            }
+        }
+        boolean argNumPossible = true;
+        if (fixedNumberMatch) {
+            if (fixedNumberInput) {
+                if (minNumberExpected != minNumberCandidate) argNumPossible = false;
+            } else {
+                if (minNumberExpected < minNumberCandidate) argNumPossible = false;
+            }
+        } else {
+            if (fixedNumberInput) {
+                if (minNumberCandidate < minNumberExpected) argNumPossible = false;
+            } else {
+                /* both pattern and candidate's size can not static decide */
+                /* filtering impossible, leave for dynamic check */
+            }
+        }
+        if (!argNumPossible) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+
+        /* claim such pattern is possibly matched joint point */
+        IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+        result.reset();
+        result.calls.add(this);
+        return result;
     }
 }

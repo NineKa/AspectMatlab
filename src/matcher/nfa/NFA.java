@@ -13,6 +13,7 @@ public class NFA implements Iterable<NFANode>{
     private Collection<NFANode> acceptStates = new HashSet<>();
     private NFANode entryState = null;
 
+    @Deprecated
     public NFA(Alphabet pAlphabet) {
         this.alphabet = pAlphabet;
         this.alloc = new NFAStateAlloc(this.alphabet, this);

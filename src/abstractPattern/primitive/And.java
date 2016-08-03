@@ -127,6 +127,6 @@ public class And extends Primitive{
         IsPossibleJointPointResult lhsResult = this.lhs.isPossibleJointPoint(astNode, runtimeInfo).clone();
         IsPossibleJointPointResult rhsResult = this.rhs.isPossibleJointPoint(astNode, runtimeInfo).clone();
 
-        return lhsResult.merge(rhsResult);
+        return lhsResult.andMerge(rhsResult);
     }
 }

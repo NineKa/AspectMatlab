@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Debug_DFAAnnotation {
+public class DebugDFAAnnotation {
     private static DFA buildDFAFromSignature(List<String> strings) {
         NFA nfa = NFAFactory.buildNFAfromAnnotateSelector(strings);
         return new DFA(nfa);

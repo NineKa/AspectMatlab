@@ -6,9 +6,7 @@ import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
 import ast.*;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
-import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 
 public class Main {
@@ -87,6 +85,7 @@ public class Main {
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
 
+        /*
         assert units.getProgram(0) instanceof AspectDef;
         for (Actions actions : ((AspectDef) units.getProgram(0)).getActionList()) {
             for (Action action : actions.getActionList()) {
@@ -101,6 +100,7 @@ public class Main {
 
         VFAnalysis analysis = new VFFlowInsensitiveAnalysis(new CompilationUnits());
         analysis.analyze();
-        // recPrintStructure(units, 0);
+        */
+        recPrintStructure(units, 0);
     }
 }

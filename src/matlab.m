@@ -3,7 +3,7 @@ aspect_ demo
 		p : p  %pattern p is depend on itself
 	end
 	actions
-        a : after call(foo(int[3,3])) & ~~~(istype(double) & dimension([3,3])) : ()
+        a : after annotate(foo(..,[..])) : ()
 
 		end
 	end

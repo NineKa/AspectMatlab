@@ -11,7 +11,8 @@ public enum OperatorType {
     lDivide (2),       /* ".\" */
     mPower  (2),       /* "^"  */
     Power   (2),       /* ".^" */
-    Transpose(1)       /* ".'" */;
+    Transpose(1),      /* ".'" */
+    mTranspose(1)      /* "'"  */;
 
     private int maxArgs = 0;
 
@@ -29,7 +30,8 @@ public enum OperatorType {
         if (typeString.equals(".\\")) return OperatorType.lDivide;
         if (typeString.equals("^"))   return OperatorType.mPower;
         if (typeString.equals(".^"))  return OperatorType.Power;
-        if (typeString.equals(".'"))   return OperatorType.Transpose;
+        if (typeString.equals(".'"))  return OperatorType.Transpose;
+        if (typeString.equals("'"))   return OperatorType.mTranspose;
         throw new RuntimeException();
     }
 
@@ -37,17 +39,18 @@ public enum OperatorType {
 
     @Override public String toString() {
         switch (this) {
-            case Plus:     return "+";
-            case Minus:    return "-";
-            case mTimes:   return "*";
-            case Times:    return ".*";
-            case mrDivide: return "/";
-            case rDivide:  return "./";
-            case mlDivide: return "\\";
-            case lDivide:  return ".\\";
-            case mPower:   return "^";
-            case Power:    return ".^";
-            case Transpose:return ".'";
+            case Plus:       return "+";
+            case Minus:      return "-";
+            case mTimes:     return "*";
+            case Times:      return ".*";
+            case mrDivide:   return "/";
+            case rDivide:    return "./";
+            case mlDivide:   return "\\";
+            case lDivide:    return ".\\";
+            case mPower:     return "^";
+            case Power:      return ".^";
+            case Transpose:  return ".'";
+            case mTranspose: return "'";
             default:       throw new RuntimeException();
         }
     }

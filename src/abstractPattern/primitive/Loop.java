@@ -9,9 +9,9 @@ import abstractPattern.modifier.IsType;
 import abstractPattern.modifier.Within;
 import abstractPattern.type.LoopType;
 import abstractPattern.type.WeaveType;
-import ast.ASTNode;
-import ast.Name;
-import ast.PatternLoop;
+import ast.*;
+import transformer.IsPossibleJointPointResult;
+import transformer.RuntimeInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -148,5 +148,47 @@ public class Loop extends Primitive{
         weaveTypeBooleanMap.put(WeaveType.After, true);
         weaveTypeBooleanMap.put(WeaveType.Around, true);
         return weaveTypeBooleanMap;
+    }
+
+    @Override
+    public IsPossibleJointPointResult isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        /* structure check */
+        boolean isValidStructure = false;
+        if (astNode instanceof ForStmt) isValidStructure = true;
+        if (astNode instanceof WhileStmt) isValidStructure = true;
+        if (!isValidStructure) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        /* loop name check */
+        if (!runtimeInfo.loopNameResolveMap.keySet().contains(astNode)) {
+            /* in proper loop resolve map         */
+            /* control flow should not reach here */
+            throw new AssertionError();
+        }
+        String actualName = runtimeInfo.loopNameResolveMap.get(astNode);
+        if (!this.loopName.equals("*") && !this.loopName.equals(actualName)) {
+            /* miss matched name */
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        /* loop type check */
+        boolean isValidLoopType = false;
+        if (this.loopType == LoopType.Any) isValidLoopType = true;
+        if (this.loopType == LoopType.For && astNode instanceof ForStmt) isValidLoopType = true;
+        if (this.loopType == LoopType.While && astNode instanceof WhileStmt) isValidLoopType = true;
+        if (!isValidLoopType) { /* miss matched */
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+
+        /* claim such pattern is possibly matched joint point */
+        IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+        result.reset();
+        result.isLoops = true;
+        return result;
     }
 }

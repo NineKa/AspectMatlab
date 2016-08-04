@@ -11,9 +11,9 @@ import abstractPattern.modifier.Within;
 import abstractPattern.signature.Signature;
 import abstractPattern.type.OperatorType;
 import abstractPattern.type.WeaveType;
-import ast.ASTNode;
-import ast.FullSignature;
-import ast.PatternOperator;
+import ast.*;
+import transformer.IsPossibleJointPointResult;
+import transformer.RuntimeInfo;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -148,5 +148,58 @@ public class Operator extends Primitive{
         weaveTypeBooleanMap.put(WeaveType.After, true);
         weaveTypeBooleanMap.put(WeaveType.Around, true);
         return weaveTypeBooleanMap;
+    }
+
+    @Override
+    public IsPossibleJointPointResult isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        /* structure check */
+        boolean isValidStructure = false;
+        if (astNode instanceof PlusExpr) isValidStructure = true;           /* OperatorType.Plus       */
+        if (astNode instanceof MinusExpr) isValidStructure = true;          /* OperatorType.Minus      */
+        if (astNode instanceof MTimesExpr) isValidStructure = true;         /* OperatorType.mTimes     */
+        if (astNode instanceof MDivExpr) isValidStructure = true;           /* OperatorType.mrDivide   */
+        if (astNode instanceof MLDivExpr) isValidStructure = true;          /* OperatorType.mlDivide   */
+        if (astNode instanceof MPowExpr) isValidStructure = true;           /* OperatorType.mPower     */
+        if (astNode instanceof ETimesExpr) isValidStructure = true;         /* OperatorType.Times      */
+        if (astNode instanceof EDivExpr) isValidStructure = true;           /* OperatorType.rDivide    */
+        if (astNode instanceof ELDivExpr) isValidStructure = true;          /* OperatorType.lDivide    */
+        if (astNode instanceof EPowExpr) isValidStructure = true;           /* OperatorType.Power      */
+        if (astNode instanceof MTransposeExpr) isValidStructure = true;     /* OperatorType.mTranspose */
+        if (astNode instanceof ArrayTransposeExpr) isValidStructure = true; /* OperatorType.Transpose  */
+        if (!isValidStructure) {    /* miss matched */
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        /* operator type check */
+        OperatorType actualOperatorType = null;
+        if (astNode instanceof PlusExpr) actualOperatorType = OperatorType.Plus;
+        if (astNode instanceof MinusExpr) actualOperatorType = OperatorType.Minus;
+        if (astNode instanceof MTimesExpr) actualOperatorType = OperatorType.mTimes;
+        if (astNode instanceof MDivExpr) actualOperatorType = OperatorType.mrDivide;
+        if (astNode instanceof MLDivExpr) actualOperatorType = OperatorType.mlDivide;
+        if (astNode instanceof MPowExpr) actualOperatorType = OperatorType.mPower;
+        if (astNode instanceof ETimesExpr) actualOperatorType = OperatorType.Times;
+        if (astNode instanceof EDivExpr) actualOperatorType = OperatorType.rDivide;
+        if (astNode instanceof ELDivExpr) actualOperatorType = OperatorType.lDivide;
+        if (astNode instanceof EPowExpr) actualOperatorType = OperatorType.Power;
+        if (astNode instanceof MTransposeExpr) actualOperatorType = OperatorType.mTranspose;
+        if (astNode instanceof ArrayTransposeExpr) actualOperatorType = OperatorType.Transpose;
+        if (actualOperatorType == null) {
+            /* control flow should not reach here */
+            /* code revision required             */
+            throw new AssertionError();
+        }
+        if (!this.operatorType.equals(actualOperatorType)) {    /* miss matched */
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+
+        /* claim such pattern is possibly matched joint point */
+        IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+        result.reset();
+        result.isOperators = true;
+        return result;
     }
 }

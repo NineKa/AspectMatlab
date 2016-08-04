@@ -3,7 +3,7 @@ aspect_ demo
 		p : p  %pattern p is depend on itself
 	end
 	actions
-        a : after annotate(foo(..,[..])) : ()
+        a : after op(': int,int) : ()
 
 		end
 	end

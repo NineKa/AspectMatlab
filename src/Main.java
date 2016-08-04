@@ -78,7 +78,7 @@ public class Main {
         String functionFilePath = "/Users/k9/Documents/AspectMatlab/src/function.m";
 
         Result<UnitNode> result = MRecognizer.RecognizeFile(
-                functionFilePath,
+                matlabFilePath,
                 true,
                 new Notifier()
         );

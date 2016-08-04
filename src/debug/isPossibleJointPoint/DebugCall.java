@@ -70,7 +70,7 @@ public class DebugCall {
 
     public static boolean verify(Call pattern, Pair<ParameterizedExpr, RuntimeInfo> candidate) {
         IsPossibleJointPointResult result = pattern.isPossibleJointPoint(candidate.getValue0(), candidate.getValue1());
-        return result.isCall();
+        return result.isCalls;
     }
 
     @Test

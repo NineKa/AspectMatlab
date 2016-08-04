@@ -1,21 +1,18 @@
 package transformer;
 
-import abstractPattern.primitive.*;
 import util.Mergeable;
-import util.MergeableCollection;
-import util.MergeableHashSet;
 
 public class IsPossibleJointPointResult implements Cloneable, Mergeable<IsPossibleJointPointResult> {
-    public MergeableCollection<Annotate> annotates = new MergeableHashSet<>();
-    public MergeableCollection<Call> calls = new MergeableHashSet<>();
-    public MergeableCollection<Execution> executions = new MergeableHashSet<>();
-    public MergeableCollection<Get> gets = new MergeableHashSet<>();
-    public MergeableCollection<Loop> loops = new MergeableHashSet<>();
-    public MergeableCollection<LoopBody> loopBodies = new MergeableHashSet<>();
-    public MergeableCollection<LoopHead> loopHeads = new MergeableHashSet<>();
-    public MergeableCollection<MainExecution> mainExecutions = new MergeableHashSet<>();
-    public MergeableCollection<Operator> operators = new MergeableHashSet<>();
-    public MergeableCollection<Set> sets = new MergeableHashSet<>();
+    public boolean isAnnotates = false;
+    public boolean isCalls = false;
+    public boolean isExecutions = false;
+    public boolean isGets = false;
+    public boolean isLoops = false;
+    public boolean isLoopBodies = false;
+    public boolean isLoopHeads = false;
+    public boolean isMainExecutions = false;
+    public boolean isOperators = false;
+    public boolean isSets = false;
 
     @SuppressWarnings("deprecation")
     public IsPossibleJointPointResult andMerge(IsPossibleJointPointResult target) {
@@ -35,7 +32,16 @@ public class IsPossibleJointPointResult implements Cloneable, Mergeable<IsPossib
 
     public void reset() {
         /* this method will clear all records and reset the result */
-        this.annotates.clear();
+        this.isAnnotates = false;
+        this.isCalls = false;
+        this.isExecutions = false;
+        this.isGets = false;
+        this.isLoops = false;
+        this.isLoopBodies = false;
+        this.isLoopHeads = false;
+        this.isMainExecutions = false;
+        this.isOperators = false;
+        this.isSets = false;
     }
 
     @Override
@@ -52,72 +58,32 @@ public class IsPossibleJointPointResult implements Cloneable, Mergeable<IsPossib
     @Override @Deprecated
     public IsPossibleJointPointResult intersection(IsPossibleJointPointResult target) {
         IsPossibleJointPointResult result = new IsPossibleJointPointResult();
-        result.annotates = this.annotates.intersection(target.annotates);
-        result.calls = this.calls.intersection(target.calls);
-        result.executions = this.executions.intersection(target.executions);
-        result.gets = this.gets.intersection(target.gets);
-        result.loops = this.loops.intersection(target.loops);
-        result.loopBodies = this.loopBodies.intersection(target.loopBodies);
-        result.loopHeads = this.loopHeads.intersection(target.loopHeads);
-        result.mainExecutions = this.mainExecutions.intersection(target.mainExecutions);
-        result.operators = this.operators.intersection(target.operators);
-        result.sets = this.sets.intersection(target.sets);
+        result.isAnnotates = this.isAnnotates && target.isAnnotates;
+        result.isCalls = this.isCalls && target.isCalls;
+        result.isExecutions = this.isExecutions && target.isExecutions;
+        result.isGets = this.isGets && target.isGets;
+        result.isLoops = this.isLoops && target.isLoops;
+        result.isLoopBodies = this.isLoopBodies && target.isLoopBodies;
+        result.isLoopHeads = this.isLoopHeads && target.isLoopHeads;
+        result.isMainExecutions = this.isMainExecutions && target.isMainExecutions;
+        result.isOperators = this.isOperators && target.isOperators;
+        result.isSets = this.isSets && target.isSets;
         return result;
     }
 
     @Override @Deprecated
     public IsPossibleJointPointResult union(IsPossibleJointPointResult target) {
         IsPossibleJointPointResult result = new IsPossibleJointPointResult();
-        result.annotates = this.annotates.union(target.annotates);
-        result.calls = this.calls.union(target.calls);
-        result.executions = this.executions.union(target.executions);
-        result.gets = this.gets.union(target.gets);
-        result.loops = this.loops.union(target.loops);
-        result.loopBodies = this.loopBodies.union(target.loopBodies);
-        result.loopHeads = this.loopHeads.union(target.loopHeads);
-        result.mainExecutions = this.mainExecutions.union(target.mainExecutions);
-        result.operators = this.operators.union(target.operators);
-        result.sets = this.sets.union(target.sets);
+        result.isAnnotates = this.isAnnotates || target.isAnnotates;
+        result.isCalls = this.isCalls || target.isCalls;
+        result.isExecutions = this.isExecutions || target.isExecutions;
+        result.isGets = this.isGets || target.isGets;
+        result.isLoops = this.isLoops || target.isLoops;
+        result.isLoopBodies = this.isLoopBodies || target.isLoopBodies;
+        result.isLoopHeads = this.isLoopHeads || target.isLoopHeads;
+        result.isMainExecutions = this.isMainExecutions || target.isMainExecutions;
+        result.isOperators = this.isOperators || target.isOperators;
+        result.isSets = this.isSets || target.isSets;
         return result;
-    }
-
-    public boolean isAnnotate() {
-        return !this.annotates.isEmpty();
-    }
-
-    public boolean isCall() {
-        return !this.calls.isEmpty();
-    }
-
-    public boolean isExecution() {
-        return !this.executions.isEmpty();
-    }
-
-    public boolean isGet() {
-        return !this.gets.isEmpty();
-    }
-
-    public boolean isLoop() {
-        return !this.loops.isEmpty();
-    }
-
-    public boolean isLoopBody() {
-        return !this.loopBodies.isEmpty();
-    }
-
-    public boolean isLoopHead() {
-        return !this.loopHeads.isEmpty();
-    }
-
-    public boolean isMainExecution() {
-        return !this.mainExecutions.isEmpty();
-    }
-
-    public boolean isOperator() {
-        return !this.operators.isEmpty();
-    }
-
-    public boolean isSet() {
-        return !this.sets.isEmpty();
     }
 }

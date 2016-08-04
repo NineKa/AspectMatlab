@@ -11,6 +11,8 @@ import abstractPattern.modifier.Within;
 import abstractPattern.signature.Signature;
 import abstractPattern.type.WeaveType;
 import ast.*;
+import transformer.IsPossibleJointPointResult;
+import transformer.RuntimeInfo;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -191,5 +193,103 @@ public class Execution extends Primitive {
         weaveTypeBooleanMap.put(WeaveType.After, true);
         weaveTypeBooleanMap.put(WeaveType.Around, (needReturnValidation)?false:true);
         return weaveTypeBooleanMap;
+    }
+
+    @Override
+    public IsPossibleJointPointResult isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        /* structure check */
+        if (!(astNode instanceof Function)) { /* false return*/
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        assert astNode instanceof Function;
+        /* function name check */
+        String actualName = ((Function) astNode).getName().getID();
+        if (!this.functionName.equals("*") && !this.functionName.equals(actualName)) { /* name mismatch */
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+
+        /* static signature check */
+        /* Input Section  : */ boolean inputStaticPossible  = true;
+        /* Output Section : */ boolean outputStaticPossible = true;
+
+        /* static check input parameters (if number could possibly matched) */
+        boolean inputFixedPattern = true; int inputMinNumberPattern = this.getInputSignatures().size();
+        boolean inputFixedInput   = true; int inputMinNumberInput   = ((Function) astNode).getNumInputParam();
+        for (Signature signature : this.getInputSignatures()) {
+            /* [..] wildcards may consume more than one token -> not fixed number of match */
+            if (signature.getType().getSignature().equals("..")) {
+                inputFixedPattern = false;
+                inputMinNumberPattern = inputMinNumberPattern - 1;
+            }
+        }
+        for (Name arg : ((Function) astNode).getInputParamList()) {
+            /* varargin <=> variable-length input argument list */
+            if (arg.getID().equals("varargin")) {
+                inputFixedInput = false;
+                inputMinNumberInput = inputMinNumberInput - 1;
+            }
+        }
+        if (inputFixedPattern) {
+            if (inputFixedInput) {
+                if (inputMinNumberInput != inputMinNumberPattern) inputStaticPossible = false;
+            } else {
+                if (inputMinNumberPattern < inputMinNumberInput) inputStaticPossible = false;
+            }
+        } else {
+            if (inputFixedInput) {
+                if (inputMinNumberInput < inputMinNumberPattern) inputStaticPossible = false;
+            } else {
+                /* both pattern and candidate's size can not static decide */
+                /* filtering impossible, leave for dynamic check */
+            }
+        }
+
+        /* static check output parameters (if number could possibly matched) */
+        boolean outputFixedPattern = true; int outputMinNumberPattern = this.getOutputSignatures().size();
+        boolean outputFixedInput   = true; int outputMinNumberInput   = ((Function) astNode).getNumOutputParam();
+        for (Signature signature : this.getOutputSignatures()) {
+            /* [..] wildcards may consume more than one token -> not fixed number of match */
+            if (signature.getType().getSignature().equals("..")) {
+                outputFixedPattern = false;
+                outputMinNumberPattern = outputMinNumberPattern - 1;
+            }
+        }
+        for (Name arg : ((Function) astNode).getOutputParamList()) {
+            /* varargout <=> variable-length output argument list */
+            if (arg.getID().equals("varargout")) {
+                outputFixedInput = false;
+                outputMinNumberInput = outputMinNumberInput - 1;
+            }
+        }
+        if (outputFixedPattern) {
+            if (outputFixedInput) {
+                if (outputMinNumberInput != outputMinNumberPattern) outputStaticPossible = false;
+            } else {
+                if (outputMinNumberPattern < outputMinNumberInput) outputStaticPossible = false;
+            }
+        } else {
+            if (outputFixedInput) {
+                if (outputMinNumberInput < outputMinNumberPattern) outputStaticPossible = false;
+            } else {
+                /* both pattern and candidate's size can not static decide */
+                /* filtering impossible, leave for dynamic check */
+            }
+        }
+
+        /* static check summary */
+        if (!inputStaticPossible || !outputStaticPossible) { /* false return */
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+
+        /* claim such pattern is possibly matched joint point */
+        IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+        result.isExecutions = true;
+        return result;
     }
 }

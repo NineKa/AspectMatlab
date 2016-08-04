@@ -300,7 +300,7 @@ public class Call extends Primitive {
         /* claim such pattern is possibly matched joint point */
         IsPossibleJointPointResult result = new IsPossibleJointPointResult();
         result.reset();
-        result.calls.add(this);
+        result.isCalls = true;
         return result;
     }
 }

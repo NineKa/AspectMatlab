@@ -9,6 +9,8 @@ import abstractPattern.type.WeaveType;
 import ast.ASTNode;
 import ast.AndExpr;
 import ast.OrExpr;
+import transformer.util.IsPossibleJointPointResult;
+import transformer.util.RuntimeInfo;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -118,5 +120,13 @@ public class Or extends Primitive{
         weaveTypeBooleanWeaveType.put(WeaveType.After, lhsMap.get(WeaveType.After) && rhsMap.get(WeaveType.After));
         weaveTypeBooleanWeaveType.put(WeaveType.Around, lhsMap.get(WeaveType.Around) && rhsMap.get(WeaveType.Around));
         return weaveTypeBooleanWeaveType;
+    }
+
+    @Override
+    public IsPossibleJointPointResult isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        IsPossibleJointPointResult lhsResult = this.lhs.isPossibleJointPoint(astNode, runtimeInfo).clone();
+        IsPossibleJointPointResult rhsResult = this.rhs.isPossibleJointPoint(astNode, runtimeInfo).clone();
+
+        return lhsResult.orMerge(rhsResult);
     }
 }

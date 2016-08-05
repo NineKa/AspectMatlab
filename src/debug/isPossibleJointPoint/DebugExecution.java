@@ -9,8 +9,8 @@ import ast.*;
 import org.javatuples.Pair;
 import org.junit.Assert;
 import org.junit.Test;
-import transformer.IsPossibleJointPointResult;
-import transformer.RuntimeInfo;
+import transformer.util.IsPossibleJointPointResult;
+import transformer.util.RuntimeInfo;
 
 public class DebugExecution {
     public static Execution buildPattern(String pattern) {

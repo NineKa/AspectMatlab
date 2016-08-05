@@ -10,8 +10,8 @@ import natlab.toolkits.analysis.varorfun.VFDatum;
 import org.javatuples.Pair;
 import org.junit.Assert;
 import org.junit.Test;
-import transformer.IsPossibleJointPointResult;
-import transformer.RuntimeInfo;
+import transformer.util.IsPossibleJointPointResult;
+import transformer.util.RuntimeInfo;
 
 import java.util.LinkedList;
 import java.util.List;

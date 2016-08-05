@@ -8,8 +8,8 @@ import abstractPattern.Primitive;
 import abstractPattern.type.WeaveType;
 import ast.ASTNode;
 import ast.AndExpr;
-import transformer.IsPossibleJointPointResult;
-import transformer.RuntimeInfo;
+import transformer.util.IsPossibleJointPointResult;
+import transformer.util.RuntimeInfo;
 
 import java.util.Arrays;
 import java.util.HashMap;

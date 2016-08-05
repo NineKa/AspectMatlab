@@ -1,4 +1,4 @@
-package transformer;
+package transformer.util;
 
 import abstractPattern.type.ScopeType;
 import ast.EmptyStmt;

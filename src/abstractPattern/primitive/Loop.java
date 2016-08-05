@@ -10,8 +10,8 @@ import abstractPattern.modifier.Within;
 import abstractPattern.type.LoopType;
 import abstractPattern.type.WeaveType;
 import ast.*;
-import transformer.IsPossibleJointPointResult;
-import transformer.RuntimeInfo;
+import transformer.util.IsPossibleJointPointResult;
+import transformer.util.RuntimeInfo;
 
 import java.util.HashMap;
 import java.util.Map;

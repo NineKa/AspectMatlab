@@ -6,8 +6,8 @@ import abstractPattern.modifier.ModifierAnd;
 import abstractPattern.type.WeaveType;
 import ast.*;
 import org.javatuples.Pair;
-import transformer.IsPossibleJointPointResult;
-import transformer.RuntimeInfo;
+import transformer.util.IsPossibleJointPointResult;
+import transformer.util.RuntimeInfo;
 
 import java.util.*;
 import java.util.List;

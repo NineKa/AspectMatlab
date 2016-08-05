@@ -10,9 +10,9 @@ import natlab.toolkits.analysis.varorfun.VFDatum;
 import org.javatuples.Pair;
 import org.junit.Assert;
 import org.junit.Test;
-import transformer.AccessMode;
-import transformer.IsPossibleJointPointResult;
-import transformer.RuntimeInfo;
+import transformer.util.AccessMode;
+import transformer.util.IsPossibleJointPointResult;
+import transformer.util.RuntimeInfo;
 
 public class DebugGet {
     public static Get buildPattern(String pattern) {

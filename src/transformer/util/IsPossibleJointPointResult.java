@@ -1,4 +1,4 @@
-package transformer;
+package transformer.util;
 
 import util.Mergeable;
 
@@ -85,5 +85,20 @@ public class IsPossibleJointPointResult implements Cloneable, Mergeable<IsPossib
         result.isOperators = this.isOperators || target.isOperators;
         result.isSets = this.isSets || target.isSets;
         return result;
+    }
+
+    public boolean isPossible() {
+        if (isAnnotates) return true;
+        if (isCalls) return true;
+        if (isExecutions) return true;
+        if (isGets) return true;
+        if (isLoops) return true;
+        if (isLoopBodies) return true;
+        if (isLoopHeads) return true;
+        if (isMainExecutions) return true;
+        if (isOperators) return true;
+        if (isSets) return true;
+        /* control flow should not reach here */
+        throw new AssertionError();
     }
 }

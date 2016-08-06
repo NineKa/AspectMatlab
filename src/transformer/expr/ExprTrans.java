@@ -3,9 +3,11 @@ package transformer.expr;
 import abstractPattern.Action;
 import ast.Expr;
 import ast.LiteralExpr;
+import ast.UnaryExpr;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import transformer.expr.literal.LiteralTrans;
+import transformer.expr.unary.UnaryTrans;
 import transformer.util.RuntimeInfo;
 import util.Namespace;
 
@@ -40,6 +42,8 @@ public abstract class ExprTrans {
         /* TODO */
         if (expr instanceof LiteralExpr)
             return LiteralTrans.buildLiteralTransformer(actions, runtimeInfo, namespace, (LiteralExpr) expr);
+        if (expr instanceof UnaryExpr)
+            return UnaryTrans.buildUnaryTransformer(actions, runtimeInfo, namespace, (UnaryExpr) expr);
 
         /* control flow should not reach here */
         throw new AssertionError();

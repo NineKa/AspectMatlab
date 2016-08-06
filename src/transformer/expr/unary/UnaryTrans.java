@@ -25,7 +25,6 @@ public abstract class UnaryTrans extends ExprTrans {
             Namespace namespace,
             UnaryExpr unaryExpr
     ) {
-        /* TODO */
         if (unaryExpr instanceof UMinusExpr)
             return new UMinusTrans(actions, runtimeInfo, namespace, (UMinusExpr) unaryExpr);
         if (unaryExpr instanceof UPlusExpr)
@@ -34,6 +33,8 @@ public abstract class UnaryTrans extends ExprTrans {
             return new NotTrans(actions, runtimeInfo, namespace, (NotExpr) unaryExpr);
         if (unaryExpr instanceof MTransposeExpr)
             return new MTransposeTrans(actions, runtimeInfo, namespace, (MTransposeExpr) unaryExpr);
+        if (unaryExpr instanceof ArrayTransposeExpr)
+            return new ArrayTransposeTrans(actions, runtimeInfo, namespace, (ArrayTransposeExpr) unaryExpr);
 
         /* control flow should not reach here */
         throw new AssertionError();

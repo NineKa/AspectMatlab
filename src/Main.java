@@ -6,8 +6,11 @@ import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
 import ast.*;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
+import org.javatuples.Pair;
+import transformer.util.RuntimeInfo;
 
 import java.util.LinkedList;
+import java.util.Map;
 
 public class Main {
     public static VFAnalysis analysis = null;
@@ -32,33 +35,14 @@ public class Main {
     }
     public static void recPrintStructure(ASTNode node, int indent) {
         for (int iter = 0; iter < indent; iter++) System.out.print('\t');
-        try {
-            if (node instanceof Name) {
-                System.out.print(String.format(
-                        "[%d : %d] [%b] %s : ",
-                        node.getStartLine(),
-                        node.getStartColumn(),
-                        node.hasComments(),
-                        node.getClass().getName()
-                ));
-                if (analysis.getResult((Name) node) == null) {
-                    System.out.println("null");
-                } else {
-                    System.out.println(analysis.getResult((ast.Name) node));
-                }
-
-            } else {
-                System.out.println(String.format(
-                        "[%d : %d] [%b] %s",
-                        node.getStartLine(),
-                        node.getStartColumn(),
-                        node.hasComments(),
-                        node.getClass().getName()
-                ));
-            }
-        } catch (NullPointerException exception) {
-            System.out.println("null");
+        System.out.println(String.format("[%d] %s", node.GetRelativeChildIndex(), node.getClass().getName()));
+        System.out.println(node.getComments().size());
+        for (int iter = 0; iter < node.getComments().size(); iter++) {
+            HelpComment comment = (HelpComment) node.getComments().get(iter);
+            System.out.println(comment.getText());
         }
+
+
         for (int iter = 0; iter < node.getNumChild(); iter++) {
             recPrintStructure(node.getChild(iter), indent + 1);
         }
@@ -78,12 +62,16 @@ public class Main {
         String functionFilePath = "/Users/k9/Documents/AspectMatlab/src/function.m";
 
         Result<UnitNode> result = MRecognizer.RecognizeFile(
-                matlabFilePath,
+                functionFilePath,
                 true,
                 new Notifier()
         );
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
+
+        Pair<Map<Stmt, String>, IReport> r = RuntimeInfo.resolveLoopName(units, functionFilePath);
+        System.out.println(r.getValue0().toString());
+        printReport(r.getValue1());
 
         /*
         assert units.getProgram(0) instanceof AspectDef;
@@ -101,6 +89,6 @@ public class Main {
         VFAnalysis analysis = new VFFlowInsensitiveAnalysis(new CompilationUnits());
         analysis.analyze();
         */
-        recPrintStructure(units, 0);
+        // recPrintStructure(units, 0);
     }
 }

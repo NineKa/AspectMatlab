@@ -1,6 +1,6 @@
 function [varargout] = foo(varargin)
     %@loopname y
-    %@loopname x
+    %@loopname x  z
     for i = 1 : 10 %comment3
 
         %@loopname loop2

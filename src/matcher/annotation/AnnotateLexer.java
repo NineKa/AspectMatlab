@@ -1,12 +1,9 @@
-// $ANTLR 3.4 Annotate.g3 2016-07-26 20:27:24
+// $ANTLR 3.4 Annotate.g3 2016-08-07 04:33:38
 
     package matcher.annotation;
 
 
 import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked"})
 public class AnnotateLexer extends Lexer {

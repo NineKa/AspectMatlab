@@ -6,11 +6,9 @@ import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
 import ast.*;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
-import org.javatuples.Pair;
 import transformer.util.RuntimeInfo;
 
 import java.util.LinkedList;
-import java.util.Map;
 
 public class Main {
     public static VFAnalysis analysis = null;
@@ -69,9 +67,7 @@ public class Main {
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
 
-        Pair<Map<Stmt, String>, IReport> r = RuntimeInfo.resolveLoopName(units, functionFilePath);
-        System.out.println(r.getValue0().toString());
-        printReport(r.getValue1());
+        RuntimeInfo.insertAnnotationEmptyStmt(units);
 
         /*
         assert units.getProgram(0) instanceof AspectDef;

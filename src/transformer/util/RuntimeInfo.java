@@ -4,6 +4,7 @@ import Matlab.Utils.IReport;
 import Matlab.Utils.Report;
 import abstractPattern.type.ScopeType;
 import ast.*;
+import ast.List;
 import matcher.annotation.AbstractAnnotation;
 import matcher.annotation.AnnotationMatcher;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
@@ -12,11 +13,9 @@ import util.MergeableCollection;
 import util.MergeableHashMap;
 import util.MergeableHashSet;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class RuntimeInfo {
@@ -27,8 +26,6 @@ public class RuntimeInfo {
     public Map<EmptyStmt, HelpComment> annotationMap = null;
 
     public static Pair<Map<Stmt, String>, IReport> resolveLoopName(ASTNode astNode, String filepath) {
-        /* TODO */
-
         IReport report = new Report();      /* use to collect all messages */
 
         Collection<HelpComment> allLoopNameAnnotation = (new Function<ASTNode, Collection<HelpComment>>() {
@@ -184,7 +181,13 @@ public class RuntimeInfo {
             String resolvedName = idExpr.getName().getID();
 
             resolvedAnnotations.add(selectedComment);
-            resolvedMap.put(stmt, resolvedName);
+            modifyPendingSet.add(new Pair<>(stmt, resolvedName));
+        }
+
+        /* apply modification */
+        for (Pair<Stmt, String> resolvedPair : modifyPendingSet) {
+            assert resolvedMap.keySet().contains(resolvedPair.getValue0());
+            resolvedMap.put(resolvedPair.getValue0(), resolvedPair.getValue1());
         }
 
         for (HelpComment comment : allLoopNameAnnotation) {
@@ -197,5 +200,38 @@ public class RuntimeInfo {
         }
 
         return new Pair<>(resolvedMap, report);
+    }
+
+    public static void insertAnnotationEmptyStmt(ASTNode astNode) {  /* using in-place insertion */
+        /* TODO */
+        /* build up the delegates */
+        Map<Class<? extends ASTNode>, Consumer<ASTNode>> handlerMap = new HashMap<>();
+
+        /* collect all valid annotation at such scope */
+        java.util.List<Pair<HelpComment, AbstractAnnotation>> validAnnotation = new LinkedList<>();
+        for (Object symbol : astNode.getComments()) {
+            assert symbol instanceof HelpComment;
+            HelpComment comment = (HelpComment) symbol; /* promise by the parser */
+            AnnotationMatcher matcher = new AnnotationMatcher(comment.getText());
+            if (!matcher.isValid()) continue;
+            System.out.println(comment.getText());
+            AbstractAnnotation annotation = matcher.getAbstractAnnotation();
+            if (annotation.getAnnotationName().equals("loopname")) continue;    /* reserved annotation, ignored */
+            validAnnotation.add(new Pair<>(comment, annotation));
+        }
+        validAnnotation.sort((Pair<HelpComment, AbstractAnnotation> p1, Pair<HelpComment, AbstractAnnotation> p2) -> {
+            int p1RelativeIndex = p1.getValue0().GetRelativeChildIndex();
+            int p2RelativeIndex = p2.getValue0().GetRelativeChildIndex();
+            if (p1RelativeIndex == p2RelativeIndex) assert  p1.equals(p2);      /* fulfill java implementation */
+            return p1RelativeIndex - p2RelativeIndex;
+        });
+
+        /* */
+
+        /* recursive */
+        for (int iter = 0; iter < astNode.getNumChild(); iter++) {
+            ASTNode child = astNode.getChild(iter);
+            insertAnnotationEmptyStmt(child);
+        }
     }
 }

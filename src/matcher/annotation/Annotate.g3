@@ -63,7 +63,7 @@ selectorL 	returns [ast.List<Expr> exprs]
 			:	'[' 
 					(
 						e=selectorE {selectorLBuffer.add($e.expr);} 
-						(',' a=selectorE {selectorLBuffer.add($a.expr);})*
+						((',')? a=selectorE {selectorLBuffer.add($a.expr);})*
 					)? 
 				']' { 
 				$exprs = selectorLBuffer;
@@ -78,7 +78,7 @@ annotate	returns [AbstractAnnotation absAnnotate]
 			:	'%@' ID 
 				(
 					e=selector {annotateBuffer.add(e);} 
-					(a=selector {annotateBuffer.add(a);})*
+					((',')? a=selector {annotateBuffer.add(a);})*
 				)? {
 				$absAnnotate = new AbstractAnnotation($ID.text, annotateBuffer);
 			};

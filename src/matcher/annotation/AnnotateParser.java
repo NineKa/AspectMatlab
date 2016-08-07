@@ -1,14 +1,11 @@
-// $ANTLR 3.4 Annotate.g3 2016-07-26 20:27:24
+// $ANTLR 3.4 Annotate.g3 2016-08-07 04:33:37
 
 	package matcher.annotation;
-	import ast.*;
-	import natlab.*;
 
-
+import ast.*;
+import natlab.DecIntNumericLiteralValue;
+import natlab.FPNumericLiteralValue;
 import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked"})
 public class AnnotateParser extends Parser {
@@ -312,7 +309,7 @@ public class AnnotateParser extends Parser {
 
 
     // $ANTLR start "selectorL"
-    // Annotate.g3:62:1: selectorL returns [ast.List<Expr> exprs] : '[' (e= selectorE ( ',' a= selectorE )* )? ']' ;
+    // Annotate.g3:62:1: selectorL returns [ast.List<Expr> exprs] : '[' (e= selectorE ( ( ',' )? a= selectorE )* )? ']' ;
     public final ast.List<Expr> selectorL() throws RecognitionException {
         ast.List<Expr> exprs = null;
 
@@ -323,21 +320,21 @@ public class AnnotateParser extends Parser {
 
 
         try {
-            // Annotate.g3:63:4: ( '[' (e= selectorE ( ',' a= selectorE )* )? ']' )
-            // Annotate.g3:63:6: '[' (e= selectorE ( ',' a= selectorE )* )? ']'
+            // Annotate.g3:63:4: ( '[' (e= selectorE ( ( ',' )? a= selectorE )* )? ']' )
+            // Annotate.g3:63:6: '[' (e= selectorE ( ( ',' )? a= selectorE )* )? ']'
             {
             match(input,17,FOLLOW_17_in_selectorL158); 
 
-            // Annotate.g3:64:6: (e= selectorE ( ',' a= selectorE )* )?
-            int alt4=2;
-            int LA4_0 = input.LA(1);
+            // Annotate.g3:64:6: (e= selectorE ( ( ',' )? a= selectorE )* )?
+            int alt5=2;
+            int LA5_0 = input.LA(1);
 
-            if ( ((LA4_0 >= ID && LA4_0 <= IMAGINARY)||LA4_0==REAL||LA4_0==STRING) ) {
-                alt4=1;
+            if ( ((LA5_0 >= ID && LA5_0 <= IMAGINARY)||LA5_0==REAL||LA5_0==STRING) ) {
+                alt5=1;
             }
-            switch (alt4) {
+            switch (alt5) {
                 case 1 :
-                    // Annotate.g3:65:7: e= selectorE ( ',' a= selectorE )*
+                    // Annotate.g3:65:7: e= selectorE ( ( ',' )? a= selectorE )*
                     {
                     pushFollow(FOLLOW_selectorE_in_selectorL176);
                     e=selectorE();
@@ -347,24 +344,41 @@ public class AnnotateParser extends Parser {
 
                     selectorLBuffer.add(e);
 
-                    // Annotate.g3:66:7: ( ',' a= selectorE )*
-                    loop3:
+                    // Annotate.g3:66:7: ( ( ',' )? a= selectorE )*
+                    loop4:
                     do {
-                        int alt3=2;
-                        int LA3_0 = input.LA(1);
+                        int alt4=2;
+                        int LA4_0 = input.LA(1);
 
-                        if ( (LA3_0==16) ) {
-                            alt3=1;
+                        if ( ((LA4_0 >= ID && LA4_0 <= IMAGINARY)||LA4_0==REAL||LA4_0==STRING||LA4_0==16) ) {
+                            alt4=1;
                         }
 
 
-                        switch (alt3) {
+                        switch (alt4) {
                     	case 1 :
-                    	    // Annotate.g3:66:8: ',' a= selectorE
+                    	    // Annotate.g3:66:8: ( ',' )? a= selectorE
                     	    {
-                    	    match(input,16,FOLLOW_16_in_selectorL188); 
+                    	    // Annotate.g3:66:8: ( ',' )?
+                    	    int alt3=2;
+                    	    int LA3_0 = input.LA(1);
 
-                    	    pushFollow(FOLLOW_selectorE_in_selectorL192);
+                    	    if ( (LA3_0==16) ) {
+                    	        alt3=1;
+                    	    }
+                    	    switch (alt3) {
+                    	        case 1 :
+                    	            // Annotate.g3:66:9: ','
+                    	            {
+                    	            match(input,16,FOLLOW_16_in_selectorL189); 
+
+                    	            }
+                    	            break;
+
+                    	    }
+
+
+                    	    pushFollow(FOLLOW_selectorE_in_selectorL195);
                     	    a=selectorE();
 
                     	    state._fsp--;
@@ -376,7 +390,7 @@ public class AnnotateParser extends Parser {
                     	    break;
 
                     	default :
-                    	    break loop3;
+                    	    break loop4;
                         }
                     } while (true);
 
@@ -387,7 +401,7 @@ public class AnnotateParser extends Parser {
             }
 
 
-            match(input,18,FOLLOW_18_in_selectorL211); 
+            match(input,18,FOLLOW_18_in_selectorL214); 
 
              
             				exprs = selectorLBuffer;
@@ -424,27 +438,27 @@ public class AnnotateParser extends Parser {
 
         try {
             // Annotate.g3:74:4: ( selectorE | selectorL )
-            int alt5=2;
-            int LA5_0 = input.LA(1);
+            int alt6=2;
+            int LA6_0 = input.LA(1);
 
-            if ( ((LA5_0 >= ID && LA5_0 <= IMAGINARY)||LA5_0==REAL||LA5_0==STRING) ) {
-                alt5=1;
+            if ( ((LA6_0 >= ID && LA6_0 <= IMAGINARY)||LA6_0==REAL||LA6_0==STRING) ) {
+                alt6=1;
             }
-            else if ( (LA5_0==17) ) {
-                alt5=2;
+            else if ( (LA6_0==17) ) {
+                alt6=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 5, 0, input);
+                    new NoViableAltException("", 6, 0, input);
 
                 throw nvae;
 
             }
-            switch (alt5) {
+            switch (alt6) {
                 case 1 :
                     // Annotate.g3:74:6: selectorE
                     {
-                    pushFollow(FOLLOW_selectorE_in_selector229);
+                    pushFollow(FOLLOW_selectorE_in_selector232);
                     selectorE8=selectorE();
 
                     state._fsp--;
@@ -457,7 +471,7 @@ public class AnnotateParser extends Parser {
                 case 2 :
                     // Annotate.g3:75:7: selectorL
                     {
-                    pushFollow(FOLLOW_selectorL_in_selector239);
+                    pushFollow(FOLLOW_selectorL_in_selector242);
                     selectorL9=selectorL();
 
                     state._fsp--;
@@ -485,7 +499,7 @@ public class AnnotateParser extends Parser {
 
 
     // $ANTLR start "annotate"
-    // Annotate.g3:77:1: annotate returns [AbstractAnnotation absAnnotate] : '%@' ID (e= selector (a= selector )* )? ;
+    // Annotate.g3:77:1: annotate returns [AbstractAnnotation absAnnotate] : '%@' ID (e= selector ( ( ',' )? a= selector )* )? ;
     public final AbstractAnnotation annotate() throws RecognitionException {
         AbstractAnnotation absAnnotate = null;
 
@@ -497,25 +511,25 @@ public class AnnotateParser extends Parser {
 
 
         try {
-            // Annotate.g3:78:4: ( '%@' ID (e= selector (a= selector )* )? )
-            // Annotate.g3:78:6: '%@' ID (e= selector (a= selector )* )?
+            // Annotate.g3:78:4: ( '%@' ID (e= selector ( ( ',' )? a= selector )* )? )
+            // Annotate.g3:78:6: '%@' ID (e= selector ( ( ',' )? a= selector )* )?
             {
-            match(input,15,FOLLOW_15_in_annotate256); 
+            match(input,15,FOLLOW_15_in_annotate259); 
 
-            ID10=(Token)match(input,ID,FOLLOW_ID_in_annotate258); 
+            ID10=(Token)match(input,ID,FOLLOW_ID_in_annotate261); 
 
-            // Annotate.g3:79:5: (e= selector (a= selector )* )?
-            int alt7=2;
-            int LA7_0 = input.LA(1);
+            // Annotate.g3:79:5: (e= selector ( ( ',' )? a= selector )* )?
+            int alt9=2;
+            int LA9_0 = input.LA(1);
 
-            if ( ((LA7_0 >= ID && LA7_0 <= IMAGINARY)||LA7_0==REAL||LA7_0==STRING||LA7_0==17) ) {
-                alt7=1;
+            if ( ((LA9_0 >= ID && LA9_0 <= IMAGINARY)||LA9_0==REAL||LA9_0==STRING||LA9_0==17) ) {
+                alt9=1;
             }
-            switch (alt7) {
+            switch (alt9) {
                 case 1 :
-                    // Annotate.g3:80:6: e= selector (a= selector )*
+                    // Annotate.g3:80:6: e= selector ( ( ',' )? a= selector )*
                     {
-                    pushFollow(FOLLOW_selector_in_annotate274);
+                    pushFollow(FOLLOW_selector_in_annotate277);
                     e=selector();
 
                     state._fsp--;
@@ -523,22 +537,41 @@ public class AnnotateParser extends Parser {
 
                     annotateBuffer.add(e);
 
-                    // Annotate.g3:81:6: (a= selector )*
-                    loop6:
+                    // Annotate.g3:81:6: ( ( ',' )? a= selector )*
+                    loop8:
                     do {
-                        int alt6=2;
-                        int LA6_0 = input.LA(1);
+                        int alt8=2;
+                        int LA8_0 = input.LA(1);
 
-                        if ( ((LA6_0 >= ID && LA6_0 <= IMAGINARY)||LA6_0==REAL||LA6_0==STRING||LA6_0==17) ) {
-                            alt6=1;
+                        if ( ((LA8_0 >= ID && LA8_0 <= IMAGINARY)||LA8_0==REAL||LA8_0==STRING||(LA8_0 >= 16 && LA8_0 <= 17)) ) {
+                            alt8=1;
                         }
 
 
-                        switch (alt6) {
+                        switch (alt8) {
                     	case 1 :
-                    	    // Annotate.g3:81:7: a= selector
+                    	    // Annotate.g3:81:7: ( ',' )? a= selector
                     	    {
-                    	    pushFollow(FOLLOW_selector_in_annotate287);
+                    	    // Annotate.g3:81:7: ( ',' )?
+                    	    int alt7=2;
+                    	    int LA7_0 = input.LA(1);
+
+                    	    if ( (LA7_0==16) ) {
+                    	        alt7=1;
+                    	    }
+                    	    switch (alt7) {
+                    	        case 1 :
+                    	            // Annotate.g3:81:8: ','
+                    	            {
+                    	            match(input,16,FOLLOW_16_in_annotate289); 
+
+                    	            }
+                    	            break;
+
+                    	    }
+
+
+                    	    pushFollow(FOLLOW_selector_in_annotate295);
                     	    a=selector();
 
                     	    state._fsp--;
@@ -550,7 +583,7 @@ public class AnnotateParser extends Parser {
                     	    break;
 
                     	default :
-                    	    break loop6;
+                    	    break loop8;
                         }
                     } while (true);
 
@@ -593,15 +626,16 @@ public class AnnotateParser extends Parser {
     public static final BitSet FOLLOW_tStr_in_selectorE130 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_tVar_in_selectorE140 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_17_in_selectorL158 = new BitSet(new long[]{0x00000000000428C0L});
-    public static final BitSet FOLLOW_selectorE_in_selectorL176 = new BitSet(new long[]{0x0000000000050000L});
-    public static final BitSet FOLLOW_16_in_selectorL188 = new BitSet(new long[]{0x00000000000028C0L});
-    public static final BitSet FOLLOW_selectorE_in_selectorL192 = new BitSet(new long[]{0x0000000000050000L});
-    public static final BitSet FOLLOW_18_in_selectorL211 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_selectorE_in_selector229 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_selectorL_in_selector239 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_15_in_annotate256 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_ID_in_annotate258 = new BitSet(new long[]{0x00000000000228C2L});
-    public static final BitSet FOLLOW_selector_in_annotate274 = new BitSet(new long[]{0x00000000000228C2L});
-    public static final BitSet FOLLOW_selector_in_annotate287 = new BitSet(new long[]{0x00000000000228C2L});
+    public static final BitSet FOLLOW_selectorE_in_selectorL176 = new BitSet(new long[]{0x00000000000528C0L});
+    public static final BitSet FOLLOW_16_in_selectorL189 = new BitSet(new long[]{0x00000000000028C0L});
+    public static final BitSet FOLLOW_selectorE_in_selectorL195 = new BitSet(new long[]{0x00000000000528C0L});
+    public static final BitSet FOLLOW_18_in_selectorL214 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_selectorE_in_selector232 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_selectorL_in_selector242 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_15_in_annotate259 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_ID_in_annotate261 = new BitSet(new long[]{0x00000000000228C2L});
+    public static final BitSet FOLLOW_selector_in_annotate277 = new BitSet(new long[]{0x00000000000328C2L});
+    public static final BitSet FOLLOW_16_in_annotate289 = new BitSet(new long[]{0x00000000000228C0L});
+    public static final BitSet FOLLOW_selector_in_annotate295 = new BitSet(new long[]{0x00000000000328C2L});
 
 }

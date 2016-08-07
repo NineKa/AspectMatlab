@@ -9,6 +9,7 @@ import natlab.toolkits.analysis.varorfun.VFAnalysis;
 import transformer.util.RuntimeInfo;
 
 import java.util.LinkedList;
+import java.util.Map;
 
 public class Main {
     public static VFAnalysis analysis = null;
@@ -34,13 +35,6 @@ public class Main {
     public static void recPrintStructure(ASTNode node, int indent) {
         for (int iter = 0; iter < indent; iter++) System.out.print('\t');
         System.out.println(String.format("[%d] %s", node.GetRelativeChildIndex(), node.getClass().getName()));
-        System.out.println(node.getComments().size());
-        for (int iter = 0; iter < node.getComments().size(); iter++) {
-            HelpComment comment = (HelpComment) node.getComments().get(iter);
-            System.out.println(comment.getText());
-        }
-
-
         for (int iter = 0; iter < node.getNumChild(); iter++) {
             recPrintStructure(node.getChild(iter), indent + 1);
         }
@@ -67,7 +61,10 @@ public class Main {
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
 
-        RuntimeInfo.insertAnnotationEmptyStmt(units);
+        Map<EmptyStmt, HelpComment> map = RuntimeInfo.insertAnnotationEmptyStmt(units);
+        for (EmptyStmt emptyStmt : map.keySet()) {
+            System.out.println(emptyStmt + " " + map.get(emptyStmt).getText());
+        }
 
         /*
         assert units.getProgram(0) instanceof AspectDef;
@@ -85,6 +82,6 @@ public class Main {
         VFAnalysis analysis = new VFFlowInsensitiveAnalysis(new CompilationUnits());
         analysis.analyze();
         */
-        // recPrintStructure(units, 0);
+        recPrintStructure(units, 0);
     }
 }

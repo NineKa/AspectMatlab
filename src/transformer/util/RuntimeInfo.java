@@ -202,36 +202,221 @@ public class RuntimeInfo {
         return new Pair<>(resolvedMap, report);
     }
 
-    public static void insertAnnotationEmptyStmt(ASTNode astNode) {  /* using in-place insertion */
-        /* TODO */
-        /* build up the delegates */
-        Map<Class<? extends ASTNode>, Consumer<ASTNode>> handlerMap = new HashMap<>();
-
+    public static Map<EmptyStmt, HelpComment> insertAnnotationEmptyStmt(ASTNode astNode) {  /* using in-place insertion */
         /* collect all valid annotation at such scope */
-        java.util.List<Pair<HelpComment, AbstractAnnotation>> validAnnotation = new LinkedList<>();
+        Collection<HelpComment> validAnnotation = new HashSet<>();
         for (Object symbol : astNode.getComments()) {
             assert symbol instanceof HelpComment;
             HelpComment comment = (HelpComment) symbol; /* promise by the parser */
             AnnotationMatcher matcher = new AnnotationMatcher(comment.getText());
             if (!matcher.isValid()) continue;
-            System.out.println(comment.getText());
             AbstractAnnotation annotation = matcher.getAbstractAnnotation();
             if (annotation.getAnnotationName().equals("loopname")) continue;    /* reserved annotation, ignored */
-            validAnnotation.add(new Pair<>(comment, annotation));
+            validAnnotation.add(comment);
         }
-        validAnnotation.sort((Pair<HelpComment, AbstractAnnotation> p1, Pair<HelpComment, AbstractAnnotation> p2) -> {
-            int p1RelativeIndex = p1.getValue0().GetRelativeChildIndex();
-            int p2RelativeIndex = p2.getValue0().GetRelativeChildIndex();
-            if (p1RelativeIndex == p2RelativeIndex) assert  p1.equals(p2);      /* fulfill java implementation */
-            return p1RelativeIndex - p2RelativeIndex;
+        System.out.println(astNode.getClass().getName() + " " + validAnnotation);
+
+        /* build up the delegates */
+        Map<Class<? extends ASTNode>, Consumer<ASTNode>> handlerMap = new HashMap<>();
+        Function<Collection<Iterator<? extends ASTNode>>, Iterable<? extends ASTNode>> sequencer = (collection) -> {
+            java.util.List<ASTNode> mergingList = new LinkedList<>();
+            for (Iterator<? extends ASTNode> iterator : collection) {
+                while (iterator.hasNext()) mergingList.add(iterator.next());
+            }
+            mergingList.sort((ASTNode node1, ASTNode node2) -> {
+                /* full fill java implementation */
+                if (node1.GetRelativeChildIndex() == node2.GetRelativeChildIndex()) assert  node1.equals(node2);
+                return node1.GetRelativeChildIndex() - node2.GetRelativeChildIndex();
+            });
+            return mergingList;
+        };
+
+        MergeableHashMap<EmptyStmt, HelpComment> annotationMap = new MergeableHashMap<>();
+
+        handlerMap.put(Script.class, (ASTNode node) -> {
+            assert node instanceof Script;
+            List<Stmt> alterStatementList = new List<Stmt>();
+            for (HelpComment comment : validAnnotation) {
+                EmptyStmt appendingEmptyStmt = new EmptyStmt();
+                appendingEmptyStmt.SetRelativeChildIndex(comment.GetRelativeChildIndex());
+                annotationMap.put(appendingEmptyStmt, comment);
+            }
+            Iterable<? extends ASTNode> iterable = sequencer.apply(Arrays.asList(
+                    annotationMap.keySet().iterator(),
+                    ((Script) node).getStmtList().iterator()
+            ));
+            for (ASTNode appendingStmt : iterable) {
+                assert appendingStmt instanceof Stmt;
+                alterStatementList.add((Stmt) appendingStmt);
+            }
+            ((Script) node).setStmtList(alterStatementList);
+        });
+        handlerMap.put(ast.Function.class, (ASTNode node) -> {
+            assert node instanceof ast.Function;
+            List<Stmt> alterStatementList = new List<Stmt>();
+            for (HelpComment comment : validAnnotation) {
+                EmptyStmt appendingEmptyStmt = new EmptyStmt();
+                appendingEmptyStmt.SetRelativeChildIndex(comment.GetRelativeChildIndex());
+                annotationMap.put(appendingEmptyStmt, comment);
+            }
+            Iterable<? extends ASTNode> iterable = sequencer.apply(Arrays.asList(
+                    annotationMap.keySet().iterator(),
+                    ((ast.Function) node).getStmtList().iterator()
+            ));
+            for (ASTNode appendingStmt : iterable) {
+                assert appendingStmt instanceof Stmt;
+                alterStatementList.add((Stmt) appendingStmt);
+            }
+            ((ast.Function) node).setStmtList(alterStatementList);
+        });
+        /* TODO : property access ? */
+        handlerMap.put(PropertyAccess.class, (ASTNode node) -> {throw new UnsupportedOperationException();});
+        handlerMap.put(ForStmt.class, (ASTNode node) -> {
+            assert node instanceof ForStmt;
+            List<Stmt> alterStatementList = new List<Stmt>();
+            for (HelpComment comment : validAnnotation) {
+                EmptyStmt appendingEmptyStmt = new EmptyStmt();
+                appendingEmptyStmt.SetRelativeChildIndex(comment.GetRelativeChildIndex());
+                annotationMap.put(appendingEmptyStmt, comment);
+            }
+            Iterable<? extends ASTNode> iterable = sequencer.apply(Arrays.asList(
+                    annotationMap.keySet().iterator(),
+                    ((ForStmt) node).getStmtList().iterator()
+            ));
+            for (ASTNode appendingStmt : iterable) {
+                assert appendingStmt instanceof Stmt;
+                alterStatementList.add((Stmt) appendingStmt);
+            }
+            ((ForStmt) node).setStmtList(alterStatementList);
+        });
+        handlerMap.put(WhileStmt.class, (ASTNode node) -> {
+            assert node instanceof WhileStmt;
+            List<Stmt> alterStatementList = new List<Stmt>();
+            for (HelpComment comment : validAnnotation) {
+                EmptyStmt appendingEmptyStmt = new EmptyStmt();
+                appendingEmptyStmt.SetRelativeChildIndex(comment.GetRelativeChildIndex());
+                annotationMap.put(appendingEmptyStmt, comment);
+            }
+            Iterable<? extends ASTNode> iterable = sequencer.apply(Arrays.asList(
+                    annotationMap.keySet().iterator(),
+                    ((WhileStmt) node).getStmtList().iterator()
+            ));
+            for (ASTNode appendingStmt : iterable) {
+                assert appendingStmt instanceof Stmt;
+                alterStatementList.add((Stmt) appendingStmt);
+            }
+            ((WhileStmt) node).setStmtList(alterStatementList);
+        });
+        /* TODO : need parser update, relative pos of comment confusing */
+        handlerMap.put(TryStmt.class, (ASTNode node) -> {throw new UnsupportedOperationException();});
+        handlerMap.put(SwitchCaseBlock.class, (ASTNode node) -> {
+            assert node instanceof SwitchCaseBlock;
+            List<Stmt> alterStatementList = new List<Stmt>();
+            for (HelpComment comment : validAnnotation) {
+                EmptyStmt appendingEmptyStmt = new EmptyStmt();
+                appendingEmptyStmt.SetRelativeChildIndex(comment.GetRelativeChildIndex());
+                annotationMap.put(appendingEmptyStmt, comment);
+            }
+            Iterable<? extends ASTNode> iterable = sequencer.apply(Arrays.asList(
+                    annotationMap.keySet().iterator(),
+                    ((SwitchCaseBlock) node).getStmtList().iterator()
+            ));
+            for (ASTNode appendingStmt : iterable) {
+                assert appendingStmt instanceof Stmt;
+                alterStatementList.add((Stmt) appendingStmt);
+            }
+            ((SwitchCaseBlock) node).setStmtList(alterStatementList);
+        });
+        handlerMap.put(DefaultCaseBlock.class, (ASTNode node) -> {
+            assert node instanceof DefaultCaseBlock;
+            List<Stmt> alterStatementList = new List<Stmt>();
+            for (HelpComment comment : validAnnotation) {
+                EmptyStmt appendingEmptyStmt = new EmptyStmt();
+                appendingEmptyStmt.SetRelativeChildIndex(comment.GetRelativeChildIndex());
+                annotationMap.put(appendingEmptyStmt, comment);
+            }
+            Iterable<? extends ASTNode> iterable = sequencer.apply(Arrays.asList(
+                    annotationMap.keySet().iterator(),
+                    ((DefaultCaseBlock) node).getStmtList().iterator()
+            ));
+            for (ASTNode appendingStmt : iterable) {
+                assert appendingStmt instanceof Stmt;
+                alterStatementList.add((Stmt) appendingStmt);
+            }
+            ((DefaultCaseBlock) node).setStmtList(alterStatementList);
+        });
+        handlerMap.put(IfBlock.class, (ASTNode node) -> {
+            assert node instanceof IfBlock;
+            List<Stmt> alterStatementList = new List<Stmt>();
+            for (HelpComment comment : validAnnotation) {
+                EmptyStmt appendingEmptyStmt = new EmptyStmt();
+                appendingEmptyStmt.SetRelativeChildIndex(comment.GetRelativeChildIndex());
+                annotationMap.put(appendingEmptyStmt, comment);
+            }
+            Iterable<? extends ASTNode> iterable = sequencer.apply(Arrays.asList(
+                    annotationMap.keySet().iterator(),
+                    ((IfBlock) node).getStmtList().iterator()
+            ));
+            for (ASTNode appendingStmt : iterable) {
+                assert appendingStmt instanceof Stmt;
+                alterStatementList.add((Stmt) appendingStmt);
+            }
+            ((IfBlock) node).setStmtList(alterStatementList);
+        });
+        handlerMap.put(ElseBlock.class, (ASTNode node) -> {
+            assert node instanceof ElseBlock;
+            List<Stmt> alterStatementList = new List<Stmt>();
+            for (HelpComment comment : validAnnotation) {
+                EmptyStmt appendingEmptyStmt = new EmptyStmt();
+                appendingEmptyStmt.SetRelativeChildIndex(comment.GetRelativeChildIndex());
+                annotationMap.put(appendingEmptyStmt, comment);
+            }
+            Iterable<? extends ASTNode> iterable = sequencer.apply(Arrays.asList(
+                    annotationMap.keySet().iterator(),
+                    ((ElseBlock) node).getStmtList().iterator()
+            ));
+            for (ASTNode appendingStmt : iterable) {
+                assert appendingStmt instanceof Stmt;
+                alterStatementList.add((Stmt) appendingStmt);
+            }
+            ((ElseBlock) node).setStmtList(alterStatementList);
+        });
+        handlerMap.put(SpmdStmt.class, (ASTNode node) -> {
+            assert node instanceof SpmdStmt;
+            List<Stmt> alterStatemnetList = new List<Stmt>();
+            for (HelpComment comment : validAnnotation) {
+                EmptyStmt appendingEmptyStmt = new EmptyStmt();
+                appendingEmptyStmt.SetRelativeChildIndex(comment.GetRelativeChildIndex());
+                annotationMap.put(appendingEmptyStmt, comment);
+            }
+            Iterable<? extends ASTNode> iterable = sequencer.apply(Arrays.asList(
+                    annotationMap.keySet().iterator(),
+                    ((SpmdStmt) node).getStmtList().iterator()
+            ));
+            for (ASTNode appendingStmt : iterable) {
+                assert appendingStmt instanceof Stmt;
+                alterStatemnetList.add((Stmt) appendingStmt);
+            }
+            ((SpmdStmt) node).setStmtList(alterStatemnetList);
         });
 
-        /* */
+        /* apply the delegates */
+        if (handlerMap.keySet().contains(astNode.getClass())) {
+            Consumer<ASTNode> delegate = handlerMap.get(astNode.getClass());
+            assert delegate != null;                                            /* hopefully */
+            delegate.accept(astNode);                                           /* execute   */
+        }
 
+        MergeableHashMap retMap = new MergeableHashMap();
+        retMap = retMap.union(annotationMap);
         /* recursive */
         for (int iter = 0; iter < astNode.getNumChild(); iter++) {
             ASTNode child = astNode.getChild(iter);
-            insertAnnotationEmptyStmt(child);
+            Map<EmptyStmt, HelpComment> mergeMap = insertAnnotationEmptyStmt(child);
+            assert mergeMap instanceof MergeableHashMap;
+            retMap = retMap.union((MergeableHashMap) mergeMap);
         }
+
+        return retMap;
     }
 }

@@ -1,9 +1,6 @@
 package transformer.expr.binary;
 
-import ast.BinaryExpr;
-import ast.Expr;
-import ast.MinusExpr;
-import ast.PlusExpr;
+import ast.*;
 import transformer.expr.ExprTrans;
 import transformer.expr.ExprTransArgument;
 
@@ -33,6 +30,9 @@ public abstract class BinaryTrans extends ExprTrans {
     public static BinaryTrans buildBinaryTransformer(ExprTransArgument argument, BinaryExpr binaryExpr) {
         if (binaryExpr instanceof PlusExpr) return new PlusTrans(argument, (PlusExpr) binaryExpr);
         if (binaryExpr instanceof MinusExpr) return new MinusTrans(argument, (MinusExpr) binaryExpr);
+        if (binaryExpr instanceof MTimesExpr) return new MTimesTrans(argument, (MTimesExpr) binaryExpr);
+        if (binaryExpr instanceof MDivExpr) return new MDivTrans(argument, (MDivExpr) binaryExpr);
+        if (binaryExpr instanceof MLDivExpr) return new MLDivTrans(argument, (MLDivExpr) binaryExpr);
 
         /* control flow should not reach here */
         throw new AssertionError();

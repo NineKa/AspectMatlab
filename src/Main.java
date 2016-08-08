@@ -61,6 +61,7 @@ public class Main {
         return suchClone;
     }
 
+    @SuppressWarnings("deprecation")
     public static void main(String argv[]) throws CloneNotSupportedException {
         String matlabFilePath = "/Users/k9/Documents/AspectMatlab/src/matlab.m";
         String functionFilePath = "/Users/k9/Documents/AspectMatlab/src/function.m";

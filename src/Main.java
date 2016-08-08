@@ -4,12 +4,14 @@ import Matlab.Transformer.NodeToAstTransformer;
 import Matlab.Utils.*;
 import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
-import ast.*;
+import ast.ASTNode;
+import ast.CompilationUnits;
+import ast.PatternCall;
+import ast.PatternExecution;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
 import transformer.util.RuntimeInfo;
 
 import java.util.LinkedList;
-import java.util.Map;
 
 public class Main {
     public static VFAnalysis analysis = null;
@@ -34,7 +36,7 @@ public class Main {
     }
     public static void recPrintStructure(ASTNode node, int indent) {
         for (int iter = 0; iter < indent; iter++) System.out.print('\t');
-        System.out.println(String.format("[%d] %s", node.GetRelativeChildIndex(), node.getClass().getName()));
+        System.out.println(String.format("[%x][%d] %s", node.hashCode(), node.GetRelativeChildIndex(), node.getClass().getName()));
         for (int iter = 0; iter < node.getNumChild(); iter++) {
             recPrintStructure(node.getChild(iter), indent + 1);
         }
@@ -49,7 +51,15 @@ public class Main {
         }
     }
 
-    public static void main(String argv[]) {
+    public static ASTNode testClone(ASTNode astNode) throws CloneNotSupportedException{
+        ASTNode suchClone = astNode.copy();
+        //for (int iter = 0; iter < astNode.getNumChild(); iter++) {
+        //    suchClone.setChild(testClone(astNode.getChild(iter)), iter);
+        //}
+        return suchClone;
+    }
+
+    public static void main(String argv[]) throws CloneNotSupportedException {
         String matlabFilePath = "/Users/k9/Documents/AspectMatlab/src/matlab.m";
         String functionFilePath = "/Users/k9/Documents/AspectMatlab/src/function.m";
 
@@ -61,10 +71,16 @@ public class Main {
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
 
-        Map<EmptyStmt, HelpComment> map = RuntimeInfo.insertAnnotationEmptyStmt(units);
-        for (EmptyStmt emptyStmt : map.keySet()) {
-            System.out.println(emptyStmt + " " + map.get(emptyStmt).getText());
-        }
+        ASTNode clone = units.treeCopy();
+        RuntimeInfo.insertAnnotationEmptyStmt(clone);
+
+        recPrintStructure(units, 0);
+        recPrintStructure(clone, 0);
+
+        //Map<EmptyStmt, HelpComment> map = RuntimeInfo.insertAnnotationEmptyStmt(units);
+        //for (EmptyStmt emptyStmt : map.keySet()) {
+        //    System.out.println(emptyStmt + " " + map.get(emptyStmt).getText());
+        //}
 
         /*
         assert units.getProgram(0) instanceof AspectDef;
@@ -82,6 +98,6 @@ public class Main {
         VFAnalysis analysis = new VFFlowInsensitiveAnalysis(new CompilationUnits());
         analysis.analyze();
         */
-        recPrintStructure(units, 0);
+        //recPrintStructure(units, 0);
     }
 }

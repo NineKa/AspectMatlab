@@ -1,49 +1,26 @@
 package transformer.expr.unary;
 
-import abstractPattern.Action;
 import ast.Expr;
+import ast.Stmt;
 import ast.UMinusExpr;
 import org.javatuples.Pair;
-import org.javatuples.Triplet;
-import transformer.util.RuntimeInfo;
-import util.Namespace;
+import transformer.expr.ExprTransArgument;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 public final class UMinusTrans extends UnaryTrans {
-
-    public UMinusTrans(Collection<Action> actions, RuntimeInfo runtimeInfo, Namespace namespace, UMinusExpr expr) {
-        super(actions, runtimeInfo, namespace, expr);
+    public UMinusTrans(ExprTransArgument argument, UMinusExpr uMinusExpr) {
+        super(argument, uMinusExpr);
     }
 
     @Override
-    public boolean hasFutureTransform() {
-        /* currently we do not have a pattern to capture unary minus */
-        return this.operandTransformer.hasFutureTransform();
+    public Pair<Expr, List<Stmt>> copyAndTransform() {
+        assert this.hasTransformOnCurrentNode() == false;
+        UMinusExpr copiedNode = (UMinusExpr) this.originalNode.copy();
+        Pair<Expr, List<Stmt>> operandTransformResult = this.operandTransformer.copyAndTransform();
+        Expr copiedOperand = operandTransformResult.getValue0();
+        copiedOperand.setParent(copiedNode);
+        copiedNode.setOperand(copiedOperand);
+        return new Pair<>(copiedNode, operandTransformResult.getValue1());
     }
-
-    @Override
-    public Pair<Expr, List<Triplet<String, Expr, Boolean>>> transform() {
-        UMinusExpr uMinusExpr = null;
-        List<Triplet<String, Expr, Boolean>> transformMap = null;
-        if (this.operandTransformer.hasFutureTransform()) {
-            uMinusExpr = (UMinusExpr) this.originalNode.treeCopy();
-            Pair<Expr, List<Triplet<String, Expr, Boolean>>> result = this.operandTransformer.transform();
-            uMinusExpr.setOperand(result.getValue0());
-            transformMap = result.getValue1();
-        } else {
-            uMinusExpr = (UMinusExpr) this.originalNode.treeCopy();
-            transformMap = new LinkedList<>();
-        }
-        assert uMinusExpr != null && transformMap != null;
-        return new Pair<>(uMinusExpr, transformMap);
-    }
-
-    @Override
-    public Class<? extends Expr> correspondAST() {
-        return UMinusExpr.class;
-    }
-
 }

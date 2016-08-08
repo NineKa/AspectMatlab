@@ -1,39 +1,27 @@
 package transformer.expr.literal;
 
-import abstractPattern.Action;
 import ast.Expr;
+import ast.Stmt;
 import ast.StringLiteralExpr;
 import org.javatuples.Pair;
-import org.javatuples.Triplet;
-import transformer.util.RuntimeInfo;
-import util.Namespace;
+import transformer.expr.ExprTransArgument;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 public final class StringLiteralTrans extends LiteralTrans {
-
-    public StringLiteralTrans(Collection<Action> actions, RuntimeInfo runtimeInfo, Namespace namespace, StringLiteralExpr expr) {
-        super(actions, runtimeInfo, namespace, expr);
+    public StringLiteralTrans(ExprTransArgument argument, StringLiteralExpr stringLiteralExpr) {
+        super(argument, stringLiteralExpr);
     }
 
     @Override
-    public boolean hasFutureTransform() {
-        return false;   /* obviously */
+    public Pair<Expr, List<Stmt>> copyAndTransform() {
+        StringLiteralExpr copiedExpr = (StringLiteralExpr) this.originalNode.copy();
+        return new Pair<>(copiedExpr, new LinkedList<>());
     }
 
     @Override
-    public Pair<Expr, List<Triplet<String, Expr, Boolean>>> transform() {
-        /* currently we do not have a pattern to match string literals */
-        StringLiteralExpr expr = (StringLiteralExpr) this.originalNode.treeCopy();
-        List<Triplet<String, Expr, Boolean>> transformMap = new LinkedList<>();
-        return new Pair<>(expr, transformMap);
+    public boolean hasTransformOnCurrentNode() {
+        return false;
     }
-
-    @Override
-    public Class<? extends Expr> correspondAST() {
-        return StringLiteralExpr.class;
-    }
-
 }

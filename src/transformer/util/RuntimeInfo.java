@@ -25,6 +25,24 @@ public class RuntimeInfo {
     public AccessMode accessMode = null;
     public Map<EmptyStmt, HelpComment> annotationMap = null;
 
+    public void enterScope(ScopeType scopeType, String name) {
+        assert this.scopeTraceStack != null;
+        this.scopeTraceStack.push(new Pair<>(scopeType, name));
+    }
+
+    public void exitScope() {
+        assert this.scopeTraceStack != null;
+        this.scopeTraceStack.pop();
+    }
+
+    public boolean isInScope(ScopeType scopeType, String name) {
+        assert this.scopeTraceStack != null;
+        for (Pair<ScopeType, String> pair : scopeTraceStack) {
+            if (pair.getValue0().equals(scopeType) && pair.getValue1().equals(name)) return true;
+        }
+        return false;
+    }
+
     public static Pair<Map<Stmt, String>, IReport> resolveLoopName(ASTNode astNode, String filepath) {
         IReport report = new Report();      /* use to collect all messages */
 
@@ -232,6 +250,8 @@ public class RuntimeInfo {
         };
 
         MergeableHashMap<EmptyStmt, HelpComment> annotationMap = new MergeableHashMap<>();
+
+        /* TODO : comment pos sometime miss placed */
 
         handlerMap.put(Script.class, (ASTNode node) -> {
             assert node instanceof Script;

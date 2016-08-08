@@ -1,49 +1,60 @@
 package transformer.expr;
 
 import abstractPattern.Action;
-import ast.Expr;
-import ast.LiteralExpr;
-import ast.UnaryExpr;
+import abstractPattern.Primitive;
+import ast.*;
 import org.javatuples.Pair;
-import org.javatuples.Triplet;
 import transformer.expr.literal.LiteralTrans;
 import transformer.expr.unary.UnaryTrans;
+import transformer.util.IsPossibleJointPointResult;
 import transformer.util.RuntimeInfo;
 import util.Namespace;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public abstract class ExprTrans {
     protected Expr originalNode = null;
-    protected Namespace alterNamespace = null;
     protected RuntimeInfo runtimeInfo = null;
     protected Collection<Action> actions = null;
+    protected Namespace alterNamespace = null;
+    protected Function<ASTNode, Boolean> ignoreDelegate = null;
+    protected Consumer<Stmt> jointPointDelegate = null;
 
-    public ExprTrans(Collection<Action> actions, RuntimeInfo runtimeInfo, Namespace namespace, Expr astNodes) {
-        this.originalNode = astNodes;
-        this.alterNamespace = namespace;
-        this.runtimeInfo = runtimeInfo;
-        this.actions = actions;
+    public ExprTrans (ExprTransArgument argument, Expr expr) {
+        this.actions            = argument.actions;
+        this.runtimeInfo        = argument.runtimeInfo;
+        this.alterNamespace     = argument.alterNamespace;
+        this.ignoreDelegate     = argument.ignoreDelegate;
+        this.jointPointDelegate = argument.jointPointDelegate;
+
+        this.originalNode       = expr;
     }
 
-    public abstract boolean hasFutureTransform();
+    public abstract Pair<Expr, List<Stmt>> copyAndTransform();
 
-    public abstract Pair<Expr, List<Triplet<String, Expr, Boolean>>> transform();
+    public abstract boolean hasFurtherTransform();
 
-    public abstract Class<? extends Expr> correspondAST();
+    public boolean hasTransformOnCurrentNode() {
+        if (ignoreDelegate.apply(originalNode) == true) return false;
+        for (Action action : actions) {
+            assert action.getPattern() instanceof Primitive;
+            Primitive pattern = (Primitive) action.getPattern();
+            IsPossibleJointPointResult query = pattern.isPossibleJointPoint(originalNode, runtimeInfo);
+            if (query.isPossible()) return true;
+        }
+        return false;
+    }
 
-    public static ExprTrans buildExprTransformer(
-            Collection<Action> actions,
-            RuntimeInfo runtimeInfo,
-            Namespace namespace,
-            Expr expr
-    ) {
-        /* TODO */
-        if (expr instanceof LiteralExpr)
-            return LiteralTrans.buildLiteralTransformer(actions, runtimeInfo, namespace, (LiteralExpr) expr);
-        if (expr instanceof UnaryExpr)
-            return UnaryTrans.buildUnaryTransformer(actions, runtimeInfo, namespace, (UnaryExpr) expr);
+    public Class<? extends Expr> getASTNodeClass() {
+        return originalNode.getClass();
+    }
+
+    public static ExprTrans buildExprTransformer(ExprTransArgument argument, Expr expr) {
+        if (expr instanceof LiteralExpr) return LiteralTrans.buildLiteralTransformer(argument, (LiteralExpr) expr);
+        if (expr instanceof UnaryExpr) return UnaryTrans.buildUnaryTransformer(argument, (UnaryExpr) expr);
 
         /* control flow should not reach here */
         throw new AssertionError();

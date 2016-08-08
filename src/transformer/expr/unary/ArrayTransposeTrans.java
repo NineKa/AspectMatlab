@@ -1,101 +1,55 @@
 package transformer.expr.unary;
 
-import abstractPattern.Action;
-import abstractPattern.Primitive;
-import ast.ArrayTransposeExpr;
-import ast.Expr;
-import ast.Name;
-import ast.NameExpr;
+import ast.*;
 import org.javatuples.Pair;
-import org.javatuples.Triplet;
-import transformer.util.IsPossibleJointPointResult;
-import transformer.util.RuntimeInfo;
-import util.Namespace;
+import transformer.expr.ExprTransArgument;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BiFunction;
 
 public final class ArrayTransposeTrans extends UnaryTrans {
-
-    public ArrayTransposeTrans(Collection<Action> actions, RuntimeInfo runtimeInfo, Namespace namespace, ArrayTransposeExpr expr) {
-        super(actions, runtimeInfo, namespace, expr);
+    public ArrayTransposeTrans(ExprTransArgument argument, ArrayTransposeExpr arrayTransposeExpr) {
+        super(argument, arrayTransposeExpr);
     }
 
     @Override
-    public boolean hasFutureTransform() {
-        /* check if operand need transformation */
-        if (this.operandTransformer.hasFutureTransform()) return true;
+    public Pair<Expr, List<Stmt>> copyAndTransform() {
+        if (this.hasTransformOnCurrentNode()) {
+            /* ([expr]).'   <=>     t0 = [expr]     */
+            /*                      t1 = t0.'   *   */
+            /*                      return t1       */
+            BiFunction<LValueExpr, Expr, AssignStmt> buildAssignStmt = (LValueExpr lhs, Expr rhs) -> {
+                AssignStmt returnStmt = new AssignStmt();
+                returnStmt.setLHS(lhs);
+                returnStmt.setRHS(rhs);
+                returnStmt.setOutputSuppressed(true);
+                return returnStmt;
+            };
 
-        /* then check if current node need transformation */
-        for (Action action : this.actions) {
-            assert action.getPattern() instanceof Primitive;
-            Primitive primitivePatter = (Primitive) action.getPattern();
-            IsPossibleJointPointResult query = primitivePatter.isPossibleJointPoint(this.originalNode, this.runtimeInfo);
-            if (query.isPossible()) return true;
-        }
+            String t0Name = this.alterNamespace.generateNewName();
+            String t1Name = this.alterNamespace.generateNewName();
+            Pair<Expr, List<Stmt>> operandTransformResult = this.operandTransformer.copyAndTransform();
+            Expr copiedOperand = operandTransformResult.getValue0();
+            List<Stmt> prefixStatementList = operandTransformResult.getValue1();
 
-        /* finally, no need for transformation */
-        return false;
-    }
+            AssignStmt t0Assign = buildAssignStmt.apply(new NameExpr(new Name(t0Name)), copiedOperand);
+            AssignStmt t1Assign = buildAssignStmt.apply(
+                    new NameExpr(new Name(t1Name)),
+                    new ArrayTransposeExpr(new NameExpr(new Name(t0Name)))
+            );
 
-    @Override
-    public Pair<Expr, List<Triplet<String, Expr, Boolean>>> transform() {
-        /*
-        * ([expr]).'    <=>     t_1 = [expr]
-        *                       t_2 = (t_1).'   *
-        *                       t_2
-        */
-        Expr copiedOperand = null;
-        List<Triplet<String, Expr, Boolean>> transformMap = null;
-        if (this.operandTransformer.hasFutureTransform()) {
-            Pair<Expr, List<Triplet<String, Expr, Boolean>>> result = this.operandTransformer.transform();
-            copiedOperand = result.getValue0();
-            transformMap = result.getValue1();
+            this.jointPointDelegate.accept(t1Assign);
+            prefixStatementList.add(t0Assign);
+            prefixStatementList.add(t1Assign);
+
+            return new Pair<>(new NameExpr(new Name(t1Name)), prefixStatementList);
         } else {
-            copiedOperand = this.operandExpr.treeCopy();
-            transformMap = new LinkedList<>();
-        }
-        assert copiedOperand != null && transformMap != null;
-
-        /* decide if such astNode is possible a joint point */
-        boolean isPossibleJointPoint = false;
-        for (Action action : this.actions) {
-            assert action.getPattern() instanceof Primitive;
-            Primitive primitivePattern = (Primitive) action.getPattern();
-            IsPossibleJointPointResult query = primitivePattern.isPossibleJointPoint(this.originalNode, this.runtimeInfo);
-            if (query.isPossible()) isPossibleJointPoint = true;
-        }
-        if (isPossibleJointPoint) {         /* perform the transformation */
-            String t1AlterName = this.alterNamespace.generateNewName();
-            Expr t1AlterExpr = copiedOperand;
-            Triplet<String, Expr, Boolean> t1 = new Triplet<>(t1AlterName, t1AlterExpr, false);
-
-            String t2AlterName = this.alterNamespace.generateNewName();
-            Expr t2AlterExpr = this.originalNode.treeCopy();
-            assert t2AlterExpr instanceof ArrayTransposeExpr;
-            ((ArrayTransposeExpr) t2AlterExpr).setOperand(new NameExpr(new Name(t1AlterName)));
-            Triplet<String, Expr, Boolean> t2 = new Triplet<>(t2AlterName, t2AlterExpr, true);
-
-            transformMap.add(t1);
-            transformMap.add(t2);
-
-            Expr retExpr = new NameExpr(new Name(t2AlterName));
-            List<Triplet<String, Expr, Boolean>> retTransformMap = transformMap;
-            return new Pair<>(retExpr, retTransformMap);
-        } else {                            /* copy and return            */
-            Expr retExpr = this.originalNode.treeCopy();
-            assert retExpr instanceof ArrayTransposeExpr;
-            ((ArrayTransposeExpr) retExpr).setOperand(copiedOperand);
-            List<Triplet<String, Expr, Boolean>> retTransformMap = transformMap;
-
-            return new Pair<>(retExpr, retTransformMap);
+            ArrayTransposeExpr copiedNode = (ArrayTransposeExpr) this.originalNode.copy();
+            Pair<Expr, List<Stmt>> operandTransformResult = this.operandTransformer.copyAndTransform();
+            Expr copiedOperand = operandTransformResult.getValue0();
+            copiedOperand.setParent(copiedNode);
+            copiedNode.setOperand(copiedOperand);
+            return new Pair<>(copiedNode, operandTransformResult.getValue1());
         }
     }
-
-    @Override
-    public Class<? extends Expr> correspondAST() {
-        return ArrayTransposeExpr.class;
-    }
-
 }

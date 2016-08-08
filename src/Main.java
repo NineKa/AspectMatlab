@@ -107,7 +107,7 @@ public class Main {
                 runtimeInfo,
                 new VarNamespace(),
                 (ASTNode node) -> false,
-                (Stmt statement) -> {jointPoints.add(statement);}
+                (Stmt statement) -> jointPoints.add(statement)
         );
 
         ExprTrans transformer = ExprTrans.buildExprTransformer(argument, rhs);

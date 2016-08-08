@@ -232,7 +232,6 @@ public class RuntimeInfo {
             if (annotation.getAnnotationName().equals("loopname")) continue;    /* reserved annotation, ignored */
             validAnnotation.add(comment);
         }
-        System.out.println(astNode.getClass().getName() + " " + validAnnotation);
 
         /* build up the delegates */
         Map<Class<? extends ASTNode>, Consumer<ASTNode>> handlerMap = new HashMap<>();

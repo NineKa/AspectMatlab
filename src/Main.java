@@ -4,14 +4,16 @@ import Matlab.Transformer.NodeToAstTransformer;
 import Matlab.Utils.*;
 import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
-import ast.ASTNode;
-import ast.CompilationUnits;
-import ast.PatternCall;
-import ast.PatternExecution;
+import ast.*;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
+import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
+import org.javatuples.Pair;
+import transformer.expr.ExprTrans;
+import transformer.expr.ExprTransArgument;
 import transformer.util.RuntimeInfo;
+import util.VarNamespace;
 
-import java.util.LinkedList;
+import java.util.*;
 
 public class Main {
     public static VFAnalysis analysis = null;
@@ -71,11 +73,55 @@ public class Main {
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
 
-        ASTNode clone = units.treeCopy();
-        RuntimeInfo.insertAnnotationEmptyStmt(clone);
-
         recPrintStructure(units, 0);
-        recPrintStructure(clone, 0);
+
+        Result<UnitNode> aspectResult = MRecognizer.RecognizeFile(
+                matlabFilePath,
+                true,
+                new Notifier()
+        );
+        CompilationUnits aspects = NodeToAstTransformer.Transform(aspectResult.GetValue());
+
+        assert units.getProgram(0) instanceof FunctionList;
+        Function function = ((FunctionList) units.getProgram(0)).getFunction(0);
+
+        assert function.getStmt(1) instanceof AssignStmt;
+        AssignStmt stmt = (AssignStmt) function.getStmt(1);
+        Expr rhs = stmt.getRHS();
+
+        assert aspects.getProgram(0) instanceof AspectDef;
+        Action action = ((AspectDef) aspects.getProgram(0)).getAction(0).getAction(0);
+        abstractPattern.Action abstractAction = new abstractPattern.Action(action, new HashMap<>(), matlabFilePath);
+
+        VFAnalysis kindAnalysis = new VFFlowInsensitiveAnalysis(units);
+        kindAnalysis.analyze();
+
+        RuntimeInfo runtimeInfo = new RuntimeInfo();
+        runtimeInfo.kindAnalysis = kindAnalysis;
+
+        Collection<Stmt> jointPoints = new HashSet<>();
+
+        ExprTransArgument argument = new ExprTransArgument(
+                Arrays.asList(abstractAction),
+                runtimeInfo,
+                new VarNamespace(),
+                (ASTNode node) -> false,
+                (Stmt statement) -> {jointPoints.add(statement);}
+        );
+
+        ExprTrans transformer = ExprTrans.buildExprTransformer(argument, rhs);
+        System.out.println(rhs.getPrettyPrinted());
+
+        Pair<Expr, java.util.List<Stmt>> r = transformer.copyAndTransform();
+        for (Stmt stmt1 : r.getValue1()) {
+            System.out.println(stmt1.getPrettyPrinted());
+        }
+        System.out.println(r.getValue0().getPrettyPrinted());
+
+        System.out.println("Joint Points:");
+        for (Stmt statement : jointPoints) {
+            System.out.println(statement.getPrettyPrinted());
+        }
 
         //Map<EmptyStmt, HelpComment> map = RuntimeInfo.insertAnnotationEmptyStmt(units);
         //for (EmptyStmt emptyStmt : map.keySet()) {

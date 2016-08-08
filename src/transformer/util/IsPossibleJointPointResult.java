@@ -46,7 +46,18 @@ public class IsPossibleJointPointResult implements Cloneable, Mergeable<IsPossib
 
     @Override
     public IsPossibleJointPointResult clone() {
-        return null;
+        IsPossibleJointPointResult clonedObj = new IsPossibleJointPointResult();
+        clonedObj.isAnnotates = this.isAnnotates;
+        clonedObj.isCalls = this.isCalls;
+        clonedObj.isExecutions = this.isExecutions;
+        clonedObj.isGets = this.isGets;
+        clonedObj.isLoops = this.isLoops;
+        clonedObj.isLoopBodies = this.isLoopBodies;
+        clonedObj.isLoopHeads = this.isLoopHeads;
+        clonedObj.isMainExecutions = this.isMainExecutions;
+        clonedObj.isOperators = this.isOperators;
+        clonedObj.isSets = this.isSets;
+        return clonedObj;
     }
 
     @Override @Deprecated @SuppressWarnings("deprecation")
@@ -98,7 +109,7 @@ public class IsPossibleJointPointResult implements Cloneable, Mergeable<IsPossib
         if (isMainExecutions) return true;
         if (isOperators) return true;
         if (isSets) return true;
-        /* control flow should not reach here */
-        throw new AssertionError();
+
+        return false;
     }
 }

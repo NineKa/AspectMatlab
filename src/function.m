@@ -1,10 +1,4 @@
 function [] = foo()
-    if true %@anno a1
-        idle;
-        %@anno a2
-        idle;
-    else
-        %@anno a2
-        idle;
-    end
+    x = 20;
+    x = 10 + (20 - 100);
 end

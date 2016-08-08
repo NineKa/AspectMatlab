@@ -11,7 +11,7 @@ public abstract class UnaryTrans extends ExprTrans {
     public UnaryTrans (ExprTransArgument argument, UnaryExpr unaryExpr) {
         super(argument, unaryExpr);
         this.originalOperand = unaryExpr.getOperand();
-        this.operandTransformer = ExprTrans.buildExprTransformer(argument, unaryExpr.getOperand());
+        this.operandTransformer = ExprTrans.buildExprTransformer(argument, this.originalOperand);
     }
 
     @Override

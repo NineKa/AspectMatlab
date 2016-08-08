@@ -4,6 +4,7 @@ import abstractPattern.Action;
 import abstractPattern.Primitive;
 import ast.*;
 import org.javatuples.Pair;
+import transformer.expr.binary.BinaryTrans;
 import transformer.expr.literal.LiteralTrans;
 import transformer.expr.unary.UnaryTrans;
 import transformer.util.IsPossibleJointPointResult;
@@ -55,6 +56,7 @@ public abstract class ExprTrans {
     public static ExprTrans buildExprTransformer(ExprTransArgument argument, Expr expr) {
         if (expr instanceof LiteralExpr) return LiteralTrans.buildLiteralTransformer(argument, (LiteralExpr) expr);
         if (expr instanceof UnaryExpr) return UnaryTrans.buildUnaryTransformer(argument, (UnaryExpr) expr);
+        if (expr instanceof BinaryExpr) return BinaryTrans.buildBinaryTransformer(argument, (BinaryExpr) expr);
 
         /* control flow should not reach here */
         throw new AssertionError();

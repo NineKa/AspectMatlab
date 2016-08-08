@@ -26,11 +26,12 @@ public final class MTransposeTrans extends UnaryTrans {
                 return returnStmt;
             };
 
-            String t0Name = this.alterNamespace.generateNewName();
-            String t1Name = this.alterNamespace.generateNewName();
             Pair<Expr, List<Stmt>> operandTransformResult = this.operandTransformer.copyAndTransform();
             Expr copiedOperand = operandTransformResult.getValue0();
             List<Stmt> prefixStatementList = operandTransformResult.getValue1();
+
+            String t0Name = this.alterNamespace.generateNewName();
+            String t1Name = this.alterNamespace.generateNewName();
 
             AssignStmt t0Assign = buildAssignStmt.apply(new NameExpr(new Name(t0Name)), copiedOperand);
             AssignStmt t1Assign = buildAssignStmt.apply(

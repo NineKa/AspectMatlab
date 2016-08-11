@@ -49,6 +49,12 @@ public abstract class BinaryTrans extends ExprTrans {
         if (binaryExpr instanceof GEExpr) return new GETrans(argument, (GEExpr) binaryExpr);
         if (binaryExpr instanceof EQExpr) return new EQTrans(argument, (EQExpr) binaryExpr);
         if (binaryExpr instanceof NEExpr) return new NETrans(argument, (NEExpr) binaryExpr);
+
+        if (binaryExpr instanceof ShortCircuitAndExpr)
+            return new ShortCircuitAndTrans(argument, (ShortCircuitAndExpr) binaryExpr);
+        if (binaryExpr instanceof ShortCircuitOrExpr)
+            return new ShortCircuitOrTrans(argument, (ShortCircuitOrExpr) binaryExpr);
+
         /* control flow should not reach here */
         throw new AssertionError();
     }

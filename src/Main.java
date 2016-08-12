@@ -21,10 +21,11 @@ public class Main {
     public static java.util.List<Execution> executions = new LinkedList<>();
 
     public static void recFind(ASTNode node) {
-        if (node instanceof PatternCall) calls.add(new Call((PatternCall)node));
-        if (node instanceof PatternExecution) executions.add(new Execution((PatternExecution)node));
+        if (node instanceof PatternCall) calls.add(new Call((PatternCall) node));
+        if (node instanceof PatternExecution) executions.add(new Execution((PatternExecution) node));
         for (int iter = 0; iter < node.getNumChild(); iter++) recFind(node.getChild(iter));
     }
+
     public static void printReport(IReport report) {
         for (Message message : report) {
             System.out.println(String.format(
@@ -36,6 +37,7 @@ public class Main {
             ));
         }
     }
+
     public static void recPrintStructure(ASTNode node, int indent) {
         for (int iter = 0; iter < indent; iter++) System.out.print('\t');
         System.out.println(String.format("[%x][%d] %s", node.hashCode(), node.GetRelativeChildIndex(), node.getClass().getName()));
@@ -49,11 +51,11 @@ public class Main {
         System.out.println(node.getClass().getName());
         NodeCollection collection = node.GetChildren();
         for (Node unitNode : node.GetChildren()) {
-            printRawTree(unitNode, indent+1);
+            printRawTree(unitNode, indent + 1);
         }
     }
 
-    public static ASTNode testClone(ASTNode astNode) throws CloneNotSupportedException{
+    public static ASTNode testClone(ASTNode astNode) throws CloneNotSupportedException {
         ASTNode suchClone = astNode.copy();
         //for (int iter = 0; iter < astNode.getNumChild(); iter++) {
         //    suchClone.setChild(testClone(astNode.getChild(iter)), iter);
@@ -63,6 +65,7 @@ public class Main {
 
     @SuppressWarnings("deprecation")
     public static void main(String argv[]) throws CloneNotSupportedException {
+
         String matlabFilePath = "/Users/k9/Documents/AspectMatlab/src/matlab.m";
         String functionFilePath = "/Users/k9/Documents/AspectMatlab/src/function.m";
 
@@ -148,3 +151,4 @@ public class Main {
         //recPrintStructure(units, 0);
     }
 }
+

@@ -1,0 +1,393 @@
+aspect prettyPrint {
+	protected static final String MEXCGen.INDENT = "    ";
+	protected static final String MEXCGen.RETURN = "\n";
+
+	public String Function._getPrettyPrinted(int indent) {
+		String currentIndentStr = "";
+		for (int iter = 0; iter < indent; iter++) {
+			currentIndentStr = INDENT + currentIndentStr;
+		}
+
+		String type = this.getType();
+		String name = this.getName();
+		String signature = "";
+		String statement = "";
+
+		for (int iter = 0; iter < getNumSignature(); iter++) {
+			String currentSignature = getSignature(iter).getPrettyPrinted();
+			if (iter + 1 < getNumSignature()) {
+				signature = signature + currentSignature + ", ";
+			} else {
+				signature = signature + currentSignature;
+			}
+		}
+
+		for (int iter = 0; iter < getNumStatement(); iter++) {
+			String currentStatement = getStatement(iter)._getPrettyPrinted(indent + 1);
+			statement = statement + currentStatement;
+		}
+
+		return String.format(
+			"%s%s %s (%s) {%s" +
+			"%s" + 
+			"%s}%s",
+			currentIndentStr, type, name, signature, RETURN,
+			statement,
+			currentIndentStr, RETURN
+		);
+	}
+
+	public abstract String Expr.getPrettyPrinted();
+
+	public String ConditionalExpr.getPrettyPrinted() {
+		return String.format(
+			"(%s)?(%s):(%s)", 
+			getCondition().getPrettyPrinted(),
+			getTrueExpression().getPrettyPrinted(),
+			getFalseExpression().getPrettyPrinted()
+		);
+	}
+
+	public String CastExpr.getPrettyPrinted() {
+		return String.format(
+			"(%s)%s",
+			getTarget(),
+			getOperand().getPrettyPrinted()
+		);
+	}
+
+	public String LogicOrExpr.getPrettyPrinted() {
+		return String.format("(%s || %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String LogicAndExpr.getPrettyPrinted() {
+		return String.format("(%s && %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String InclusiveOrExpr.getPrettyPrinted() {
+		return String.format("(%s | %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String ExclusiveOrExpr.getPrettyPrinted() {
+		return String.format("(%s ^ %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String AndExpr.getPrettyPrinted() {
+		return String.format("(%s & %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String EqualExpr.getPrettyPrinted() {
+		return String.format("(%s == %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String NotEqualExpr.getPrettyPrinted() {
+		return String.format("(%s != %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String LessExpr.getPrettyPrinted() {
+		return String.format("(%s < %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String LessEqualExpr.getPrettyPrinted() {
+		return String.format("(%s <= %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String GreaterExpr.getPrettyPrinted() {
+		return String.format("(%s > %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String GreaterEqualExpr.getPrettyPrinted() {
+		return String.format("(%s >= %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String LeftShiftExpr.getPrettyPrinted() {
+		return String.format("(%s << %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String RightShiftExpr.getPrettyPrinted() {
+		return String.format("(%s >> %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String AddExpr.getPrettyPrinted() {
+		return String.format("(%s + %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String MinusExpr.getPrettyPrinted() {
+		return String.format("(%s - %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String MultiplyExpr.getPrettyPrinted() {
+		return String.format("(%s * %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String DivideExpr.getPrettyPrinted() {
+		return String.format("(%s / %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String ModuloExpr.getPrettyPrinted() {
+		return String.format("(%s %% %s)", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
+	}
+
+	public String PrefixIncExpr.getPrettyPrinted() {
+		return String.format("(++%s)", getOperand().getPrettyPrinted());
+	}
+
+	public String PrefixDecExpr.getPrettyPrinted() {
+		return String.format("(--%s)", getOperand().getPrettyPrinted());
+	}
+
+	public String AddressExpr.getPrettyPrinted() {
+		return String.format("(&%s)", getOperand().getPrettyPrinted());
+	}
+
+	public String ValueExpr.getPrettyPrinted() {
+		return String.format("(*%s)", getOperand().getPrettyPrinted());
+	}
+
+	public String PrePlusExpr.getPrettyPrinted() {
+		return String.format("(+%s)", getOperand().getPrettyPrinted());
+	}
+
+	public String PreMinusExpr.getPrettyPrinted() {
+		return String.format("(-%s)", getOperand().getPrettyPrinted());
+	}
+
+	public String LogicNotExpr.getPrettyPrinted() {
+		return String.format("(!%s)", getOperand().getPrettyPrinted());
+	}
+
+	public String NotExpr.getPrettyPrinted() {
+		return String.format("(~%s)", getOperand().getPrettyPrinted());
+	}
+
+	public String SizeofExpr.getPrettyPrinted() {
+		return String.format("sizeof(%s)", getOperand().getPrettyPrinted());
+	}
+
+	public String ArrayIndexExpr.getPrettyPrinted() {
+		return String.format("%s[%s]", getTarget().getPrettyPrinted(), getIndex().getPrettyPrinted());
+	}
+
+	public String ParametrizedExpr.getPrettyPrinted() {
+		String appendingStr = "";
+		for (int index = 0; index < getNumArgument(); index++) {
+			appendingStr = appendingStr + getArgument(index).getPrettyPrinted();
+			if (index + 1 < getNumArgument()) {
+				appendingStr = appendingStr + ", ";
+			}
+		}
+		return String.format("%s(%s)", getTarget().getPrettyPrinted(), appendingStr);
+	}
+
+	public String DotExpr.getPrettyPrinted() {
+		return String.format("%s.%s", getTarget().getPrettyPrinted(), getEntry().getPrettyPrinted());
+	}
+
+	public String StructDereferenceExpr.getPrettyPrinted() {
+		return String.format("%s->%s", getTarget().getPrettyPrinted(), getEntry().getPrettyPrinted());
+	}
+
+	public String PostfixIncExpr.getPrettyPrinted() {
+		return String.format("%s++", getOperand().getPrettyPrinted());
+	}
+
+	public String PostfixDecExpr.getPrettyPrinted() {
+		return String.format("%s--", getOperand().getPrettyPrinted());
+	}
+
+	public String IntegerConstantExpr.getPrettyPrinted() {
+		return getValue().toString();
+	}
+
+	public String CharConstantExpr.getPrettyPrinted() {
+		return getValue().toString();
+	}
+
+	public String FloatingConstantExpr.getPrettyPrinted() {
+		return getValue().toString();
+	}
+
+	public String StringLiteralExpr.getPrettyPrinted() {
+		return getValue().toString();
+	}
+
+	public String AssignExpr.getPrettyPrinted() {
+		return String.format("%s = %s", getTarget().getPrettyPrinted(), getExpression().getPrettyPrinted());
+	}
+
+	public String MultiplyAssignExpr.getPrettyPrinted() {
+		return String.format("%s *= %s", getTarget().getPrettyPrinted(), getExpression().getPrettyPrinted());
+	}
+
+	public String DivideAssignExpr.getPrettyPrinted() {
+		return String.format("%s /= %s", getTarget().getPrettyPrinted(), getExpression().getPrettyPrinted());
+	}
+
+	public String ModuloAssignExpr.getPrettyPrinted() {
+		return String.format("%s %= %s", getTarget().getPrettyPrinted(), getExpression().getPrettyPrinted());
+	}
+
+	public String AddAssignExpr.getPrettyPrinted() {
+		return String.format("%s += %s", getTarget().getPrettyPrinted(), getExpression().getPrettyPrinted());
+	}
+
+	public String MinusAssignExpr.getPrettyPrinted() {
+		return String.format("%s -= %s", getTarget().getPrettyPrinted(), getExpression().getPrettyPrinted());
+	}
+
+	public String LeftShiftAssignExpr.getPrettyPrinted() {
+		return String.format("%s <<= %s", getTarget().getPrettyPrinted(), getExpression().getPrettyPrinted());
+	}
+
+	public String RightShiftAssignExpr.getPrettyPrinted() {
+		return String.format("%s >>= %s", getTarget().getPrettyPrinted(), getExpression().getPrettyPrinted());
+	}
+
+	public String AndAssignExpr.getPrettyPrinted() {
+		return String.format("%s &= %s", getTarget().getPrettyPrinted(), getExpression().getPrettyPrinted());
+	}
+
+	public String InclusiveOrAssignExpr.getPrettyPrinted() {
+		return String.format("%s |= %s", getTarget().getPrettyPrinted(), getExpression().getPrettyPrinted());
+	}
+
+	public String ExclusiveOrAssignExpr.getPrettyPrinted() {
+		return String.format("%s ~= %s", getTarget().getPrettyPrinted(), getExpression().getPrettyPrinted());
+	}
+
+	public String NameExpr.getPrettyPrinted() {
+		return getName().getPrettyPrinted();
+	}
+
+	public abstract String Stmt._getPrettyPrinted(int indent);
+
+	public String Declare._getPrettyPrinted(int indent) {
+		String currentIndentStr = "";
+		for (int iter = 0; iter < indent; iter++) {
+			currentIndentStr = INDENT + currentIndentStr;
+		}
+		return String.format(
+			"%s%s %s = %s ; %s",
+			currentIndentStr, getType(), getName(), getInitExpression().getPrettyPrinted(), RETURN
+		);
+	}
+
+	public String IfStmt._getPrettyPrinted(int indent) {
+		String currentIndentStr = "";
+		for (int iter = 0; iter < indent; iter++) {
+			currentIndentStr = INDENT + currentIndentStr;
+		}
+		if (getNumStatement() == 1 && getNumElseStatement() == 0) {
+			String statement = getStatement(1)._getPrettyPrinted(0);
+			return String.format("%sif (%s) %s", currentIndentStr, getCondition().getPrettyPrinted(), statement);
+		}
+		String trueBody = "";
+		for (Stmt stmt : getStatementList()) trueBody = trueBody + stmt._getPrettyPrinted(indent + 1);
+		String falseBody = "";
+		for (Stmt stmt : getElseStatementList()) falseBody = falseBody + stmt._getPrettyPrinted(indent + 1);
+		if (getNumElseStatement() == 0) {
+			return String.format(
+				"%sif (%s) {%s%s%s}%s",
+				currentIndentStr, getCondition().getPrettyPrinted(), RETURN, trueBody, currentIndentStr, RETURN
+			);
+		} else {
+			return String.format(
+				"%sif (%s) {%s%s%s} else {%s%s%s}%s",
+				currentIndentStr, getCondition().getPrettyPrinted(), RETURN,
+				trueBody,
+				currentIndentStr, RETURN,
+				falseBody,
+				currentIndentStr, RETURN
+			);
+		}
+	}
+	
+	public String WhileStmt._getPrettyPrinted(int indent) {
+		String currentIndentStr = "";
+		for (int iter = 0; iter < indent; iter++) {
+			currentIndentStr = INDENT + currentIndentStr;
+		}
+		if (getNumStatement() == 1) {
+			String statement = getStatement(1)._getPrettyPrinted(0);
+			return String.format("%swhile (%s) %s", currentIndentStr, getCondition().getPrettyPrinted(), statement);
+		}
+		String body = "";
+		for (Stmt stmt : getStatementList()) body = body + stmt._getPrettyPrinted(indent + 1);
+		return String.format(
+			"%swhile (%s) {%s%s%s}%s",
+			currentIndentStr, getCondition().getPrettyPrinted(), RETURN,
+			body,
+			currentIndentStr, RETURN
+		);
+	}
+
+	public String ForStmt._getPrettyPrinted(int indent) {
+		String currentIndentStr = "";
+		for (int iter = 0; iter < indent; iter++) {
+			currentIndentStr = INDENT + currentIndentStr;
+		}
+
+		String initExpr = (getInitExpr() == null)?"":getInitExpr().getPrettyPrinted();
+		String condExpr = (getCondition() == null)?"":getCondition().getPrettyPrinted();
+		String stepExpr = (getStepExpr() == null)?"":getStepExpr().getPrettyPrinted();
+		String body = "";
+		for (Stmt stmt : getStatementList()) body = body + stmt._getPrettyPrinted(indent + 1);
+
+		return String.format(
+			"%sfor (%s; %s; %s) {%s%s%s}%s",
+			currentIndentStr, initExpr, condExpr, stepExpr, RETURN,
+			body,
+			currentIndentStr, RETURN
+		);
+	}
+
+	public String ExprStmt._getPrettyPrinted(int indent) {
+		String currentIndentStr = "";
+		for (int iter = 0; iter < indent; iter++) {
+			currentIndentStr = INDENT + currentIndentStr;
+		}
+
+		String expr = (getExpression() == null)?"":getExpression().getPrettyPrinted();
+
+		return String.format("%s%s ;%s", currentIndentStr, expr, RETURN);
+	}
+
+	public String ContinueStmt._getPrettyPrinted(int indent) {
+		String currentIndentStr = "";
+		for (int iter = 0; iter < indent; iter++) {
+			currentIndentStr = INDENT + currentIndentStr;
+		}
+
+		return String.format("%scontinue ;%s", currentIndentStr, RETURN);
+	}
+
+	public String BreakStmt._getPrettyPrinted(int indent) {
+		String currentIndentStr = "";
+		for (int iter = 0; iter < indent; iter++) {
+			currentIndentStr = INDENT + currentIndentStr;
+		}
+
+		return String.format("%sbreak ;%s", currentIndentStr, RETURN);
+	}
+
+	public String Name.getPrettyPrinted() {
+		return getID();
+	}
+
+	public String Signature.getPrettyPrinted() {
+		return String.format("%s %s", getType(), getID());
+	}
+
+	public String ReturnStmt._getPrettyPrinted(int indent) {
+		String currentIndentStr = "";
+		for (int iter = 0; iter < indent; iter++) {
+			currentIndentStr = INDENT + currentIndentStr;
+		}
+		String expr = (getExpression()==null)?"":getExpression().getPrettyPrinted();
+		return String.format("%sreturn %s ;%s", currentIndentStr, expr, RETURN);
+	}
+
+	public String Function.getPrettyPrinted() {
+		return _getPrettyPrinted(0);
+	}
+}

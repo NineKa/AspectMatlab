@@ -1,0 +1,81 @@
+Function ::= <Type:String> <Name:String> Signature:Signature* Statement:Stmt*;
+
+abstract Expr;
+
+ConditionalExpr : Expr ::= Condition:Expr TrueExpression:Expr FalseExpression:Expr;
+CastExpr		: Expr ::= <Target:String> Operand:Expr;
+
+abstract BinaryExpr : Expr ::= LHS:Expr RHS:Expr;
+LogicOrExpr 		: BinaryExpr;
+LogicAndExpr 		: BinaryExpr;
+InclusiveOrExpr		: BinaryExpr;
+ExclusiveOrExpr		: BinaryExpr;
+AndExpr 			: BinaryExpr;
+EqualExpr 			: BinaryExpr;
+NotEqualExpr 		: BinaryExpr;
+LessExpr			: BinaryExpr;
+LessEqualExpr		: BinaryExpr;
+GreaterExpr			: BinaryExpr;
+GreaterEqualExpr	: BinaryExpr;
+LeftShiftExpr		: BinaryExpr;
+RightShiftExpr		: BinaryExpr;
+AddExpr				: BinaryExpr;
+MinusExpr			: BinaryExpr;
+MultiplyExpr		: BinaryExpr;
+DivideExpr			: BinaryExpr;
+ModuloExpr			: BinaryExpr;
+
+abstract PrefixExpr : Expr ::= Operand:Expr;
+PrefixIncExpr		: PrefixExpr;
+PrefixDecExpr		: PrefixExpr;
+AddressExpr			: PrefixExpr;
+ValueExpr			: PrefixExpr;
+PrePlusExpr			: PrefixExpr;
+PreMinusExpr		: PrefixExpr;
+LogicNotExpr 		: PrefixExpr;
+NotExpr 			: PrefixExpr;
+SizeofExpr			: PrefixExpr;
+
+abstract PostfixExpr : Expr;
+ArrayIndexExpr			: PostfixExpr ::= Target:Expr Index:Expr;
+ParametrizedExpr		: PostfixExpr ::= Target:Expr Argument:Expr*;
+DotExpr					: PostfixExpr ::= Target:Expr Entry:Expr;
+StructDereferenceExpr 	: PostfixExpr ::= Target:Expr Entry:Expr;
+PostfixIncExpr			: PostfixExpr ::= Operand:Expr;
+PostfixDecExpr			: PostfixExpr ::= Operand:Expr;
+
+abstract LiteralExpr : Expr;
+IntegerConstantExpr		: LiteralExpr ::= <Value:Integer>;
+CharConstantExpr 		: LiteralExpr ::= <Value:Character>;
+FloatingConstantExpr 	: LiteralExpr ::= <Value:Float>;
+StringLiteralExpr 		: LiteralExpr ::= <Value:String>;
+
+abstract AssignmentExpr : Expr ::= Target:Expr Expression:Expr;
+AssignExpr 				: AssignmentExpr;
+MultiplyAssignExpr		: AssignmentExpr;
+DivideAssignExpr		: AssignmentExpr;
+ModuloAssignExpr		: AssignmentExpr;
+AddAssignExpr			: AssignmentExpr;
+MinusAssignExpr			: AssignmentExpr;
+LeftShiftAssignExpr		: AssignmentExpr;
+RightShiftAssignExpr 	: AssignmentExpr;
+AndAssignExpr			: AssignmentExpr;
+InclusiveOrAssignExpr	: AssignmentExpr;
+ExclusiveOrAssignExpr	: AssignmentExpr;
+
+NameExpr : Expr ::= Name:Name;
+
+abstract Stmt;
+Declare : Stmt ::= <Type:String> <Name:String> [InitExpression:Expr];
+IfStmt : Stmt ::= Condition:Expr Statement:Stmt* ElseStatement:Stmt*;
+
+WhileStmt : Stmt ::= Condition:Expr Statement:Stmt*;
+ForStmt : Stmt ::= [InitExpr:Expr] [Condition:Expr] [StepExpr:Expr] Statement:Stmt*;
+ExprStmt : Stmt ::= [Expression:Expr];
+ReturnStmt : Stmt ::= [Expression:Expr];
+
+ContinueStmt : Stmt;
+BreakStmt : Stmt;
+
+Name ::= <ID : String>;
+Signature ::= <Type:String> <ID:String>;

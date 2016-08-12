@@ -33,7 +33,7 @@ public class DFA implements Iterable<DFANode>{
         return retNode;
     }
 
-    @SuppressWarnings("ann-dep") public DFA(NFA pNFA) {
+    @SuppressWarnings("deprecation") public DFA(NFA pNFA) {
         this.nfa = pNFA;
         this.alphabet = this.nfa.getAlphabet();
         this.entryState = getNewState();
@@ -53,7 +53,7 @@ public class DFA implements Iterable<DFANode>{
         }
     }
 
-    @Deprecated @SuppressWarnings("ann-dep") private void recBuildDFA(DFANode pos) {
+    @Deprecated @SuppressWarnings("deprecation") private void recBuildDFA(DFANode pos) {
         Collection<Integer> searchCodeSet = new HashSet<>();
         for (Object letter : this.alphabet) searchCodeSet.add(this.alphabet.getLetterCode(letter));
         searchCodeSet.add(this.alphabet.getSigmaTransitionCode());

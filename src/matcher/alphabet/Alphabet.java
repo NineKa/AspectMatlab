@@ -1,13 +1,11 @@
 package matcher.alphabet;
 
 import ast.*;
-import ast.Function;
 import ast.List;
 import natlab.DecIntNumericLiteralValue;
 import util.Namespace;
 
 import java.util.*;
-import java.util.function.*;
 
 public class Alphabet<T> implements Iterable<T>{
     private int stateCounter = 0;

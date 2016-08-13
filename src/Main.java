@@ -40,7 +40,20 @@ public class Main {
 
     public static void recPrintStructure(ASTNode node, int indent) {
         for (int iter = 0; iter < indent; iter++) System.out.print('\t');
-        System.out.println(String.format("[%x][%d] %s", node.hashCode(), node.GetRelativeChildIndex(), node.getClass().getName()));
+        System.out.print(String.format("[%x][%d] %s", node.hashCode(), node.GetRelativeChildIndex(), node.getClass().getName()));
+
+        if (node instanceof Name) {
+            String kindAnalysisResult;
+            try {
+                kindAnalysisResult = analysis.getResult((Name) node).toString();
+            } catch (NullPointerException except) {
+                kindAnalysisResult = "null";
+            }
+            System.out.println(" Kind Analysis: " + kindAnalysisResult);
+        } else {
+            System.out.println();
+        }
+
         for (int iter = 0; iter < node.getNumChild(); iter++) {
             recPrintStructure(node.getChild(iter), indent + 1);
         }
@@ -77,7 +90,12 @@ public class Main {
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
 
+        VFAnalysis kindAnalysis = new VFFlowInsensitiveAnalysis(units, units.getFunctionOrScriptQuery());
+        kindAnalysis.analyze();
+        analysis = kindAnalysis;
+
         recPrintStructure(units, 0);
+        System.out.println(units.getPrettyPrinted());
 
         Result<UnitNode> aspectResult = MRecognizer.RecognizeFile(
                 matlabFilePath,
@@ -96,9 +114,6 @@ public class Main {
         assert aspects.getProgram(0) instanceof AspectDef;
         Action action = ((AspectDef) aspects.getProgram(0)).getAction(0).getAction(0);
         abstractPattern.Action abstractAction = new abstractPattern.Action(action, new HashMap<>(), matlabFilePath);
-
-        VFAnalysis kindAnalysis = new VFFlowInsensitiveAnalysis(units);
-        kindAnalysis.analyze();
 
         RuntimeInfo runtimeInfo = new RuntimeInfo();
         runtimeInfo.kindAnalysis = kindAnalysis;

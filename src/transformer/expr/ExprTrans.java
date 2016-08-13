@@ -24,12 +24,17 @@ public abstract class ExprTrans {
     protected Function<ASTNode, Boolean> ignoreDelegate = null;
     protected Consumer<Stmt> jointPointDelegate = null;
 
+    @Deprecated
+    protected ExprTransArgument originalArgument = null;
+
+    @SuppressWarnings("deprecation")
     public ExprTrans (ExprTransArgument argument, Expr expr) {
         this.actions            = argument.actions;
         this.runtimeInfo        = argument.runtimeInfo;
         this.alterNamespace     = argument.alterNamespace;
         this.ignoreDelegate     = argument.ignoreDelegate;
         this.jointPointDelegate = argument.jointPointDelegate;
+        this.originalArgument   = argument;
 
         this.originalNode       = expr;
     }

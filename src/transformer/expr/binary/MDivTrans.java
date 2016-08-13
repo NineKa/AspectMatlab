@@ -33,8 +33,14 @@ public final class MDivTrans extends BinaryTrans {
             Expr copiedRHS = rhsTransformResult.getValue0();
 
             List<Stmt> newPrefixStatementList = new LinkedList<>();
-            for (Stmt iter : lhsTransformResult.getValue1()) newPrefixStatementList.add(iter);
-            for (Stmt iter : rhsTransformResult.getValue1()) newPrefixStatementList.add(iter);
+            newPrefixStatementList.addAll(lhsTransformResult.getValue1());
+            if (!rhsTransformResult.getValue1().isEmpty()) {
+                String lhsOverrideName = this.alterNamespace.generateNewName();
+                AssignStmt lhsOvrrideAssign = buildAssignStmt.apply(new NameExpr(new Name(lhsOverrideName)), copiedLHS);
+                newPrefixStatementList.add(lhsOvrrideAssign);
+                copiedLHS = new NameExpr(new Name(lhsOverrideName));
+            }
+            newPrefixStatementList.addAll(rhsTransformResult.getValue1());
 
             String t0Name = this.alterNamespace.generateNewName();
             String t1Name = this.alterNamespace.generateNewName();
@@ -57,14 +63,26 @@ public final class MDivTrans extends BinaryTrans {
         } else {
             Pair<Expr, List<Stmt>> lhsTransformResult = this.LHSTransformer.copyAndTransform();
             Pair<Expr, List<Stmt>> rhsTransformResult = this.RHSTransformer.copyAndTransform();
-
-            List<Stmt> newPrefixStatementList = new LinkedList<>();
-            for (Stmt iter : lhsTransformResult.getValue1()) newPrefixStatementList.add(iter);
-            for (Stmt iter : rhsTransformResult.getValue1()) newPrefixStatementList.add(iter);
-
             Expr copiedLHS = lhsTransformResult.getValue0();
             Expr copiedRHS = rhsTransformResult.getValue0();
             MDivExpr copiedNode = (MDivExpr) this.originalNode.copy();
+
+            List<Stmt> newPrefixStatementList = new LinkedList<>();
+            newPrefixStatementList.addAll(lhsTransformResult.getValue1());
+            BiFunction<LValueExpr, Expr, AssignStmt> buildAssignStmt = (LValueExpr lhs, Expr rhs) -> {
+                AssignStmt returnStmt = new AssignStmt();
+                returnStmt.setLHS(lhs);
+                returnStmt.setRHS(rhs);
+                returnStmt.setOutputSuppressed(true);
+                return returnStmt;
+            };
+            if (!rhsTransformResult.getValue1().isEmpty()) {
+                String lhsOverrideName = this.alterNamespace.generateNewName();
+                AssignStmt lhsOvrrideAssign = buildAssignStmt.apply(new NameExpr(new Name(lhsOverrideName)), copiedLHS);
+                newPrefixStatementList.add(lhsOvrrideAssign);
+                copiedLHS = new NameExpr(new Name(lhsOverrideName));
+            }
+            newPrefixStatementList.addAll(rhsTransformResult.getValue1());
 
             copiedLHS.setParent(copiedNode);
             copiedRHS.setParent(copiedNode);

@@ -1,13 +1,12 @@
 package transformer.expr.binary;
 
-import ast.AndExpr;
-import ast.Expr;
-import ast.Stmt;
+import ast.*;
 import org.javatuples.Pair;
 import transformer.expr.ExprTransArgument;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BiFunction;
 
 public final class AndTrans extends BinaryTrans {
     public AndTrans(ExprTransArgument argument, AndExpr binaryExpr) {
@@ -23,8 +22,21 @@ public final class AndTrans extends BinaryTrans {
         Expr copiedRHS = rhsTransformResult.getValue0();
 
         List<Stmt> newPrefixStatementList = new LinkedList<>();
-        for (Stmt iter : lhsTransformResult.getValue1()) newPrefixStatementList.add(iter);
-        for (Stmt iter : rhsTransformResult.getValue1()) newPrefixStatementList.add(iter);
+        newPrefixStatementList.addAll(lhsTransformResult.getValue1());
+        BiFunction<LValueExpr, Expr, AssignStmt> buildAssignStmt = (LValueExpr lhs, Expr rhs) -> {
+            AssignStmt returnStmt = new AssignStmt();
+            returnStmt.setLHS(lhs);
+            returnStmt.setRHS(rhs);
+            returnStmt.setOutputSuppressed(true);
+            return returnStmt;
+        };
+        if (!rhsTransformResult.getValue1().isEmpty()) {
+            String lhsOverrideName = this.alterNamespace.generateNewName();
+            AssignStmt lhsOvrrideAssign = buildAssignStmt.apply(new NameExpr(new Name(lhsOverrideName)), copiedLHS);
+            newPrefixStatementList.add(lhsOvrrideAssign);
+            copiedLHS = new NameExpr(new Name(lhsOverrideName));
+        }
+        newPrefixStatementList.addAll(rhsTransformResult.getValue1());
 
         AndExpr copiedNode = (AndExpr) this.originalNode.copy();
 

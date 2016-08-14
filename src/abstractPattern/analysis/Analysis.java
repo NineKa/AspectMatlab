@@ -10,14 +10,14 @@ import java.util.Map;
 
 public class Analysis {
     private String filepath = "Not yet implement";
-    private Map<Expr, PatternType> resultMap = new HashMap<>();
+    private Map<Expr, PatternAnalysisType> resultMap = new HashMap<>();
     private Expr patternRoot = null;
 
-    public PatternType getResult(Expr pattern) {
+    public PatternAnalysisType getResult(Expr pattern) {
         return this.resultMap.get(pattern);
     }
 
-    public PatternType getResult() {
+    public PatternAnalysisType getResult() {
         return this.resultMap.get(patternRoot);
     }
 
@@ -32,20 +32,20 @@ public class Analysis {
     public void analysis(Expr pattern) throws Backtrace{
         if (PatternClassifier.isBasicPattern(pattern)) {
             if (PatternClassifier.isBasicPatternModifier(pattern)) {
-                resultMap.put(pattern, PatternType.Modifier);
+                resultMap.put(pattern, PatternAnalysisType.Modifier);
             }
             if (PatternClassifier.isBasicPatternPrimitive(pattern)) {
-                resultMap.put(pattern, PatternType.Primitive);
+                resultMap.put(pattern, PatternAnalysisType.Primitive);
             }
         } else {
             if (pattern instanceof AndExpr) {
                 this.analysis(((AndExpr)pattern).getLHS());
                 this.analysis(((AndExpr)pattern).getRHS());
-                PatternType leftClass = resultMap.get(((AndExpr)pattern).getLHS());
-                PatternType rightClass = resultMap.get(((AndExpr)pattern).getRHS());
+                PatternAnalysisType leftClass = resultMap.get(((AndExpr)pattern).getLHS());
+                PatternAnalysisType rightClass = resultMap.get(((AndExpr)pattern).getRHS());
                 /* --- throw back trace --- */
-                PatternType thisAnalysisType = PatternType.andMerge(leftClass, rightClass);
-                if (thisAnalysisType == PatternType.Invalid) {
+                PatternAnalysisType thisAnalysisType = PatternAnalysisType.andMerge(leftClass, rightClass);
+                if (thisAnalysisType == PatternAnalysisType.Invalid) {
                     /* control flow should not reach here */
                     throw new RuntimeException();
                 }
@@ -54,11 +54,11 @@ public class Analysis {
             if (pattern instanceof OrExpr) {
                 this.analysis(((OrExpr)pattern).getLHS());
                 this.analysis(((OrExpr)pattern).getRHS());
-                PatternType leftClass = resultMap.get(((OrExpr)pattern).getLHS());
-                PatternType rightClass = resultMap.get(((OrExpr)pattern).getRHS());
+                PatternAnalysisType leftClass = resultMap.get(((OrExpr)pattern).getLHS());
+                PatternAnalysisType rightClass = resultMap.get(((OrExpr)pattern).getRHS());
                 /* --- throw back trace --- */
-                PatternType thisAnalysisType = PatternType.orMerge(leftClass, rightClass);
-                if (thisAnalysisType == PatternType.Invalid) {
+                PatternAnalysisType thisAnalysisType = PatternAnalysisType.orMerge(leftClass, rightClass);
+                if (thisAnalysisType == PatternAnalysisType.Invalid) {
                     /* attempt to concatenating a primitive pattern and a modifier pattern */
                     throw new Backtrace(
                             this.filepath,
@@ -71,10 +71,10 @@ public class Analysis {
             }
             if (pattern instanceof NotExpr) {
                 this.analysis(((NotExpr)pattern).getOperand());
-                PatternType operandClass = resultMap.get(((NotExpr)pattern).getOperand());
+                PatternAnalysisType operandClass = resultMap.get(((NotExpr)pattern).getOperand());
                 /* --- throw back trace --- */
-                PatternType thisAnalysisType = PatternType.notMerge(operandClass);
-                if (thisAnalysisType == PatternType.Invalid) {
+                PatternAnalysisType thisAnalysisType = PatternAnalysisType.notMerge(operandClass);
+                if (thisAnalysisType == PatternAnalysisType.Invalid) {
                     throw new Backtrace(
                             this.filepath,
                             pattern.getStartLine(),

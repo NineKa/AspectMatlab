@@ -5,7 +5,7 @@ import Matlab.Utils.Message;
 import Matlab.Utils.Report;
 import abstractPattern.analysis.Analysis;
 import abstractPattern.analysis.Backtrace;
-import abstractPattern.analysis.PatternType;
+import abstractPattern.analysis.PatternAnalysisType;
 import abstractPattern.type.WeaveType;
 import ast.Expr;
 import ast.List;
@@ -40,7 +40,7 @@ public class Action {
         try {
             /* pattern type analysis */
             Analysis analysis = new Analysis(this.filepath, this.astNodes.getExpr());
-            if (analysis.getResult() != PatternType.Primitive) {
+            if (analysis.getResult() != PatternAnalysisType.Primitive) {
                 report.AddError(
                         this.filepath,
                         this.astNodes.getStartLine(),

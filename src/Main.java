@@ -2,6 +2,7 @@ import Matlab.Nodes.UnitNode;
 import Matlab.Recognizer.MRecognizer;
 import Matlab.Transformer.NodeToAstTransformer;
 import Matlab.Utils.*;
+import abstractPattern.analysis.PatternType;
 import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
 import ast.*;
@@ -10,6 +11,7 @@ import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
 import org.javatuples.Pair;
 import transformer.expr.ExprTrans;
 import transformer.expr.ExprTransArgument;
+import transformer.util.AccessMode;
 import transformer.util.RuntimeInfo;
 import util.VarNamespace;
 
@@ -117,15 +119,16 @@ public class Main {
 
         RuntimeInfo runtimeInfo = new RuntimeInfo();
         runtimeInfo.kindAnalysis = kindAnalysis;
+        runtimeInfo.accessMode = AccessMode.Read;
 
-        Collection<Stmt> jointPoints = new HashSet<>();
+        Collection<Pair<Stmt, PatternType>> jointPoints = new HashSet<>();
 
         ExprTransArgument argument = new ExprTransArgument(
                 Arrays.asList(abstractAction),
                 runtimeInfo,
                 new VarNamespace(),
                 (ASTNode node) -> false,
-                (Stmt statement) -> jointPoints.add(statement)
+                (Pair<Stmt, PatternType> r) -> jointPoints.add(r)
         );
 
         ExprTrans transformer = ExprTrans.buildExprTransformer(argument, rhs);
@@ -138,8 +141,10 @@ public class Main {
         System.out.println(r.getValue0().getPrettyPrinted());
 
         System.out.println("Joint Points:");
-        for (Stmt statement : jointPoints) {
-            System.out.println(statement.getPrettyPrinted());
+        for (Pair<Stmt, PatternType> statement : jointPoints) {
+            System.out.println(
+                    String.format("[%s]\t%s", statement.getValue1(), statement.getValue0().getPrettyPrinted())
+            );
         }
 
         //Map<EmptyStmt, HelpComment> map = RuntimeInfo.insertAnnotationEmptyStmt(units);

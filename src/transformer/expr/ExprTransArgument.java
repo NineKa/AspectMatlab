@@ -1,8 +1,10 @@
 package transformer.expr;
 
 import abstractPattern.Action;
+import abstractPattern.analysis.PatternType;
 import ast.ASTNode;
 import ast.Stmt;
+import org.javatuples.Pair;
 import transformer.util.RuntimeInfo;
 import util.Namespace;
 
@@ -20,14 +22,14 @@ public class ExprTransArgument {
     /* A function decide if a node transformation is ignored (TRUE -> ignored) */
     public Function<ASTNode, Boolean> ignoreDelegate = null;
     /* A call back function, if a joint point is appearing, a call back is issued */
-    public Consumer<Stmt> jointPointDelegate = null;
+    public Consumer<Pair<Stmt, PatternType>> jointPointDelegate = null;
 
     public ExprTransArgument(
             Collection<Action> actions,
             RuntimeInfo runtimeInfo,
             Namespace alterNamespace,
             Function<ASTNode, Boolean> ignoreDelegate,
-            Consumer<Stmt> jointPointDelegate
+            Consumer<Pair<Stmt, PatternType>> jointPointDelegate
     ) {
         this.actions = actions;
         this.runtimeInfo = runtimeInfo;

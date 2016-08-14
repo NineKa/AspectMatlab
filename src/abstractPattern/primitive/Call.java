@@ -11,6 +11,7 @@ import abstractPattern.modifier.Within;
 import abstractPattern.signature.Signature;
 import abstractPattern.type.WeaveType;
 import ast.*;
+import natlab.toolkits.analysis.varorfun.VFAnalysis;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import transformer.util.IsPossibleJointPointResult;
 import transformer.util.RuntimeInfo;
@@ -208,21 +209,56 @@ public class Call extends Primitive {
         return weaveTypeBooleanMap;
     }
 
-    @Override
-    public IsPossibleJointPointResult isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
+    private IsPossibleJointPointResult isPossibleJointPointNameExpr(NameExpr nameExpr, RuntimeInfo runtimeInfo) {
+        Name functionName = nameExpr.getName();
+        /* check if this indeed a function all (Query kind Analysis) */
+        try {
+            VFAnalysis kindAnalysis = runtimeInfo.kindAnalysis;
+            VFDatum kindAnalysisResult = kindAnalysis.getResult(nameExpr.getName());
+            boolean possibleFuncCall = false;
+            if (kindAnalysisResult.isFunction()) possibleFuncCall = true;
+            if (kindAnalysisResult.isID()) possibleFuncCall = true;
+            if (!possibleFuncCall) {
+                IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+                result.reset();
+                return result;
+            }
+        } catch (NullPointerException exception) {
+            /* such exception is caused by in proper kindAnalysis */
+            /* code revision required, if control flow reach here */
+            throw new AssertionError();
+        }
+        /* check function name */
+        String actualName = nameExpr.getName().getID();
+        if (!getFunctionName().equals("*") && !getFunctionName().equals(actualName)) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        /* static check input parameters (if number could possibly match the signature) */
+        boolean canAcceptZeroInput = true;
+        for (Signature signature : this.getInputSignatures()) {
+            if (!signature.getType().getSignature().equals("..")) canAcceptZeroInput = false;
+        }
+        if (!canAcceptZeroInput) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        /* claim such pattern is possibly matched joint point */
+        IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+        result.reset();
+        result.isCalls = true;
+        return result;
+    }
+
+    private IsPossibleJointPointResult isPossibleJointPointParameterizedExpr(ParameterizedExpr astNode, RuntimeInfo runtimeInfo) {
         /* structure check */
-        if (!(astNode instanceof ParameterizedExpr)) { /* false return */
+        if (!(astNode.getTarget() instanceof NameExpr)) {
             IsPossibleJointPointResult result = new IsPossibleJointPointResult();
             result.reset();
             return result;
         }
-        assert astNode instanceof ParameterizedExpr;
-        if (!(((ParameterizedExpr) astNode).getTarget() instanceof NameExpr)) {
-            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
-            result.reset();
-            return result;
-        }
-        assert ((ParameterizedExpr) astNode).getTarget() instanceof NameExpr;
         /* check if this indeed a function call (Query Kind Analysis) */
         try {
             Name functionIdentifier = ((NameExpr) ((ParameterizedExpr) astNode).getTarget()).getName();
@@ -301,6 +337,21 @@ public class Call extends Primitive {
         IsPossibleJointPointResult result = new IsPossibleJointPointResult();
         result.reset();
         result.isCalls = true;
+        return result;
+    }
+
+    @Override
+    public IsPossibleJointPointResult isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        if (astNode instanceof NameExpr) {
+            return isPossibleJointPointNameExpr((NameExpr) astNode, runtimeInfo);
+        }
+        if (astNode instanceof ParameterizedExpr) {
+            return isPossibleJointPointParameterizedExpr((ParameterizedExpr) astNode, runtimeInfo);
+        }
+
+        /* impossible to find a match */
+        IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+        result.reset();
         return result;
     }
 }

@@ -3,8 +3,8 @@ package abstractPattern;
 import Matlab.Utils.Report;
 import abstractPattern.analysis.Analysis;
 import abstractPattern.analysis.Backtrace;
+import abstractPattern.analysis.PatternAnalysisType;
 import abstractPattern.analysis.PatternClassifier;
-import abstractPattern.analysis.PatternType;
 import abstractPattern.primitive.And;
 import abstractPattern.primitive.Or;
 import ast.*;
@@ -32,10 +32,10 @@ public class AbstractBuilder {
 
             this.analysis = new Analysis(pFilepath, this.patternExpr);
 
-            if (this.analysis.getResult() == PatternType.Modifier) {
+            if (this.analysis.getResult() == PatternAnalysisType.Modifier) {
                 this.pattern = PatternClassifier.buildModifier(this.patternExpr);
             }
-            if (this.analysis.getResult() == PatternType.Primitive) {
+            if (this.analysis.getResult() == PatternAnalysisType.Primitive) {
                 this.pattern = this.buildPrimitive(this.patternExpr);
             }
         } catch (Backtrace backtrace) {
@@ -51,14 +51,14 @@ public class AbstractBuilder {
         if (expr instanceof AndExpr) {
             Expr lhs = ((AndExpr)expr).getLHS();
             Expr rhs = ((AndExpr)expr).getRHS();
-            if (this.analysis.getResult(lhs) == PatternType.Modifier) {
-                assert this.analysis.getResult(rhs) != PatternType.Modifier;
+            if (this.analysis.getResult(lhs) == PatternAnalysisType.Modifier) {
+                assert this.analysis.getResult(rhs) != PatternAnalysisType.Modifier;
                 Primitive retNode = buildPrimitive(rhs);
                 retNode.addModifier(PatternClassifier.buildModifier(lhs));
                 return retNode;
             }
-            if (this.analysis.getResult(rhs) == PatternType.Modifier) {
-                assert this.analysis.getResult(lhs) != PatternType.Modifier;
+            if (this.analysis.getResult(rhs) == PatternAnalysisType.Modifier) {
+                assert this.analysis.getResult(lhs) != PatternAnalysisType.Modifier;
                 Primitive retNode = buildPrimitive(lhs);
                 retNode.addModifier(PatternClassifier.buildModifier(rhs));
                 return retNode;
@@ -73,8 +73,8 @@ public class AbstractBuilder {
             Expr lhs = ((OrExpr)expr).getLHS();
             Expr rhs = ((OrExpr)expr).getRHS();
 
-            assert this.analysis.getResult(lhs) != PatternType.Modifier;
-            assert this.analysis.getResult(rhs) != PatternType.Modifier;
+            assert this.analysis.getResult(lhs) != PatternAnalysisType.Modifier;
+            assert this.analysis.getResult(rhs) != PatternAnalysisType.Modifier;
 
             Or retNode = new Or();
             retNode.setOrExpr((OrExpr)expr);

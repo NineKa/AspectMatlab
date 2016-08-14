@@ -2,10 +2,12 @@ package transformer.expr;
 
 import abstractPattern.Action;
 import abstractPattern.Primitive;
+import abstractPattern.analysis.PatternType;
 import ast.*;
 import org.javatuples.Pair;
 import transformer.expr.binary.BinaryTrans;
 import transformer.expr.literal.LiteralTrans;
+import transformer.expr.lvalue.LValueTrans;
 import transformer.expr.other.*;
 import transformer.expr.unary.UnaryTrans;
 import transformer.util.IsPossibleJointPointResult;
@@ -23,7 +25,7 @@ public abstract class ExprTrans {
     protected Collection<Action> actions = null;
     protected Namespace alterNamespace = null;
     protected Function<ASTNode, Boolean> ignoreDelegate = null;
-    protected Consumer<Stmt> jointPointDelegate = null;
+    protected Consumer<Pair<Stmt, PatternType>> jointPointDelegate = null;
 
     @Deprecated
     protected ExprTransArgument originalArgument = null;
@@ -63,6 +65,7 @@ public abstract class ExprTrans {
         if (expr instanceof LiteralExpr) return LiteralTrans.buildLiteralTransformer(argument, (LiteralExpr) expr);
         if (expr instanceof UnaryExpr) return UnaryTrans.buildUnaryTransformer(argument, (UnaryExpr) expr);
         if (expr instanceof BinaryExpr) return BinaryTrans.buildBinaryTransformer(argument, (BinaryExpr) expr);
+        if (expr instanceof LValueExpr) return LValueTrans.buildLValueTransformer(argument, (LValueExpr) expr);
 
         if (expr instanceof CellArrayExpr) return new CellArrayTrans(argument, (CellArrayExpr) expr);
         if (expr instanceof ColonExpr) return new ColonTrans(argument, (ColonExpr) expr);

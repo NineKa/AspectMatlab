@@ -1,80 +1,27 @@
 package abstractPattern.analysis;
 
+import ast.*;
+
 public enum PatternType {
-    Primitive,
-    Modifier,
-    Invalid;
+    Within, IsType, Dimension, Call, Execution, Loop, LoopBody, LoopHead, Annotate, Get, Set, Operator, MainExecution;
 
-    public static PatternType andMerge(PatternType LHS, PatternType RHS) {
-        /* AND| P | M | I  M = Modifier Pattern
-           ---+---+---+--- P = Primitive Pattern
-            P | P | P | I  I = Invalid Pattern
-            M | P | M | I
-            I | I | I | I
-         */
-        switch (LHS) {
-            case Primitive:
-                switch (RHS) {
-                    case Primitive: return Primitive;
-                    case Modifier:  return Primitive;
-                    case Invalid:   return Invalid;
-                }
-            case Modifier:
-                switch (RHS) {
-                    case Primitive: return Primitive;
-                    case Modifier:  return Modifier;
-                    case Invalid:   return Invalid;
-                }
-            case Invalid:
-                switch (RHS) {
-                    case Primitive: return Invalid;
-                    case Modifier:  return Invalid;
-                    case Invalid:   return Invalid;
-                }
-        }
-        throw new RuntimeException();
-    }
+    public static PatternType fromASTNode(ASTNode astNode) {
+        if (astNode instanceof PatternWithin)        return Within;
+        if (astNode instanceof PatternIsType)        return IsType;
+        if (astNode instanceof PatternDimension)     return Dimension;
 
-    public static PatternType orMerge(PatternType LHS, PatternType RHS) {
-       /*  OR | P | M | I  M = Modifier Pattern
-           ---+---+---+--- P = Primitive Pattern
-            P | P | I | I  I = Invalid Pattern
-            M | I | M | I
-            I | I | I | I
-         */
-        switch (LHS) {
-            case Primitive:
-                switch (RHS) {
-                    case Primitive: return Primitive;
-                    case Modifier:  return Invalid;
-                    case Invalid:   return Invalid;
-                }
-            case Modifier:
-                switch (RHS) {
-                    case Primitive: return Invalid;
-                    case Modifier:  return Modifier;
-                    case Invalid:   return Invalid;
-                }
-            case Invalid:
-                switch (RHS) {
-                    case Primitive: return Invalid;
-                    case Modifier:  return Invalid;
-                    case Invalid:   return Invalid;
-                }
-        }
-        throw new RuntimeException();
-    }
+        if (astNode instanceof PatternCall)          return Call;
+        if (astNode instanceof PatternExecution)     return Execution;
+        if (astNode instanceof PatternLoop)          return Loop;
+        if (astNode instanceof PatternLoopBody)      return LoopBody;
+        if (astNode instanceof PatternLoopHead)      return LoopHead;
+        if (astNode instanceof PatternAnnotate)      return Annotate;
+        if (astNode instanceof PatternGet)           return Get;
+        if (astNode instanceof PatternSet)           return Set;
+        if (astNode instanceof PatternOperator)      return Operator;
+        if (astNode instanceof PatternMainExecution) return MainExecution;
 
-    public static PatternType notMerge(PatternType oprand) {
-        /*  NOT| P | M | I
-            ---+---+---+---
-               | I | M | I
-         */
-        switch (oprand) {
-            case Primitive: return Invalid;
-            case Modifier:  return Modifier;
-            case Invalid:   return Invalid;
-        }
-        throw new RuntimeException();
+        /* control flow should not reach here */
+        throw new AssertionError();
     }
 }

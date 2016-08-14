@@ -11,6 +11,7 @@ import abstractPattern.modifier.Within;
 import abstractPattern.signature.Signature;
 import abstractPattern.type.WeaveType;
 import ast.*;
+import natlab.toolkits.analysis.varorfun.VFAnalysis;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import transformer.util.AccessMode;
 import transformer.util.IsPossibleJointPointResult;
@@ -155,15 +156,7 @@ public class Set extends Primitive{
         return weaveTypeBooleanMap;
     }
 
-    @Override
-    public IsPossibleJointPointResult isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
-        /* structure check */
-        if (!(astNode instanceof NameExpr)) {
-            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
-            result.reset();
-            return result;
-        }
-        assert astNode instanceof NameExpr;
+    private IsPossibleJointPointResult isPossibleJointPointNameExpr(NameExpr astNode, RuntimeInfo runtimeInfo) {
         /* check if this indeed a variable reading (Query Kind Analysis) */
         try {
             Name variableIdentifier = ((NameExpr) astNode).getName();
@@ -199,6 +192,165 @@ public class Set extends Primitive{
         IsPossibleJointPointResult result = new IsPossibleJointPointResult();
         result.reset();
         result.isSets = true;
+        return result;
+    }
+
+    private IsPossibleJointPointResult isPossibleJointPointParametrizedExpr(ParameterizedExpr astNode, RuntimeInfo runtimeInfo) {
+        /* structure check */
+        if (!(astNode.getTarget() instanceof NameExpr)) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        /* check if this is indeed a variable reading (Query Kind Analysis) */
+        try {
+            Name targetName = ((NameExpr) astNode.getTarget()).getName();
+            VFAnalysis kindAnalysis = runtimeInfo.kindAnalysis;
+            VFDatum kindAnalysisResult = kindAnalysis.getResult(targetName);
+            boolean possibleGet = false;
+            if (kindAnalysisResult.isVariable()) possibleGet = true;
+            if (kindAnalysisResult.isID()) possibleGet = true;
+            if (!possibleGet) {
+                IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+                result.reset();
+                return result;
+            }
+        } catch (NullPointerException exception) {
+            /* such exception is caused by in proper kindAnalysis */
+            /* code revision required, if control flow reach here */
+            throw new AssertionError();
+        }
+        /* check if this indeed a variable reading */
+        if (runtimeInfo.accessMode != AccessMode.Write) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        /* variable name check */
+        String actualVariableName = ((NameExpr) astNode.getTarget()).getName().getID();
+        if (!this.getVariableName().equals("*") && !this.getVariableName().equals(actualVariableName)) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+
+        /* claim such pattern is possibly matched joint point */
+        IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+        result.reset();
+        result.isSets = true;
+        return result;
+    }
+
+    private IsPossibleJointPointResult isPossibleJointPointCellIndexExpr(CellIndexExpr astNode, RuntimeInfo runtimeInfo) {
+        /* structure check */
+        if (!(astNode.getTarget() instanceof NameExpr)) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        /* check if this is indeed a variable reading (Query Kind Analysis) */
+        try {
+            Name targetName = ((NameExpr) astNode.getTarget()).getName();
+            VFAnalysis kindAnalysis = runtimeInfo.kindAnalysis;
+            VFDatum kindAnalysisResult = kindAnalysis.getResult(targetName);
+            boolean possibleGet = false;
+            if (kindAnalysisResult.isVariable()) possibleGet = true;
+            if (kindAnalysisResult.isID()) possibleGet = true;
+            if (!possibleGet) {
+                IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+                result.reset();
+                return result;
+            }
+        } catch (NullPointerException exception) {
+            /* such exception is caused by in proper kindAnalysis */
+            /* code revision required, if control flow reach here */
+            throw new AssertionError();
+        }
+        /* check if this indeed a variable reading */
+        if (runtimeInfo.accessMode != AccessMode.Write) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        /* variable name check */
+        String actualVariableName = ((NameExpr) astNode.getTarget()).getName().getID();
+        if (!this.getVariableName().equals("*") && !this.getVariableName().equals(actualVariableName)) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+
+        /* claim such pattern is possibly matched joint point */
+        IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+        result.reset();
+        result.isSets = true;
+        return result;
+    }
+
+    private IsPossibleJointPointResult isPossibleJointPointDotExpr(DotExpr astNode, RuntimeInfo runtimeInfo) {
+        /* structure check */
+        if (!(astNode.getTarget() instanceof  NameExpr)) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        /* check if this is indeed a variable reading (Query Kind Analysis) */
+        try {
+            Name targetName = ((NameExpr) astNode.getTarget()).getName();
+            VFAnalysis kindAnalysis = runtimeInfo.kindAnalysis;
+            VFDatum kindAnalysisResult = kindAnalysis.getResult(targetName);
+            boolean possibleGet = false;
+            if (kindAnalysisResult.isVariable()) possibleGet = true;
+            if (kindAnalysisResult.isID()) possibleGet = true;
+            if (!possibleGet) {
+                IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+                result.reset();
+                return result;
+            }
+        } catch (NullPointerException exception) {
+            /* such exception is caused by in proper kindAnalysis */
+            /* code revision required, if control flow reach here */
+            throw new AssertionError();
+        }
+        /* check if this indeed a variable reading */
+        if (runtimeInfo.accessMode != AccessMode.Write) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        /* variable name check */
+        String actualVariableName = ((NameExpr) astNode.getTarget()).getName().getID();
+        if (!this.getVariableName().equals("*") && !this.getVariableName().equals(actualVariableName)) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+
+        /* claim such pattern is possibly matched joint point */
+        IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+        result.reset();
+        result.isSets = true;
+        return result;
+    }
+
+    @Override
+    public IsPossibleJointPointResult isPossibleJointPoint(ASTNode astNode, RuntimeInfo runtimeInfo) {
+        if (astNode instanceof NameExpr) {
+            return isPossibleJointPointNameExpr((NameExpr) astNode, runtimeInfo);
+        }
+        if (astNode instanceof ParameterizedExpr) {
+            return isPossibleJointPointParametrizedExpr((ParameterizedExpr) astNode, runtimeInfo);
+        }
+        if (astNode instanceof CellIndexExpr) {
+            return isPossibleJointPointCellIndexExpr((CellIndexExpr) astNode, runtimeInfo);
+        }
+        if (astNode instanceof DotExpr) {
+            return isPossibleJointPointDotExpr((DotExpr) astNode, runtimeInfo);
+        }
+
+        /* impossible to find a match */
+        IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+        result.reset();
         return result;
     }
 }

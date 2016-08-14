@@ -1,5 +1,6 @@
 package transformer.expr.unary;
 
+import abstractPattern.analysis.PatternType;
 import ast.*;
 import org.javatuples.Pair;
 import transformer.expr.ExprTransArgument;
@@ -39,7 +40,7 @@ public final class ArrayTransposeTrans extends UnaryTrans {
                     new ArrayTransposeExpr(new NameExpr(new Name(t0Name)))
             );
 
-            this.jointPointDelegate.accept(t1Assign);
+            this.jointPointDelegate.accept(new Pair<>(t1Assign, PatternType.Operator));
             prefixStatementList.add(t0Assign);
             prefixStatementList.add(t1Assign);
 

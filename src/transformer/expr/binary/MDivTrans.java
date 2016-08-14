@@ -1,5 +1,6 @@
 package transformer.expr.binary;
 
+import abstractPattern.analysis.PatternType;
 import ast.*;
 import org.javatuples.Pair;
 import transformer.expr.ExprTransArgument;
@@ -57,7 +58,7 @@ public final class MDivTrans extends BinaryTrans {
             newPrefixStatementList.add(t1Assign);
             newPrefixStatementList.add(t2Assign);
 
-            this.jointPointDelegate.accept(t2Assign);
+            this.jointPointDelegate.accept(new Pair<>(t2Assign, PatternType.Operator));
 
             return new Pair<>(new NameExpr(new Name(t2Name)), newPrefixStatementList);
         } else {

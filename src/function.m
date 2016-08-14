@@ -1,4 +1,4 @@
 function [] = foo()
-    x = c;
-    z = x.a;
+    c = @k;
+    z = 10 + k;
 end

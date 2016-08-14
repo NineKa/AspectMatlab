@@ -143,7 +143,7 @@ public class Main {
         System.out.println("Joint Points:");
         for (Pair<Stmt, PatternType> statement : jointPoints) {
             System.out.println(
-                    String.format("[%s]\t%s", statement.getValue1(), statement.getValue0().getPrettyPrinted())
+                    String.format("[%10s]\t%s", statement.getValue1(), statement.getValue0().getPrettyPrinted().trim())
             );
         }
 

@@ -37,4 +37,11 @@ public class ExprTransArgument {
         this.ignoreDelegate = ignoreDelegate;
         this.jointPointDelegate = jointPointDelegate;
     }
+
+    public ExprTransArgument copy() {
+        ExprTransArgument retArgument = new ExprTransArgument(
+                actions, runtimeInfo.copy(), alterNamespace, ignoreDelegate, jointPointDelegate
+        );
+        return retArgument;
+    }
 }

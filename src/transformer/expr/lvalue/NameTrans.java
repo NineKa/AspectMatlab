@@ -111,8 +111,7 @@ public final class NameTrans extends LValueTrans {
 
             if (kindAnalsysisResult.isID()) {
                 assert (runtimeInfo.accessMode == AccessMode.Read);
-                /* [expr]   <=>     t0 = cellfun(@(x)(exist('[expr]') == x), {5,3,6,2,4,8});                    */
-                /*                  if any(t0)                                                                  */
+                /* [expr]   <=>     if any(cellfun(@(x)(exist('[expr]') == x), {5,3,6,2,4,8}))                  */
                 /*                      t1 = {}                                                                 */
                 /*                      t2 = [expr](t1{:})                                      *(optional)     */
                 /*                  else                                                                        */
@@ -122,10 +121,7 @@ public final class NameTrans extends LValueTrans {
 
                 List<Stmt> newPrefixStatementList = new LinkedList<>();
 
-                String t0Name = this.alterNamespace.generateNewName();
-                AssignStmt t0Assign = new AssignStmt();
-                t0Assign.setLHS(new NameExpr(new Name(t0Name)));
-                t0Assign.setRHS(new ParameterizedExpr(
+                ParameterizedExpr existCallExpr = new ParameterizedExpr(
                         new NameExpr(new Name("cellfun")),
                         new ast.List<>(
                                 new LambdaExpr(
@@ -147,15 +143,13 @@ public final class NameTrans extends LValueTrans {
                                         new IntLiteralExpr(new DecIntNumericLiteralValue("8"))
                                 ))))
                         )
-                ));
-                t0Assign.setOutputSuppressed(true);
-                newPrefixStatementList.add(t0Assign);
+                );
 
                 /* building function block */
                 IfBlock functionBlock = new IfBlock();
                 functionBlock.setCondition(new ParameterizedExpr(
                         new NameExpr(new Name("any")),
-                        new ast.List<Expr>(new NameExpr(new Name(t0Name)))
+                        new ast.List<Expr>(existCallExpr)
                 ));
 
                 String t1Name = this.alterNamespace.generateNewName();
@@ -220,6 +214,7 @@ public final class NameTrans extends LValueTrans {
 
     @Override
     public boolean hasFurtherTransform() {
+        if (hasTransformOnCurrentNode()) return true;
         return false;
     }
 }

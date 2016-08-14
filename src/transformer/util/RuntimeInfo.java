@@ -438,4 +438,15 @@ public class RuntimeInfo {
 
         return retMap;
     }
+
+    public RuntimeInfo copy() {
+        RuntimeInfo retRuntimeInfo = new RuntimeInfo();
+        retRuntimeInfo.kindAnalysis = kindAnalysis;
+        retRuntimeInfo.scopeTraceStack = scopeTraceStack;
+        retRuntimeInfo.loopNameResolveMap = loopNameResolveMap;
+        if (accessMode == AccessMode.Read) retRuntimeInfo.accessMode = AccessMode.Read;
+        if (accessMode == AccessMode.Write) retRuntimeInfo.accessMode = AccessMode.Write;
+        retRuntimeInfo.annotationMap = annotationMap;
+        return retRuntimeInfo;
+    }
 }

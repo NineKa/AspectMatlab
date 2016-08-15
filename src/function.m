@@ -1,4 +1,4 @@
 function [] = foo()
     c = @k;
-    z = [c{:},2,3] ;
+    z = f(10) ;
 end

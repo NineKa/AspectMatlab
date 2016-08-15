@@ -77,4 +77,10 @@ public abstract class ExprTrans {
         /* control flow should not reach here */
         throw new AssertionError();
     }
+
+    @Deprecated
+    @SuppressWarnings("deprecation")
+    public ExprTransArgument getTransformArgument() {
+        return this.originalArgument;
+    }
 }

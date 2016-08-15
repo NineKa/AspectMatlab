@@ -138,8 +138,8 @@ public final class ParameterizedTrans extends LValueTrans {
                     /*                                  t1 = {[expr2..]}                                            */
                     /*                                  t2 = [expr1](t1{:})                          *(optional)    */
                     /*                              else                                                            */
-                    /*                                  t1 = [expr1]                                 *(optional)    */
-                    /*                                  t2 = t1([expr2..])                                          */
+                    /*                                  t3 = [expr1]                                 *(optional)    */
+                    /*                                  t2 = t3([expr2..])                                          */
                     /*                              end                                                             */
                     /*                              return t2                                                       */
 
@@ -207,11 +207,13 @@ public final class ParameterizedTrans extends LValueTrans {
 
                     Pair<ast.List<Expr>, List<Stmt>> varArgTransformResult = copyAndTransformArguments();
 
-                    AssignStmt vart1Assign = new AssignStmt();
-                    vart1Assign.setLHS(new NameExpr(new Name(t1Name)));
-                    vart1Assign.setRHS((NameExpr) ((ParameterizedExpr) originalNode).getTarget().treeCopy());
-                    vart1Assign.setOutputSuppressed(true);
-                    variableGetBlock.addStmt(vart1Assign);
+                    String t3Name = this.alterNamespace.generateNewName();
+
+                    AssignStmt t3Assign = new AssignStmt();
+                    t3Assign.setLHS(new NameExpr(new Name(t3Name)));
+                    t3Assign.setRHS((NameExpr) ((ParameterizedExpr) originalNode).getTarget().treeCopy());
+                    t3Assign.setOutputSuppressed(true);
+                    variableGetBlock.addStmt(t3Assign);
 
                     for (Stmt stmt : varArgTransformResult.getValue1()) variableGetBlock.addStmt(stmt);
 
@@ -241,7 +243,7 @@ public final class ParameterizedTrans extends LValueTrans {
                     assert needReportCall || needReportGet;
 
                     if (needReportCall) jointPointDelegate.accept(new Pair<>(funct2Assign, PatternType.Call));
-                    if (needReportGet) jointPointDelegate.accept(new Pair<>(vart1Assign, PatternType.Get));
+                    if (needReportGet) jointPointDelegate.accept(new Pair<>(t3Assign, PatternType.Get));
 
                     return new Pair<>(new NameExpr(new Name(t2Name)), newPrefixStatementList);
                 }

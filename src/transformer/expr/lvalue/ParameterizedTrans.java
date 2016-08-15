@@ -73,8 +73,7 @@ public final class ParameterizedTrans extends LValueTrans {
                 if (kindAnalysisResult.isVariable()) {
                     if (runtimeInfo.accessMode == AccessMode.Read) {
                         /* [expr1]([expr2..])   <=>     t0 = [expr1]         *  */
-                        /*                              t1 = t0([expr2..])      */
-                        /*                              return t1               */
+                        /*                              return t0([expr2..])    */
                         List<Stmt> newPrefixStatementList = new LinkedList<>();
                         Pair<ast.List<Expr>, List<Stmt>> argumentListTransformResult = copyAndTransformArguments();
 
@@ -86,19 +85,14 @@ public final class ParameterizedTrans extends LValueTrans {
                         newPrefixStatementList.add(t0Assign);
 
                         newPrefixStatementList.addAll(argumentListTransformResult.getValue1());
-                        String t1Name = this.alterNamespace.generateNewName();
-                        AssignStmt t1AssignStmt = new AssignStmt();
-                        t1AssignStmt.setLHS(new NameExpr(new Name(t1Name)));
-                        t1AssignStmt.setRHS(new ParameterizedExpr(
+                        ParameterizedExpr retExpr = new ParameterizedExpr(
                                 new NameExpr(new Name(t0Name)),
                                 argumentListTransformResult.getValue0()
-                        ));
-                        t1AssignStmt.setOutputSuppressed(true);
-                        newPrefixStatementList.add(t1AssignStmt);
+                        );
 
                         this.jointPointDelegate.accept(new Pair<>(t0Assign, PatternType.Get));
 
-                        return new Pair<>(new NameExpr(new Name(t1Name)),  newPrefixStatementList);
+                        return new Pair<>(new NameExpr(new Name(retExpr)),  newPrefixStatementList);
                     }
 
                     if (runtimeInfo.accessMode == AccessMode.Write) {
@@ -303,8 +297,16 @@ public final class ParameterizedTrans extends LValueTrans {
             ast.List<Expr> newArgList = new ast.List<>();
 
             for (ExprTrans argTrans : this.argumentTransformerList) {
-                String alterName = this.alterNamespace.generateNewName();
                 Pair<Expr, List<Stmt>> argTransformResult = argTrans.copyAndTransform();
+
+                /* special case */
+                if (argTransformResult.getValue0() instanceof CellIndexExpr) {
+                    newArgList.add(argTransformResult.getValue0());
+                    newPrefixStatementList.addAll(argTransformResult.getValue1());
+                    continue;
+                }
+
+                String alterName = this.alterNamespace.generateNewName();
 
                 AssignStmt alterAssign = new AssignStmt();
                 alterAssign.setLHS(new NameExpr(new Name(alterName)));

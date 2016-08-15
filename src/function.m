@@ -1,4 +1,4 @@
 function [] = foo()
     c = @k;
-    z = f(10 + 20, 3 * a);
+    z = [c{:},2,3] ;
 end

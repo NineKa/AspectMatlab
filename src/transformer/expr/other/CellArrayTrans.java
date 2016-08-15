@@ -35,6 +35,13 @@ public final class CellArrayTrans extends ExprTrans{
                 Row newRow = new Row();
                 for (ExprTrans transIter : rowIter) {
                     Pair<Expr, List<Stmt>> transformResult = transIter.copyAndTransform();
+                    /* special case */
+                    if (transformResult.getValue0() instanceof CellIndexExpr) {
+                        newPrefixStatementList.addAll(transformResult.getValue1());
+                        newRow.addElement(transformResult.getValue0());
+                        continue;
+                    }
+
                     Expr copiedElement = transformResult.getValue0();
                     newPrefixStatementList.addAll(transformResult.getValue1());
 

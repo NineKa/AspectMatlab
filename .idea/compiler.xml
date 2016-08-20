@@ -4,7 +4,7 @@
     <option name="ajcPath" value="/usr/local/Cellar/aspectj/1.8.9/libexec/aspectj/lib/aspectjtools.jar" />
   </component>
   <component name="CompilerConfiguration">
-    <option name="DEFAULT_COMPILER" value="ajc" />
+    <option name="DEFAULT_COMPILER" value="Javac" />
     <resourceExtensions />
     <wildcardResourcePatterns>
       <entry name="!?*.java" />

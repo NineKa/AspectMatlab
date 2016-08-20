@@ -1,0 +1,45 @@
+\begin{thebibliography}{1}
+
+\bibitem{AspectMATLABPPpaper}
+Laurie~Hendren Andrew~Bodzay.
+\newblock Aspectmatlab++: Annotations, types, and aspects for scientists.
+\newblock {\em MODULARITY'15}, 2015.
+
+\bibitem{ToheedMasterThesis}
+Toheed Aslam.
+\newblock Aspectmatlab: An aspect-oriented scientific programming language.
+\newblock Master's thesis, McGill University, 2010.
+
+\bibitem{AndrewMasterThesis}
+Andrew Bodzay.
+\newblock Aspectmatlab++: Developing an aspect-oriented language for
+  scientists.
+\newblock Master's thesis, McGill University, 2014.
+
+\bibitem{AspectJ}
+Eclipse Foundation.
+\newblock Aspectj.
+\newblock URL: \url{https://eclipse.org/aspectj/}.
+
+\bibitem{MATLABWeb}
+The MathWorks.
+\newblock Matlab.
+\newblock URL:
+  \url{http://www.mathworks.com/products/matlab/?s_tid=hp_ff_p_matlab}.
+
+\bibitem{MclabParser}
+Samuel Suffos.
+\newblock mclab-parser.
+\newblock URL: \url{https://github.com/Sable/mclab-parser}.
+
+\bibitem{JastAdd}
+JastAdd Team.
+\newblock Jastadd.
+\newblock URL: \url{http://jastadd.org/web/}.
+
+\bibitem{AspectMATLABpaper}
+Anton~Dubrau Toheed~Aslam, Jesse~Doherty and Laurie Hendren.
+\newblock Aspectmatlab: An aspect-oriented scientific programming language.
+\newblock {\em AOSD'10}, 2010.
+
+\end{thebibliography}

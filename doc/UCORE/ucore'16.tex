@@ -1,0 +1,150 @@
+\documentclass[preprint]{sig-alternate-05-2015}
+
+\title{Creating a Robust AspectMATLAB compiler}
+\doi{}
+\isbn{}
+
+
+\numberofauthors{2}
+\author{
+\alignauthor
+Hongji Chen\\
+			\affaddr{McGill University}			\\
+			\affaddr{Montreal, QC, Canada}		\\
+			\email{hongji.chen@mail.mcgill.ca}
+\alignauthor
+Laurie Hendren (advisor)\\
+			\affaddr{McGill University}			\\
+			\affaddr{Montreal, QC, Canada}		\\
+			\email{hendren@cs.mcgill.ca}
+}
+
+\begin{document}
+\maketitle
+
+\section{Problem and Motivation}
+
+%LJH add a citation for MATLAB - fixed
+MATLAB \cite{MATLABWeb} is a dynamic programming language that widely
+used in scientific computation.  Aspect oriented programming (AOP) allows
+programmers to separate out concerns by defining ``pointcuts" which identify
+certain program events such as writing to a variable,  or entering a function,
+and then associate with those pointcuts advice, or actions, which will
+execute at those points.  This is accomplished by the compiler weaving
+the advice codes into the appropriate program locations that match the
+pointcuts.
+
+This project aims to build on previous work to create a robust and
+semantically well-defined version of AspectMATLAB.  In addition, more
+powerful patterns and matching strategies have been developed and
+implemented,  extending the functionality of AspectMATLAB.  Having a
+robust and well-defined AspectMATLAB will enable scientists to use
+aspects to add functionality to their base MATLAB programs. Example uses
+include sparse matrix detection, dynamic type checking, custom profiling, and
+much more.
+
+
+\section{Background and Related Work}
+
+%LJH add citations for AspectJ and Jastadd - fixed
+AspectJ \cite{AspectJ}, an AOP implementation for Java, has had a huge
+influence in the Java world, and Jastadd \cite{JastAdd} framework
+utilizes the idea of AOP to shorten the development period for compiler by
+generating AST structure from aspects. 
+
+Our research project is based on the success of Toheed Aslam's
+AspectMATLAB compiler \cite{AspectMATLABpaper} and Andrew Bodzay's
+AspectMATLAB++ compiler \cite{AspectMATLABPPpaper}. The existing
+AspectMATLAB compiler allows programmers to define patterns(``pointcuts")
+and actions(``advice"). Along with variable access, function call and
+execution, which are present in most AOP languages, the existing
+AspectMATLAB compiler introduces loop patterns to capture loop statement
+\cite[p.15-17]{ToheedMasterThesis}, and shape matching and attribute matching,
+which are both important in scientific computing
+\cite[p.14-15]{AndrewMasterThesis}.
+
+
+\section{Approach and Uniqueness}
+
+The existing compiler demonstrated that the idea of AspectMATLAB was
+interesting and worthwhile,  but it has many weaknesses including:
+incomplete source code parsing, undefined and unimplemented pattern
+validation, an incomplete transforming strategy, and limitations on
+argument parsing.  The key motivation of this project was to identify
+all of the weaknesses and to improve and extend the language definition
+and the compiler.  As a result of this project, the new AspectMATLAB
+language definition and the compiler is much more complete and robust.
+
+\section{Results and Contributions}
+
+The project has resulted in a new implementation of the AspectMATLAB
+compiler which improves over the previous ones in the following ways:
+
+\begin{description}
+\item[Use of more Robust front-end:]
+The previous AspectMATLAB implementations used an incomplete front-end,
+and hence could not parse many MATLAB Programs. This project integrates a much
+more robust front-end using Samuel Suffos's new MATLAB parser
+\cite{MclabParser}. 
+
+\item[Clear Grammar:] The existing AspectMATLAB compiler provides 11
+different types of patterns, but some of the patterns have confusing
+syntax and/or semantics. We also noticed that some of the patterns are
+usually used together, such as variable get pattern usually forms a
+compound pattern with dimension pattern, and type pattern. Thus, we
+developed a new set of pattern grammar rules to remove the ambiguous and
+redundant patterns, while also making it backward compatible with the
+existing grammar.
+
+\item[Semantic Validation:] Limited semantic validation is applied on
+the patterns in the existed AspectMATLAB compiler. Semantic invalidation
+will make the source code hard to read and even lead to unpredictable
+results during code transformation. Thus we have developed a
+simplification and analysis process for patterns. This includes pattern
+type analysis, pattern modification validation, pattern syntax
+validation. The current version of AspectMATLAB will raise errors and
+warnings during compilation.
+
+\item[More Robust Transforming Strategy:] We also improved the
+transforming and weaving strategy for AspectMATLAB. The existing
+AspectMATLAB uses a simple transformation strategy on cell indexing,
+variable set and comma separate list handling. The original
+transformation resulted in improper resolving of assigned values and cannot
+correctly identify the spanned comma separate list. We have implemented a
+new transformation framework and a sound transforming strategy, making
+the compiler more robust.
+
+\item[Extended Argument Matching:] In the existing AspectMATLAB,
+programmers are only allowed to match the function call and execution
+using the number of arguments. The new AspectMATLAB takes this a step
+further. We have developed a new matching strategy for argument list
+which allows the programmer to specify both type and shape information
+for each argument, as well as using wildcards to make a general match.
+This general matcher is implemented as a generalized DFA.
+\end{description}
+
+This project has identified many weaknesses in the previous AspectMATLAB
+compilers, and has developed a new version of AspectMatlab, which builds
+upon a more robust front-end, addresses many shortcomings in the
+previous AspectMATLAB versions, and provides extensions to the
+AspectMATLAB language.    
+
+The new AspectMATLAB compiler can be used in different kinds of MATLAB
+optimization, such as sparse matrix tracing, subroutine profiling, loop
+unrolling and dynamic call graph generation. It can also be used to
+generate safer  MATLAB code, by using aspects for argument type and
+shape checking. Another important usage is to provide analysis and
+profiling features using predefined aspects for other MATLAB toolkits,
+for example, McWeb, a web-based interface for MATLAB analysis, profiling
+and source-to-source compilation.
+
+\section*{Acknowledgements}
+This work was done as a summer research project, supported by a SURA and
+NSERC. The authors would like to thank the donors who provide the
+support for the SURA awards. We would also like to thank Samuel
+Suffos for his help in integrating his new front-end with AspectMATLAB.
+
+\bibliographystyle{plainurl}
+\bibliography{reference}
+
+\end{document}

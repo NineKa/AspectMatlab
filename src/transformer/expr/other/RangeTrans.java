@@ -2,8 +2,8 @@ package transformer.expr.other;
 
 import ast.*;
 import org.javatuples.Pair;
+import transformer.TransformerArgument;
 import transformer.expr.ExprTrans;
-import transformer.expr.ExprTransArgument;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +14,7 @@ public final class RangeTrans extends ExprTrans {
     private ExprTrans increTransformer = null;
     private ExprTrans upperTransformer = null;
 
-    public RangeTrans(ExprTransArgument argument, RangeExpr rangeExpr) {
+    public RangeTrans(TransformerArgument argument, RangeExpr rangeExpr) {
         super(argument, rangeExpr);
         this.lowerTransformer = ExprTrans.buildExprTransformer(argument, rangeExpr.getLower());
         this.upperTransformer = ExprTrans.buildExprTransformer(argument, rangeExpr.getUpper());

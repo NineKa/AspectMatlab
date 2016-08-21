@@ -4,14 +4,14 @@ import ast.EndExpr;
 import ast.Expr;
 import ast.Stmt;
 import org.javatuples.Pair;
+import transformer.TransformerArgument;
 import transformer.expr.ExprTrans;
-import transformer.expr.ExprTransArgument;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public final class EndTrans extends ExprTrans {
-    public EndTrans(ExprTransArgument argument, EndExpr endExpr) {
+    public EndTrans(TransformerArgument argument, EndExpr endExpr) {
         super(argument, endExpr);
     }
 

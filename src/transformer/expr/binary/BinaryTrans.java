@@ -1,8 +1,8 @@
 package transformer.expr.binary;
 
 import ast.*;
+import transformer.TransformerArgument;
 import transformer.expr.ExprTrans;
-import transformer.expr.ExprTransArgument;
 
 public abstract class BinaryTrans extends ExprTrans {
     protected Expr originalLHS = null;
@@ -10,7 +10,7 @@ public abstract class BinaryTrans extends ExprTrans {
     protected ExprTrans LHSTransformer = null;
     protected ExprTrans RHSTransformer = null;
 
-    public BinaryTrans(ExprTransArgument argument, BinaryExpr binaryExpr) {
+    public BinaryTrans(TransformerArgument argument, BinaryExpr binaryExpr) {
         super(argument, binaryExpr);
         this.originalLHS = binaryExpr.getLHS();
         this.originalRHS = binaryExpr.getRHS();
@@ -27,7 +27,7 @@ public abstract class BinaryTrans extends ExprTrans {
         return transformOnLHS || transformOnRHS;
     }
 
-    public static BinaryTrans buildBinaryTransformer(ExprTransArgument argument, BinaryExpr binaryExpr) {
+    public static BinaryTrans buildBinaryTransformer(TransformerArgument argument, BinaryExpr binaryExpr) {
         if (binaryExpr instanceof PlusExpr) return new PlusTrans(argument, (PlusExpr) binaryExpr);
         if (binaryExpr instanceof MinusExpr) return new MinusTrans(argument, (MinusExpr) binaryExpr);
 

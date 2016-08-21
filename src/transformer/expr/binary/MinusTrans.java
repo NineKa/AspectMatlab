@@ -3,14 +3,14 @@ package transformer.expr.binary;
 import abstractPattern.analysis.PatternType;
 import ast.*;
 import org.javatuples.Pair;
-import transformer.expr.ExprTransArgument;
+import transformer.TransformerArgument;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
 
 public final class MinusTrans extends BinaryTrans {
-    public MinusTrans(ExprTransArgument argument, MinusExpr minusExpr) {
+    public MinusTrans(TransformerArgument argument, MinusExpr minusExpr) {
         super(argument, minusExpr);
     }
 

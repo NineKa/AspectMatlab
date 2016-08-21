@@ -8,13 +8,15 @@ import abstractPattern.modifier.Dimension;
 import abstractPattern.modifier.IsType;
 import abstractPattern.modifier.Within;
 import abstractPattern.type.WeaveType;
-import ast.*;
+import ast.ASTNode;
+import ast.EmptyStmt;
+import ast.HelpComment;
+import ast.PatternAnnotate;
 import matcher.annotation.AnnotationMatcher;
 import transformer.util.IsPossibleJointPointResult;
 import transformer.util.RuntimeInfo;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,15 +32,7 @@ public class Annotate extends Primitive {
         assert this.astNodes.getIdentifier() != null;
         if (this.astNodes.getSelectorList() == null) this.astNodes.setSelectorList(new ast.List<>());
         /* ---------------- */
-        this.annotateName = this.astNodes.getIdentifier().getID();
-        this.signature = new LinkedList<>();
-        for (Selector selector : this.astNodes.getSelectorList()) {
-            List<String> appendingList = new LinkedList<>();
-            for (Name name : selector.getElementList()) {
-                appendingList.add(name.getID());
-            }
-            this.signature.add(appendingList);
-        }
+        // TODO
     }
 
     public String getAnnotateName() {
@@ -56,70 +50,14 @@ public class Annotate extends Primitive {
 
     @Override
     public boolean isValid() {
-        if (this.annotateName.equals("..")) return false;
-        if (this.annotateName.equals("loopname")) return false;
-        for (List<String> list : this.signature) {
-            for (String string : list) {
-                if (string.equals("var")) continue;
-                if (string.equals("num")) continue;
-                if (string.equals("str")) continue;
-                if (string.equals("*"))   continue;
-                if (string.equals(".."))  continue;
-                return false;
-            }
-        }
+        // TODO
         return true;
     }
 
     @Override
     public IReport getValidationReport(String pFilepath) {
         Report report = new Report();
-        for (int listIter = 0; listIter < this.signature.size(); listIter++) {
-            List<String> list = this.signature.get(listIter);
-            for (int strIter = 0; strIter < list.size(); strIter++) {
-                String string = list.get(strIter);
-                if (strIter + 1 < list.size()) {
-                    String nextToken = list.get(strIter + 1);
-                    if (string.equals("..") && nextToken.equals("..")) report.AddWarning(
-                            pFilepath,
-                            this.astNodes.getSelector(listIter).getElement(strIter).getStartLine(),
-                            this.astNodes.getSelector(listIter).getElement(strIter).getStartColumn(),
-                            "redundant pattern [.., ..], use [..] instead"
-                    );
-                }
-                if (string.equals("var")) continue;
-                if (string.equals("num")) continue;
-                if (string.equals("str")) continue;
-                if (string.equals("*"))   continue;
-                if (string.equals(".."))  continue;
-                report.AddError(
-                        pFilepath,
-                        this.astNodes.getSelector(listIter).getElement(strIter).getStartLine(),
-                        this.astNodes.getSelector(listIter).getElement(strIter).getStartColumn(),
-                        String.format(
-                                "%s is not a valid select in annotation pattern",
-                                string
-                        )
-                );
-            }
-        }
-        if (this.annotateName.equals("..")) {
-            report.AddError(
-                    pFilepath,
-                    this.astNodes.getIdentifier().getStartLine(),
-                    this.astNodes.getIdentifier().getStartColumn(),
-                    "wildcard [..] is not a valid matcher in annotation pattern for annotation name, use [*] instead"
-            );
-        }
-        if (this.annotateName.equals("loopname")) {
-            report.AddError(
-                    pFilepath,
-                    this.astNodes.getIdentifier().getStartLine(),
-                    this.astNodes.getIdentifier().getStartColumn(),
-                    "annotation loopname is reserved in AspectMATLAB"
-            );
-        }
-
+        // TODO
         return report;
     }
 

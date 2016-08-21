@@ -2,14 +2,14 @@ package transformer.expr.binary;
 
 import ast.*;
 import org.javatuples.Pair;
-import transformer.expr.ExprTransArgument;
+import transformer.TransformerArgument;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
 
 public final class AndTrans extends BinaryTrans {
-    public AndTrans(ExprTransArgument argument, AndExpr binaryExpr) {
+    public AndTrans(TransformerArgument argument, AndExpr binaryExpr) {
         super(argument, binaryExpr);
     }
 

@@ -2,14 +2,14 @@ package transformer.expr.binary;
 
 import ast.*;
 import org.javatuples.Pair;
-import transformer.expr.ExprTransArgument;
+import transformer.TransformerArgument;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
 
 public final class LTTrans extends BinaryTrans{
-    public LTTrans (ExprTransArgument argument, LTExpr ltExpr) {
+    public LTTrans (TransformerArgument argument, LTExpr ltExpr) {
         super(argument, ltExpr);
     }
 

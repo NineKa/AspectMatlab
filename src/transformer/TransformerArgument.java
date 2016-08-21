@@ -1,18 +1,19 @@
-package transformer.expr;
+package transformer;
 
 import abstractPattern.Action;
 import abstractPattern.analysis.PatternType;
-import ast.ASTNode;
-import ast.Stmt;
+import ast.*;
 import org.javatuples.Pair;
 import transformer.util.RuntimeInfo;
 import util.Namespace;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class ExprTransArgument {
+public class TransformerArgument {
     /* A collection of all actions of aspects */
     public Collection<Action> actions = null;
     /* A runtime information gathered during statement transformation */
@@ -24,23 +25,33 @@ public class ExprTransArgument {
     /* A call back function, if a joint point is appearing, a call back is issued */
     public Consumer<Pair<Stmt, PatternType>> jointPointDelegate = null;
 
-    public ExprTransArgument(
+    public Map<Stmt, CellArrayExpr> variableIndiceMap = new HashMap<>();
+    public Map<EndExpr, ParameterizedExpr> endExpressionResolveMap = new HashMap<>();
+
+    public TransformerArgument(
             Collection<Action> actions,
             RuntimeInfo runtimeInfo,
             Namespace alterNamespace,
             Function<ASTNode, Boolean> ignoreDelegate,
-            Consumer<Pair<Stmt, PatternType>> jointPointDelegate
+            Consumer<Pair<Stmt, PatternType>> jointPointDelegate,
+            Map<Stmt, CellArrayExpr> variableIndiceMap
     ) {
         this.actions = actions;
         this.runtimeInfo = runtimeInfo;
         this.alterNamespace = alterNamespace;
         this.ignoreDelegate = ignoreDelegate;
         this.jointPointDelegate = jointPointDelegate;
+        this.variableIndiceMap = variableIndiceMap;
     }
 
-    public ExprTransArgument copy() {
-        ExprTransArgument retArgument = new ExprTransArgument(
-                actions, runtimeInfo.copy(), alterNamespace, ignoreDelegate, jointPointDelegate
+    public TransformerArgument copy() {
+        TransformerArgument retArgument = new TransformerArgument(
+                actions,
+                runtimeInfo.copy(),
+                alterNamespace,
+                ignoreDelegate,
+                jointPointDelegate,
+                variableIndiceMap
         );
         return retArgument;
     }

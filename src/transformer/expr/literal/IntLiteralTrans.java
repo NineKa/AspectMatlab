@@ -4,13 +4,13 @@ import ast.Expr;
 import ast.IntLiteralExpr;
 import ast.Stmt;
 import org.javatuples.Pair;
-import transformer.expr.ExprTransArgument;
+import transformer.TransformerArgument;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public final class IntLiteralTrans extends LiteralTrans {
-    public IntLiteralTrans(ExprTransArgument argument, IntLiteralExpr intLiteralExpr) {
+    public IntLiteralTrans(TransformerArgument argument, IntLiteralExpr intLiteralExpr) {
         super(argument, intLiteralExpr);
     }
 

@@ -5,6 +5,8 @@ import abstractPattern.Primitive;
 import abstractPattern.analysis.PatternType;
 import ast.*;
 import org.javatuples.Pair;
+import transformer.Transformer;
+import transformer.TransformerArgument;
 import transformer.expr.binary.BinaryTrans;
 import transformer.expr.literal.LiteralTrans;
 import transformer.expr.lvalue.LValueTrans;
@@ -16,10 +18,11 @@ import util.Namespace;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public abstract class ExprTrans {
+public abstract class ExprTrans implements Transformer<Expr>{
     protected Expr originalNode = null;
     protected RuntimeInfo runtimeInfo = null;
     protected Collection<Action> actions = null;
@@ -27,17 +30,21 @@ public abstract class ExprTrans {
     protected Function<ASTNode, Boolean> ignoreDelegate = null;
     protected Consumer<Pair<Stmt, PatternType>> jointPointDelegate = null;
 
+    protected Map<Stmt, CellArrayExpr> indiceMap = null;
+
     @Deprecated
-    protected ExprTransArgument originalArgument = null;
+    protected TransformerArgument originalArgument = null;
 
     @SuppressWarnings("deprecation")
-    public ExprTrans (ExprTransArgument argument, Expr expr) {
+    public ExprTrans (TransformerArgument argument, Expr expr) {
         this.actions            = argument.actions;
         this.runtimeInfo        = argument.runtimeInfo;
         this.alterNamespace     = argument.alterNamespace;
         this.ignoreDelegate     = argument.ignoreDelegate;
         this.jointPointDelegate = argument.jointPointDelegate;
         this.originalArgument   = argument;
+
+        this.indiceMap          = argument.variableIndiceMap;
 
         this.originalNode       = expr;
     }
@@ -61,7 +68,7 @@ public abstract class ExprTrans {
         return originalNode.getClass();
     }
 
-    public static ExprTrans buildExprTransformer(ExprTransArgument argument, Expr expr) {
+    public static ExprTrans buildExprTransformer(TransformerArgument argument, Expr expr) {
         if (expr instanceof LiteralExpr) return LiteralTrans.buildLiteralTransformer(argument, (LiteralExpr) expr);
         if (expr instanceof UnaryExpr) return UnaryTrans.buildUnaryTransformer(argument, (UnaryExpr) expr);
         if (expr instanceof BinaryExpr) return BinaryTrans.buildBinaryTransformer(argument, (BinaryExpr) expr);
@@ -80,7 +87,7 @@ public abstract class ExprTrans {
 
     @Deprecated
     @SuppressWarnings("deprecation")
-    public ExprTransArgument getTransformArgument() {
+    public TransformerArgument getTransformArgument() {
         return this.originalArgument;
     }
 }

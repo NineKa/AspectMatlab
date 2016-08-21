@@ -2,20 +2,12 @@ import Matlab.Nodes.UnitNode;
 import Matlab.Recognizer.MRecognizer;
 import Matlab.Transformer.NodeToAstTransformer;
 import Matlab.Utils.*;
-import abstractPattern.analysis.PatternType;
 import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
 import ast.*;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
-import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
-import org.javatuples.Pair;
-import transformer.expr.ExprTrans;
-import transformer.expr.ExprTransArgument;
-import transformer.util.AccessMode;
-import transformer.util.RuntimeInfo;
-import util.VarNamespace;
 
-import java.util.*;
+import java.util.LinkedList;
 
 public class Main {
     public static VFAnalysis analysis = null;
@@ -92,83 +84,10 @@ public class Main {
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
 
-        VFAnalysis kindAnalysis = new VFFlowInsensitiveAnalysis(units, units.getFunctionOrScriptQuery());
-        kindAnalysis.analyze();
-        analysis = kindAnalysis;
-
-        recPrintStructure(units, 0);
-        System.out.println(units.getPrettyPrinted());
-
-        Result<UnitNode> aspectResult = MRecognizer.RecognizeFile(
-                matlabFilePath,
-                true,
-                new Notifier()
-        );
-        CompilationUnits aspects = NodeToAstTransformer.Transform(aspectResult.GetValue());
-
         assert units.getProgram(0) instanceof FunctionList;
-        Function function = ((FunctionList) units.getProgram(0)).getFunction(0);
-
-        assert function.getStmt(1) instanceof AssignStmt;
-        AssignStmt stmt = (AssignStmt) function.getStmt(1);
-        Expr rhs = stmt.getRHS();
-
-        assert aspects.getProgram(0) instanceof AspectDef;
-        Action action = ((AspectDef) aspects.getProgram(0)).getAction(0).getAction(0);
-        abstractPattern.Action abstractAction = new abstractPattern.Action(action, new HashMap<>(), matlabFilePath);
-
-        RuntimeInfo runtimeInfo = new RuntimeInfo();
-        runtimeInfo.kindAnalysis = kindAnalysis;
-        runtimeInfo.accessMode = AccessMode.Read;
-
-        Collection<Pair<Stmt, PatternType>> jointPoints = new HashSet<>();
-
-        ExprTransArgument argument = new ExprTransArgument(
-                Arrays.asList(abstractAction),
-                runtimeInfo,
-                new VarNamespace(),
-                (ASTNode node) -> false,
-                (Pair<Stmt, PatternType> r) -> jointPoints.add(r)
-        );
-
-        ExprTrans transformer = ExprTrans.buildExprTransformer(argument, rhs);
-        System.out.println(rhs.getPrettyPrinted());
-
-        Pair<Expr, java.util.List<Stmt>> r = transformer.copyAndTransform();
-        for (Stmt stmt1 : r.getValue1()) {
-            System.out.println(stmt1.getPrettyPrinted());
-        }
-        System.out.println(r.getValue0().getPrettyPrinted());
-
-        System.out.println("Joint Points:");
-        for (Pair<Stmt, PatternType> statement : jointPoints) {
-            System.out.println(
-                    String.format("[%10s]\t%s", statement.getValue1(), statement.getValue0().getPrettyPrinted().trim())
-            );
-        }
-
-        //Map<EmptyStmt, HelpComment> map = RuntimeInfo.insertAnnotationEmptyStmt(units);
-        //for (EmptyStmt emptyStmt : map.keySet()) {
-        //    System.out.println(emptyStmt + " " + map.get(emptyStmt).getText());
-        //}
-
-        /*
-        assert units.getProgram(0) instanceof AspectDef;
-        for (Actions actions : ((AspectDef) units.getProgram(0)).getActionList()) {
-            for (Action action : actions.getActionList()) {
-                abstractPattern.Action abstractAction = new abstractPattern.Action(
-                        action,
-                        new HashMap<>(),
-                        matlabFilePath
-                );
-                System.out.println(abstractAction.toString());
-            }
-        }
-
-        VFAnalysis analysis = new VFFlowInsensitiveAnalysis(new CompilationUnits());
-        analysis.analyze();
-        */
-        //recPrintStructure(units, 0);
+        assert ((FunctionList) units.getProgram(0)).getFunction(0).getStmt(1) instanceof ExprStmt;
+        Expr target = ((ExprStmt) ((FunctionList) units.getProgram(0)).getFunction(0).getStmt(1)).getExpr();
+        assert target instanceof CellIndexExpr;
     }
 }
 

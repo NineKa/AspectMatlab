@@ -2,7 +2,7 @@ package transformer.expr.binary;
 
 import ast.*;
 import org.javatuples.Pair;
-import transformer.expr.ExprTransArgument;
+import transformer.TransformerArgument;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.function.BiFunction;
 public final class ShortCircuitAndTrans extends BinaryTrans {
     private static final Expr FALSERETURNEXPR = new NameExpr(new Name("false"));
 
-    public ShortCircuitAndTrans(ExprTransArgument argument, ShortCircuitAndExpr shortCircuitAndExpr) {
+    public ShortCircuitAndTrans(TransformerArgument argument, ShortCircuitAndExpr shortCircuitAndExpr) {
         super(argument, shortCircuitAndExpr);
     }
 

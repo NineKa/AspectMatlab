@@ -3,14 +3,14 @@ package transformer.expr.binary;
 import abstractPattern.analysis.PatternType;
 import ast.*;
 import org.javatuples.Pair;
-import transformer.expr.ExprTransArgument;
+import transformer.TransformerArgument;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
 
 public final class MLDivTrans extends BinaryTrans {
-    public MLDivTrans(ExprTransArgument argument, MLDivExpr mlDivExpr) {
+    public MLDivTrans(TransformerArgument argument, MLDivExpr mlDivExpr) {
         super(argument, mlDivExpr);
     }
 

@@ -3,13 +3,13 @@ package transformer.expr.unary;
 import abstractPattern.analysis.PatternType;
 import ast.*;
 import org.javatuples.Pair;
-import transformer.expr.ExprTransArgument;
+import transformer.TransformerArgument;
 
 import java.util.List;
 import java.util.function.BiFunction;
 
 public final class ArrayTransposeTrans extends UnaryTrans {
-    public ArrayTransposeTrans(ExprTransArgument argument, ArrayTransposeExpr arrayTransposeExpr) {
+    public ArrayTransposeTrans(TransformerArgument argument, ArrayTransposeExpr arrayTransposeExpr) {
         super(argument, arrayTransposeExpr);
     }
 

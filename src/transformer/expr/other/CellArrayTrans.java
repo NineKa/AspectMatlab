@@ -2,8 +2,8 @@ package transformer.expr.other;
 
 import ast.*;
 import org.javatuples.Pair;
+import transformer.TransformerArgument;
 import transformer.expr.ExprTrans;
-import transformer.expr.ExprTransArgument;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
 public final class CellArrayTrans extends ExprTrans{
     private List<List<ExprTrans>> cellElementTransformer = new LinkedList<>();
 
-    public CellArrayTrans(ExprTransArgument argument, CellArrayExpr cellArrayExpr) {
+    public CellArrayTrans(TransformerArgument argument, CellArrayExpr cellArrayExpr) {
         super(argument, cellArrayExpr);
         for (Row row : cellArrayExpr.getRowList()) {
             List<ExprTrans> currentRowTransformer = new LinkedList<>();

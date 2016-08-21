@@ -4,14 +4,14 @@ import ast.Expr;
 import ast.LambdaExpr;
 import ast.Stmt;
 import org.javatuples.Pair;
+import transformer.TransformerArgument;
 import transformer.expr.ExprTrans;
-import transformer.expr.ExprTransArgument;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public final class LambdaTrans extends ExprTrans{
-    public LambdaTrans(ExprTransArgument argument, LambdaExpr lambdaExpr) {
+    public LambdaTrans(TransformerArgument argument, LambdaExpr lambdaExpr) {
         super(argument, lambdaExpr);
     }
 

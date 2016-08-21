@@ -3,7 +3,7 @@ aspect_ demo
 		p : p  %pattern p is depend on itself
 	end
 	actions
-        a : after op(+) | call(*(..)) | get(*)  : ()
+        a : after op(+) | call(*(..)) | get(*) | set(*)  : ()
 
 		end
 	end

@@ -4,14 +4,14 @@ import ast.ColonExpr;
 import ast.Expr;
 import ast.Stmt;
 import org.javatuples.Pair;
+import transformer.TransformerArgument;
 import transformer.expr.ExprTrans;
-import transformer.expr.ExprTransArgument;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public final class ColonTrans extends ExprTrans {
-    public ColonTrans(ExprTransArgument argument, ColonExpr expr) {
+    public ColonTrans(TransformerArgument argument, ColonExpr expr) {
         super(argument, expr);
     }
 

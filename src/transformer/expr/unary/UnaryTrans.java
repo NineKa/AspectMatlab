@@ -1,14 +1,14 @@
 package transformer.expr.unary;
 
 import ast.*;
+import transformer.TransformerArgument;
 import transformer.expr.ExprTrans;
-import transformer.expr.ExprTransArgument;
 
 public abstract class UnaryTrans extends ExprTrans {
     protected Expr originalOperand = null;
     protected ExprTrans operandTransformer = null;
 
-    public UnaryTrans (ExprTransArgument argument, UnaryExpr unaryExpr) {
+    public UnaryTrans (TransformerArgument argument, UnaryExpr unaryExpr) {
         super(argument, unaryExpr);
         this.originalOperand = unaryExpr.getOperand();
         this.operandTransformer = ExprTrans.buildExprTransformer(argument, this.originalOperand);
@@ -20,7 +20,7 @@ public abstract class UnaryTrans extends ExprTrans {
         return this.operandTransformer.hasFurtherTransform();
     }
 
-    public static UnaryTrans buildUnaryTransformer(ExprTransArgument argument, UnaryExpr unaryExpr) {
+    public static UnaryTrans buildUnaryTransformer(TransformerArgument argument, UnaryExpr unaryExpr) {
         if (unaryExpr instanceof UMinusExpr) return new UMinusTrans(argument, (UMinusExpr) unaryExpr);
         if (unaryExpr instanceof UPlusExpr) return new UPlusTrans(argument, (UPlusExpr) unaryExpr);
         if (unaryExpr instanceof NotExpr) return new NotTrans(argument, (NotExpr) unaryExpr);

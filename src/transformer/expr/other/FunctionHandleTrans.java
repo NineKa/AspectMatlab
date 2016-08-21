@@ -4,14 +4,14 @@ import ast.Expr;
 import ast.FunctionHandleExpr;
 import ast.Stmt;
 import org.javatuples.Pair;
+import transformer.TransformerArgument;
 import transformer.expr.ExprTrans;
-import transformer.expr.ExprTransArgument;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public final class FunctionHandleTrans extends ExprTrans {
-    public FunctionHandleTrans(ExprTransArgument argument, FunctionHandleExpr functionHandleExpr) {
+    public FunctionHandleTrans(TransformerArgument argument, FunctionHandleExpr functionHandleExpr) {
         super(argument, functionHandleExpr);
     }
 

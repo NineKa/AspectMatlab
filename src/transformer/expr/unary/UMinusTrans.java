@@ -4,12 +4,12 @@ import ast.Expr;
 import ast.Stmt;
 import ast.UMinusExpr;
 import org.javatuples.Pair;
-import transformer.expr.ExprTransArgument;
+import transformer.TransformerArgument;
 
 import java.util.List;
 
 public final class UMinusTrans extends UnaryTrans {
-    public UMinusTrans(ExprTransArgument argument, UMinusExpr uMinusExpr) {
+    public UMinusTrans(TransformerArgument argument, UMinusExpr uMinusExpr) {
         super(argument, uMinusExpr);
     }
 

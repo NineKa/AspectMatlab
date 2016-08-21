@@ -4,12 +4,12 @@ import ast.Expr;
 import ast.NotExpr;
 import ast.Stmt;
 import org.javatuples.Pair;
-import transformer.expr.ExprTransArgument;
+import transformer.TransformerArgument;
 
 import java.util.List;
 
 public final class NotTrans extends UnaryTrans {
-    public NotTrans(ExprTransArgument argument, NotExpr notExpr) {
+    public NotTrans(TransformerArgument argument, NotExpr notExpr) {
         super(argument, notExpr);
     }
 

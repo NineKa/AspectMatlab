@@ -4,14 +4,14 @@ import ast.Expr;
 import ast.Stmt;
 import ast.SuperClassMethodExpr;
 import org.javatuples.Pair;
+import transformer.TransformerArgument;
 import transformer.expr.ExprTrans;
-import transformer.expr.ExprTransArgument;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public final class SuperClassMethodTrans extends ExprTrans {
-    public SuperClassMethodTrans(ExprTransArgument argument, SuperClassMethodExpr superClassMethodExpr) {
+    public SuperClassMethodTrans(TransformerArgument argument, SuperClassMethodExpr superClassMethodExpr) {
         super(argument, superClassMethodExpr);
     }
 

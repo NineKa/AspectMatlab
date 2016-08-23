@@ -7,7 +7,6 @@ import ast.*;
 import ast.List;
 import matcher.annotation.AbstractAnnotation;
 import matcher.annotation.AnnotationMatcher;
-import natlab.toolkits.analysis.varorfun.VFAnalysis;
 import org.javatuples.Pair;
 import util.MergeableCollection;
 import util.MergeableHashMap;
@@ -19,7 +18,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class RuntimeInfo {
-    public VFAnalysis kindAnalysis = null;
+    public VFAnalysisOverride kindAnalysis = null;
     public Stack<Pair<ScopeType, String>> scopeTraceStack = null;
     public Map<Stmt, String> loopNameResolveMap = null;
     public AccessMode accessMode = null;

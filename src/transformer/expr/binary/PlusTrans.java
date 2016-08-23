@@ -1,9 +1,9 @@
 package transformer.expr.binary;
 
-import abstractPattern.analysis.PatternType;
 import ast.*;
 import org.javatuples.Pair;
 import transformer.TransformerArgument;
+import transformer.jointpoint.AMJointPointOperator;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -58,7 +58,15 @@ public final class PlusTrans extends BinaryTrans {
             newPrefixStatementList.add(t1Assign);
             newPrefixStatementList.add(t2Assign);
 
-            this.jointPointDelegate.accept(new Pair<>(t2Assign, PatternType.Operator));
+            /* invoke joint point delegate */
+            AMJointPointOperator jointPoint = new AMJointPointOperator(
+                    t2Assign, originalNode.getStartLine(),
+                    originalNode.getStartColumn(), enclosingFilename
+            );
+            jointPoint.addAllMatchedAction(getPossibleAttachedActionsSet());
+            jointPoint.addOperand(new NameExpr(new Name(t0Name)));
+            jointPoint.addOperand(new NameExpr(new Name(t1Name)));
+            jointPointDelegate.accept(jointPoint);
 
             return new Pair<>(new NameExpr(new Name(t2Name)), newPrefixStatementList);
         } else {

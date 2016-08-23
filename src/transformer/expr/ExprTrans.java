@@ -2,7 +2,6 @@ package transformer.expr;
 
 import abstractPattern.Action;
 import abstractPattern.Primitive;
-import abstractPattern.analysis.PatternType;
 import ast.*;
 import org.javatuples.Pair;
 import transformer.Transformer;
@@ -12,11 +11,13 @@ import transformer.expr.literal.LiteralTrans;
 import transformer.expr.lvalue.LValueTrans;
 import transformer.expr.other.*;
 import transformer.expr.unary.UnaryTrans;
+import transformer.jointpoint.AMJointPoint;
 import transformer.util.IsPossibleJointPointResult;
 import transformer.util.RuntimeInfo;
 import util.Namespace;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -28,9 +29,10 @@ public abstract class ExprTrans implements Transformer<Expr>{
     protected Collection<Action> actions = null;
     protected Namespace alterNamespace = null;
     protected Function<ASTNode, Boolean> ignoreDelegate = null;
-    protected Consumer<Pair<Stmt, PatternType>> jointPointDelegate = null;
+    protected Consumer<AMJointPoint> jointPointDelegate = null;
 
-    protected Map<Stmt, CellArrayExpr> indiceMap = null;
+    protected Map<EndExpr, ParameterizedExpr> endExpressionResolveMap = null;
+    protected String enclosingFilename = null;
 
     @Deprecated
     protected TransformerArgument originalArgument = null;
@@ -44,7 +46,8 @@ public abstract class ExprTrans implements Transformer<Expr>{
         this.jointPointDelegate = argument.jointPointDelegate;
         this.originalArgument   = argument;
 
-        this.indiceMap          = argument.variableIndiceMap;
+        this.endExpressionResolveMap = argument.endExpressionResolveMap;
+        this.enclosingFilename  = argument.enclosingFilename;
 
         this.originalNode       = expr;
     }
@@ -62,6 +65,18 @@ public abstract class ExprTrans implements Transformer<Expr>{
             if (query.isPossible()) return true;
         }
         return false;
+    }
+
+    public Collection<Action> getPossibleAttachedActionsSet() {
+        if (ignoreDelegate.apply(originalNode) == true) return new HashSet<>();
+        Collection<Action> returnSet = new HashSet<>();
+        for (Action action : actions) {
+            assert action.getPattern() instanceof Primitive;
+            Primitive pattern = (Primitive) action.getPattern();
+            IsPossibleJointPointResult query = pattern.isPossibleJointPoint(originalNode, runtimeInfo);
+            if (query.isPossible()) returnSet.add(action);
+        }
+        return returnSet;
     }
 
     public Class<? extends Expr> getASTNodeClass() {

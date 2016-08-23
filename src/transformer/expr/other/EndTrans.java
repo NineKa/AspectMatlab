@@ -18,12 +18,17 @@ public final class EndTrans extends ExprTrans {
     @Override
     public Pair<Expr, List<Stmt>> copyAndTransform() {
         assert !hasTransformOnCurrentNode();
-        EndExpr copiedNode = (EndExpr) this.originalNode.copy();
-        return new Pair<>(copiedNode, new LinkedList<>());
+        if (this.endExpressionResolveMap.keySet().contains(originalNode)) {
+            Expr retExpr = this.endExpressionResolveMap.get(originalNode).treeCopy();
+            return new Pair<>(retExpr, new LinkedList<>());
+        } else {
+            return new Pair<>(new EndExpr(), new LinkedList<>());
+        }
     }
 
     @Override
     public boolean hasFurtherTransform() {
+        if (this.endExpressionResolveMap.keySet().contains(originalNode)) return true;
         return false;
     }
 }

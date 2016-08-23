@@ -1,9 +1,9 @@
 package transformer.expr.unary;
 
-import abstractPattern.analysis.PatternType;
 import ast.*;
 import org.javatuples.Pair;
 import transformer.TransformerArgument;
+import transformer.jointpoint.AMJointPointOperator;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -40,9 +40,18 @@ public final class ArrayTransposeTrans extends UnaryTrans {
                     new ArrayTransposeExpr(new NameExpr(new Name(t0Name)))
             );
 
-            this.jointPointDelegate.accept(new Pair<>(t1Assign, PatternType.Operator));
             prefixStatementList.add(t0Assign);
             prefixStatementList.add(t1Assign);
+
+            /* invoke joint point delegate */
+            AMJointPointOperator jointPoint = new AMJointPointOperator(
+                    t1Assign, originalNode.getStartLine(),
+                    originalNode.getStartColumn(), enclosingFilename
+            );
+            jointPoint.addAllMatchedAction(getPossibleAttachedActionsSet());
+            jointPoint.addOperand(new NameExpr(new Name(t0Name)));
+            jointPointDelegate.accept(jointPoint);
+
 
             return new Pair<>(new NameExpr(new Name(t1Name)), prefixStatementList);
         } else {

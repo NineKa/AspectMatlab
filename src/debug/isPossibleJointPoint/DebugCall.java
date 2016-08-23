@@ -12,6 +12,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import transformer.util.IsPossibleJointPointResult;
 import transformer.util.RuntimeInfo;
+import transformer.util.VFAnalysisOverride;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -52,7 +53,7 @@ public class DebugCall {
         assert units.getProgram(0) instanceof FunctionList;
         assert ((FunctionList) units.getProgram(0)).getFunction(0) instanceof Function;
         RuntimeInfo runtimeInfo = new RuntimeInfo();
-        runtimeInfo.kindAnalysis = new DebugVFAnalysis(units, units.getFunctionOrScriptQuery());
+        runtimeInfo.kindAnalysis = new VFAnalysisOverride(units, units.getFunctionOrScriptQuery());
         runtimeInfo.kindAnalysis.analyze();
 
         assert ((FunctionList) units.getProgram(0)).getFunction(0).getStmt(0) instanceof ExprStmt;
@@ -62,8 +63,8 @@ public class DebugCall {
         assert expr.getTarget() instanceof NameExpr;
         Name targetName = ((NameExpr) expr.getTarget()).getName();
         /* override Kind Analysis result */
-        assert runtimeInfo.kindAnalysis instanceof DebugVFAnalysis;
-        ((DebugVFAnalysis) runtimeInfo.kindAnalysis).override(targetName, vfDatum);
+        assert runtimeInfo.kindAnalysis instanceof VFAnalysisOverride;
+        ((VFAnalysisOverride) runtimeInfo.kindAnalysis).override(targetName, vfDatum);
 
         return new Pair<>(expr, runtimeInfo);
     }

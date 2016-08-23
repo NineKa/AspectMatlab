@@ -7,7 +7,6 @@ import transformer.expr.ExprTrans;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.BiFunction;
 
 public final class RangeTrans extends ExprTrans {
     private ExprTrans lowerTransformer = null;
@@ -30,45 +29,70 @@ public final class RangeTrans extends ExprTrans {
     @Override
     public Pair<Expr, List<Stmt>> copyAndTransform() {
         assert !this.hasTransformOnCurrentNode();
+        assert originalNode instanceof RangeExpr;
         if (this.hasFurtherTransform()) {
-            BiFunction<LValueExpr, Expr, AssignStmt> buildAssignStmt = (LValueExpr lhs, Expr rhs) -> {
-                AssignStmt returnStmt = new AssignStmt();
-                returnStmt.setLHS(lhs);
-                returnStmt.setRHS(rhs);
-                returnStmt.setOutputSuppressed(true);
-                return returnStmt;
-            };
-            RangeExpr newRangeExpr = new RangeExpr();
-            List<Stmt> newPrefixStatementList = new LinkedList<>();
+            if (((RangeExpr) originalNode).hasIncr()) {
+                List<Stmt> newPrefixStatementList = new LinkedList<>();
 
-            Pair<Expr, List<Stmt>> lowerTransformResult = this.lowerTransformer.copyAndTransform();
-            Pair<Expr, List<Stmt>> upperTransformResult = this.upperTransformer.copyAndTransform();
-            Pair<Expr, List<Stmt>> increTransformResult = (increTransformer == null)? null : increTransformer.copyAndTransform();
+                Pair<Expr, List<Stmt>> lowerTransformResult = lowerTransformer.copyAndTransform();
+                newPrefixStatementList.addAll(lowerTransformResult.getValue1());
+                String lowerAlterName = alterNamespace.generateNewName();
+                AssignStmt lowerAlterAssign = new AssignStmt();
+                lowerAlterAssign.setLHS(new NameExpr(new Name(lowerAlterName)));
+                lowerAlterAssign.setRHS(lowerTransformResult.getValue0());
+                lowerAlterAssign.setOutputSuppressed(true);
+                newPrefixStatementList.add(lowerAlterAssign);
 
-            String lowerAlterName = this.alterNamespace.generateNewName();
-            String upperAlterName = this.alterNamespace.generateNewName();
-            String increAlterName = this.alterNamespace.generateNewName();
+                Pair<Expr, List<Stmt>> incrTransformResult = increTransformer.copyAndTransform();
+                String incrAlterName = alterNamespace.generateNewName();
+                AssignStmt incrAlterAssign = new AssignStmt();
+                incrAlterAssign.setLHS(new NameExpr(new Name(incrAlterName)));
+                incrAlterAssign.setRHS(incrTransformResult.getValue0());
+                incrAlterAssign.setOutputSuppressed(true);
+                newPrefixStatementList.add(incrAlterAssign);
 
-            Expr copiedLower = lowerTransformResult.getValue0();
-            Expr copiedUpper = upperTransformResult.getValue0();
-            Expr copiedIncre = increTransformResult.getValue0();
+                Pair<Expr, List<Stmt>> upperTransformResult = upperTransformer.copyAndTransform();
+                newPrefixStatementList.addAll(upperTransformResult.getValue1());
+                String upperAlterName = alterNamespace.generateNewName();
+                AssignStmt upperAlterassign = new AssignStmt();
+                upperAlterassign.setLHS(new NameExpr(new Name(upperAlterName)));
+                upperAlterassign.setRHS(upperTransformResult.getValue0());
+                upperAlterassign.setOutputSuppressed(true);
+                newPrefixStatementList.add(upperAlterassign);
 
-            AssignStmt lowerAssign = buildAssignStmt.apply(new NameExpr(new Name(lowerAlterName)), copiedLower);
-            AssignStmt upperAssign = buildAssignStmt.apply(new NameExpr(new Name(upperAlterName)), copiedUpper);
-            AssignStmt increAssign = buildAssignStmt.apply(new NameExpr(new Name(increAlterName)), copiedIncre);
+                RangeExpr retExpr = new RangeExpr();
+                retExpr.setLower(new NameExpr(new Name(lowerAlterName)));
+                retExpr.setIncr(new NameExpr(new Name(incrAlterName)));
+                retExpr.setUpper(new NameExpr(new Name(upperAlterName)));
 
-            newPrefixStatementList.addAll(lowerTransformResult.getValue1());
-            newPrefixStatementList.add(lowerAssign);
-            newPrefixStatementList.addAll(increTransformResult.getValue1());
-            newPrefixStatementList.add(increAssign);
-            newPrefixStatementList.addAll(upperTransformResult.getValue1());
-            newPrefixStatementList.add(upperAssign);
+                return new Pair<>(retExpr, newPrefixStatementList);
+            } else {
+                List<Stmt> newPrefixStatementList = new LinkedList<>();
 
-            newRangeExpr.setLower(new NameExpr(new Name(lowerAlterName)));
-            newRangeExpr.setIncr(new NameExpr(new Name(increAlterName)));
-            newRangeExpr.setUpper(new NameExpr(new Name(upperAlterName)));
+                Pair<Expr, List<Stmt>> lowerTransformResult = lowerTransformer.copyAndTransform();
+                newPrefixStatementList.addAll(lowerTransformResult.getValue1());
+                String lowerAlterName = alterNamespace.generateNewName();
+                AssignStmt lowerAlterAssign = new AssignStmt();
+                lowerAlterAssign.setLHS(new NameExpr(new Name(lowerAlterName)));
+                lowerAlterAssign.setRHS(lowerTransformResult.getValue0());
+                lowerAlterAssign.setOutputSuppressed(true);
+                newPrefixStatementList.add(lowerAlterAssign);
 
-            return new Pair<>(newRangeExpr, newPrefixStatementList);
+                Pair<Expr, List<Stmt>> upperTransformResult = upperTransformer.copyAndTransform();
+                newPrefixStatementList.addAll(upperTransformResult.getValue1());
+                String upperAlterName = alterNamespace.generateNewName();
+                AssignStmt upperAlterAssign = new AssignStmt();
+                upperAlterAssign.setLHS(new NameExpr(new Name(upperAlterName)));
+                upperAlterAssign.setRHS(upperTransformResult.getValue0());
+                upperAlterAssign.setOutputSuppressed(true);
+                newPrefixStatementList.add(upperAlterAssign);
+
+                RangeExpr retExpr = new RangeExpr();
+                retExpr.setLower(new NameExpr(new Name(lowerAlterName)));
+                retExpr.setUpper(new NameExpr(new Name(upperAlterName)));
+
+                return new Pair<>(retExpr, newPrefixStatementList);
+            }
         } else {
             RangeExpr copiedNode = (RangeExpr) this.originalNode.treeCopy();
             return new Pair<>(copiedNode, new LinkedList<>());

@@ -1,9 +1,10 @@
 package transformer;
 
 import abstractPattern.Action;
-import abstractPattern.analysis.PatternType;
-import ast.*;
-import org.javatuples.Pair;
+import ast.ASTNode;
+import ast.EndExpr;
+import ast.ParameterizedExpr;
+import transformer.jointpoint.AMJointPoint;
 import transformer.util.RuntimeInfo;
 import util.Namespace;
 
@@ -23,9 +24,10 @@ public class TransformerArgument {
     /* A function decide if a node transformation is ignored (TRUE -> ignored) */
     public Function<ASTNode, Boolean> ignoreDelegate = null;
     /* A call back function, if a joint point is appearing, a call back is issued */
-    public Consumer<Pair<Stmt, PatternType>> jointPointDelegate = null;
+    public Consumer<AMJointPoint> jointPointDelegate = null;
 
-    public Map<Stmt, CellArrayExpr> variableIndiceMap = new HashMap<>();
+    public String enclosingFilename = null;
+
     public Map<EndExpr, ParameterizedExpr> endExpressionResolveMap = new HashMap<>();
 
     public TransformerArgument(
@@ -33,15 +35,15 @@ public class TransformerArgument {
             RuntimeInfo runtimeInfo,
             Namespace alterNamespace,
             Function<ASTNode, Boolean> ignoreDelegate,
-            Consumer<Pair<Stmt, PatternType>> jointPointDelegate,
-            Map<Stmt, CellArrayExpr> variableIndiceMap
+            Consumer<AMJointPoint> jointPointDelegate,
+            String enclosingFilename
     ) {
         this.actions = actions;
         this.runtimeInfo = runtimeInfo;
         this.alterNamespace = alterNamespace;
         this.ignoreDelegate = ignoreDelegate;
         this.jointPointDelegate = jointPointDelegate;
-        this.variableIndiceMap = variableIndiceMap;
+        this.enclosingFilename = enclosingFilename;
     }
 
     public TransformerArgument copy() {
@@ -51,8 +53,11 @@ public class TransformerArgument {
                 alterNamespace,
                 ignoreDelegate,
                 jointPointDelegate,
-                variableIndiceMap
+                enclosingFilename
         );
+
+        retArgument.endExpressionResolveMap = endExpressionResolveMap;
+
         return retArgument;
     }
 }

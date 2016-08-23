@@ -13,6 +13,7 @@ import org.junit.Test;
 import transformer.util.AccessMode;
 import transformer.util.IsPossibleJointPointResult;
 import transformer.util.RuntimeInfo;
+import transformer.util.VFAnalysisOverride;
 
 public class DebugGet {
     public static Get buildPattern(String pattern) {
@@ -56,9 +57,9 @@ public class DebugGet {
         assert exprStmt.getExpr() instanceof NameExpr;
         NameExpr expr = (NameExpr) exprStmt.getExpr();
 
-        runtimeInfo.kindAnalysis = new DebugVFAnalysis(units, units.getFunctionOrScriptQuery());
-        assert runtimeInfo.kindAnalysis instanceof DebugVFAnalysis;
-        ((DebugVFAnalysis) runtimeInfo.kindAnalysis).override(expr.getName(), kindAnalysis);
+        runtimeInfo.kindAnalysis = new VFAnalysisOverride(units, units.getFunctionOrScriptQuery());
+        assert runtimeInfo.kindAnalysis instanceof VFAnalysisOverride;
+        ((VFAnalysisOverride) runtimeInfo.kindAnalysis).override(expr.getName(), kindAnalysis);
         runtimeInfo.accessMode = accessMode;
 
         return new Pair<>(expr, runtimeInfo);

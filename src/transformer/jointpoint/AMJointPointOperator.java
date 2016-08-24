@@ -33,12 +33,13 @@ public final class AMJointPointOperator extends AMJointPoint {
         operandsList.forEach((expr -> exprString.add(expr.getPrettyPrinted().trim())));
 
         return String.format(
-                "[%10s] [%3d:%3d] %s with operands: %s",
+                "[%10s] [%3d:%3d] %s with operands: %s, actions: %s",
                 getMatchedPatternType(),
                 getStartLine(),
                 getStartColumn(),
                 getInlineStatement().getPrettyPrinted().trim(),
-                exprString.toString()
+                exprString.toString(),
+                getMatchedActions().toString()
         );
     }
 }

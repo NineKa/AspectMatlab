@@ -1,4 +1,4 @@
 function [] = foo()
     c = {1,1};
-    g;
+    x{1}{1};
 end

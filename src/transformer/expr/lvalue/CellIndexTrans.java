@@ -11,6 +11,7 @@ import transformer.util.AccessMode;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public final class CellIndexTrans extends LValueTrans {
     private ExprTrans targetTransformer = null;
@@ -18,302 +19,450 @@ public final class CellIndexTrans extends LValueTrans {
 
     public CellIndexTrans(TransformerArgument argument, CellIndexExpr cellIndexExpr) {
         super(argument, cellIndexExpr);
-        assert cellIndexExpr.getNumArg() != 0;
 
         targetTransformer = ExprTrans.buildExprTransformer(argument, cellIndexExpr.getTarget());
 
         TransformerArgument argArgument = argument.copy();
         argArgument.runtimeInfo.accessMode = AccessMode.Read;
+
         for (Expr arg : cellIndexExpr.getArgList()) {
-            ExprTrans argTransformer = ExprTrans.buildExprTransformer(argArgument, arg);
-            argumentTransformerList.add(argTransformer);
-        }
-
-        /* populate end expr substitution map */
-        if (hasTransformOnCurrentNode()) {
-            assert cellIndexExpr.getTarget() instanceof NameExpr;
-            String targetName = ((NameExpr) cellIndexExpr.getTarget()).getName().getID();
-            int totalNumArgument = cellIndexExpr.getNumArg();
-            for (int argIndex = 0; argIndex < cellIndexExpr.getNumArg(); argIndex++) {
-                int matlabIndex = argIndex + 1;
-
-                ParameterizedExpr substituteExpr = new ParameterizedExpr();
-                substituteExpr.setTarget(new NameExpr(new Name("builtin")));
-                substituteExpr.addArg(new StringLiteralExpr("end"));
-                substituteExpr.addArg(new NameExpr(new Name(targetName)));
-                substituteExpr.addArg(new IntLiteralExpr(new DecIntNumericLiteralValue(String.valueOf(matlabIndex))));
-                substituteExpr.addArg(new IntLiteralExpr(new DecIntNumericLiteralValue(String.valueOf(totalNumArgument))));
-
-                Consumer<ASTNode> collectEndExpr = new Consumer<ASTNode>() {
-                    @Override
-                    public void accept(ASTNode astNode) {
-                        if (astNode instanceof EndExpr) endExpressionResolveMap.put((EndExpr) astNode, substituteExpr);
-                        if (astNode instanceof ParameterizedExpr) return;
-                        if (astNode instanceof CellIndexExpr) return;
-                        for (int childIndex = 0; childIndex < astNode.getNumChild(); childIndex++) {
-                            ASTNode childNode = astNode.getChild(childIndex);
-                            this.accept(childNode);
-                        }
-                    }
-                };
-
-                collectEndExpr.accept(cellIndexExpr.getArg(argIndex));
-            }
+            ExprTrans appendingTrans = ExprTrans.buildExprTransformer(argArgument, arg);
+            argumentTransformerList.add(appendingTrans);
         }
     }
 
     @Override
     public Pair<Expr, List<Stmt>> copyAndTransform() {
+        if (runtimeInfo.accessMode == AccessMode.Read) {
+            return accessModeReadHandle();
+        } else {
+            assert runtimeInfo.accessMode == AccessMode.Write;
+            return accessModeWriteHandle();
+        }
+    }
+
+    private Pair<Expr, List<Stmt>> accessModeReadHandle() {
+        assert runtimeInfo.accessMode == AccessMode.Read;
         assert originalNode instanceof CellIndexExpr;
         CellIndexExpr retExpr = new CellIndexExpr();
         List<Stmt> newPrefixStatementList = new LinkedList<>();
+
         if (hasTransformOnCurrentNode()) {
             assert ((CellIndexExpr) originalNode).getTarget() instanceof NameExpr;
             String targetName = ((NameExpr) ((CellIndexExpr) originalNode).getTarget()).getName().getID();
-            /* [expr1]{[expr2]}     <=>     [expr2(transform)]          */
-            /*                              t0 = {[expr2]}              */
-            /*                              t1 = {[expr1]{t0{:}}    *   */
-            /*                              return t1{:}                */
-            Pair<ast.List<Expr>, List<Stmt>> argTransformResult = copyAndTransformArgument();
-            newPrefixStatementList.addAll(argTransformResult.getValue1());
+            if (hasEndExpression() || hasColonExpression()) {
+                resolveEndExpr(new NameExpr(new Name(targetName)));
+                Pair<ast.List<Expr>, List<Stmt>> argTransResult = copyAndTransformArgument();
+                Pair<ast.List<Expr>, List<Stmt>> colonResuloveResult = resolveColonExpr(
+                        argTransResult.getValue0(),
+                        new NameExpr(new Name(targetName))
+                );
+                newPrefixStatementList.addAll(argTransResult.getValue1());
+                newPrefixStatementList.addAll(colonResuloveResult.getValue1());
 
-            String t0Name = alterNamespace.generateNewName();
-            AssignStmt t0Assign = new AssignStmt();
-            t0Assign.setLHS(new NameExpr(new Name(t0Name)));
-            t0Assign.setRHS(new CellArrayExpr(new ast.List<>(new Row(argTransformResult.getValue0()))));
-            t0Assign.setOutputSuppressed(true);
-            newPrefixStatementList.add(t0Assign);
+                ast.List<Expr> newArgumentList = colonResuloveResult.getValue0();
 
-            String t1Name = alterNamespace.generateNewName();
-            AssignStmt t1Assign = new AssignStmt();
-            t1Assign.setLHS(new NameExpr(new Name(t1Name)));
-            t1Assign.setRHS(new CellArrayExpr(new ast.List<>(new Row(new ast.List<>(new CellIndexExpr(
-                    new NameExpr(new Name(targetName)),
-                    new ast.List<Expr>(new CellIndexExpr(
-                            new NameExpr(new Name(t0Name)),
-                            new ast.List<Expr>(new ColonExpr())
-                    ))
-            ))))));
-            t1Assign.setOutputSuppressed(true);
-            newPrefixStatementList.add(t1Assign);
+                String alterName = alterNamespace.generateNewName();
+                AssignStmt alterAssign = new AssignStmt();
+                alterAssign.setLHS(new NameExpr(new Name(alterName)));
+                alterAssign.setRHS(new CellArrayExpr(new ast.List<Row>(new Row(new ast.List<Expr>(
+                        new CellIndexExpr(new NameExpr( new Name(targetName)), newArgumentList)
+                )))));
+                alterAssign.setOutputSuppressed(true);
+                newPrefixStatementList.add(alterAssign);
 
-            retExpr = new CellIndexExpr(new NameExpr(new Name(t1Name)), new ast.List<>(new ColonExpr()));
+                /* invoke joint point delegate */
+                AMJointPointGet jointPoint = new AMJointPointGet(
+                        alterAssign, originalNode.getStartLine(),
+                        originalNode.getStartColumn(), enclosingFilename
+                );
+                jointPoint.addAllMatchedAction(getPossibleAttachedActionsSet());
+                jointPoint.setTargetExpr(new NameExpr(new Name(targetName)));
+                jointPoint.setIndicesExpr(new CellArrayExpr(new ast.List<Row>(new Row(newArgumentList))));
+                jointPointDelegate.accept(jointPoint);
 
-            /* invoke joint point delegate function */
-            AMJointPointGet jointPoint = new AMJointPointGet(
-                    t1Assign, originalNode.getStartLine(),
-                    originalNode.getStartColumn(), enclosingFilename
-            );
-            jointPoint.addAllMatchedAction(getPossibleAttachedActionsSet());
-            jointPoint.setTargetExpr(new NameExpr(new Name(targetName)));
-            jointPoint.setIndicesExpr(new NameExpr(new Name(t0Name)));
-            jointPointDelegate.accept(jointPoint);
+                retExpr.setTarget(new NameExpr(new Name(alterName)));
+                retExpr.addArg(new ColonExpr());
 
+                return new Pair<>(retExpr, newPrefixStatementList);
+            } else {
+                Pair<ast.List<Expr>, List<Stmt>> argTransResult = copyAndTransformArgument();
+                newPrefixStatementList.addAll(argTransResult.getValue1());
+
+                String alterName = alterNamespace.generateNewName();
+                AssignStmt alterAssign = new AssignStmt();
+                alterAssign.setLHS(new NameExpr(new Name(alterName)));
+                alterAssign.setRHS(new CellIndexExpr(new NameExpr(new Name(targetName)), argTransResult.getValue0()));
+                alterAssign.setOutputSuppressed(true);
+                newPrefixStatementList.add(alterAssign);
+
+                /* invoke joint point delegate */
+                AMJointPointGet jointPoint = new AMJointPointGet(
+                        alterAssign, originalNode.getStartLine(),
+                        originalNode.getStartColumn(), enclosingFilename
+                );
+                jointPoint.addAllMatchedAction(getPossibleAttachedActionsSet());
+                jointPoint.setTargetExpr(new NameExpr(new Name(targetName)));
+                jointPoint.setIndicesExpr(new CellArrayExpr(new ast.List<Row>(new Row(new ast.List<Expr>(
+                        new CellArrayExpr(new ast.List<Row>(new Row(argTransResult.getValue0().treeCopy())))
+                )))));
+                jointPointDelegate.accept(jointPoint);
+
+                retExpr.setTarget(new NameExpr(new Name(alterName)));
+                retExpr.addArg(new ColonExpr());
+
+                return new Pair<>(retExpr, newPrefixStatementList);
+            }
         } else {
+            if (!hasFurtherTransform()) {
+                Expr copiedExpr = originalNode.treeCopy();
+                return new Pair<>(copiedExpr, new LinkedList<>());
+            }
+            NameExpr targetExpr;
+            if (((CellIndexExpr) originalNode).getTarget() instanceof NameExpr) {
+                targetExpr = (NameExpr) ((CellIndexExpr) originalNode).getTarget().treeCopy();
+            } else {
+                Pair<Expr, List<Stmt>> targetTransformResult = targetTransformer.copyAndTransform();
+                newPrefixStatementList.addAll(targetTransformResult.getValue1());
+
+                String alterName = alterNamespace.generateNewName();
+                AssignStmt alterAssign = new AssignStmt();
+                alterAssign.setLHS(new NameExpr(new Name(alterName)));
+                alterAssign.setRHS(targetTransformResult.getValue0());
+                alterAssign.setOutputSuppressed(true);
+                newPrefixStatementList.add(alterAssign);
+
+                targetExpr = new NameExpr(new Name(alterName));
+            }
+
             ast.List<Expr> argumentList;
             if (hasFurtherTransformArgument()) {
-                Pair<ast.List<Expr>, List<Stmt>> transformResult = copyAndTransformArgumentNoColonResolve();
-                argumentList = transformResult.getValue0();
-                newPrefixStatementList.addAll(transformResult.getValue1());
+                resolveEndExpr(targetExpr);
+                Pair<ast.List<Expr>, List<Stmt>> argumentTransformResult = copyAndTransformArgument();
+
+                newPrefixStatementList.addAll(argumentTransformResult.getValue1());
+
+                argumentList = argumentTransformResult.getValue0();
             } else {
                 argumentList = ((CellIndexExpr) originalNode).getArgList().treeCopy();
             }
-            assert argumentList != null;
+
+            retExpr.setTarget(targetExpr);
             retExpr.setArgList(argumentList);
 
-            Expr targetExpr;
-            if (((CellIndexExpr) originalNode).getTarget() instanceof NameExpr) {
-                String targetName = ((NameExpr) ((CellIndexExpr) originalNode).getTarget()).getName().getID();
-                targetExpr = new NameExpr(new Name(targetName));
-            } else {
-                Pair<Expr, List<Stmt>> transformResult = targetTransformer.copyAndTransform();
-                targetExpr = transformResult.getValue0();
-                newPrefixStatementList.addAll(transformResult.getValue1());
-            }
-            assert targetExpr != null;
-            retExpr.setTarget(targetExpr);
+            return new Pair<>(retExpr, newPrefixStatementList);
         }
-
-        return new Pair<>(retExpr, newPrefixStatementList);
     }
 
-    @Override
+    @SuppressWarnings("deprecation")
+    private Pair<Expr, List<Stmt>> accessModeWriteHandle() {
+        assert runtimeInfo.accessMode == AccessMode.Write;
+        assert originalNode instanceof CellIndexExpr;
+        CellIndexExpr retExpr = new CellIndexExpr();
+        List<Stmt> newPrefixStatement = new LinkedList<>();
+        if (hasTransformOnCurrentNode()) {
+            assert ((CellIndexExpr) originalNode).getTarget() instanceof NameExpr;
+            String targetName = ((NameExpr) ((CellIndexExpr) originalNode).getTarget()).getName().getID();
+            resolveEndExpr(new NameExpr(new Name(targetName)));
+            /* [expr1]{[expr2]}     <=>     if exist('[expr1]','var')       */
+            /*                                  t0 = [expr1];               */
+            /*                              end                             */
+            /*                              [expr2(transform)]              */
+            /*                              t0{[expr2]}                 =   */
+            /*                              [expr1] = t0;                   */
+
+            IfBlock existingCheckBlock = new IfBlock();
+            existingCheckBlock.setCondition(new ParameterizedExpr(
+                    new NameExpr(new Name("exist")),
+                    new ast.List<Expr>(
+                            new StringLiteralExpr(targetName),
+                            new StringLiteralExpr("var")
+                    )
+            ));
+
+            String t0Name = alterNamespace.generateNewName();
+            AssignStmt t0Assign = new AssignStmt();
+            t0Assign.setLHS(new NameExpr(new Name(t0Name)));
+            t0Assign.setRHS(new NameExpr(new Name(targetName)));
+            t0Assign.setOutputSuppressed(true);
+            existingCheckBlock.addStmt(t0Assign);
+
+            newPrefixStatement.add(new IfStmt(new ast.List<IfBlock>(existingCheckBlock), new Opt<ElseBlock>()));
+
+            Pair<ast.List<Expr>, List<Stmt>> argumentTransformResult = copyAndTransformArgument();
+            newPrefixStatement.addAll(argumentTransformResult.getValue1());
+
+            retExpr.setTarget(new NameExpr(new Name(t0Name)));
+            retExpr.setArgList(argumentTransformResult.getValue0());
+
+            AssignStmt t0RetrieveAssign = new AssignStmt();
+            t0RetrieveAssign.setLHS(new NameExpr(new Name(targetName)));
+            t0RetrieveAssign.setRHS(new NameExpr(new Name(t0Name)));
+            t0RetrieveAssign.setOutputSuppressed(true);
+            assignRetriveStack.push(t0RetrieveAssign);
+
+            return new Pair<>(retExpr, newPrefixStatement);
+        } else {
+            assert originalNode instanceof CellIndexExpr;
+            if (!hasFurtherTransform()) {
+                CellIndexExpr copiedExpr = (CellIndexExpr) originalNode.treeCopy();
+                return new Pair<>(copiedExpr, new LinkedList<>());
+            }
+            if (hasEndExpression()) {
+                NameExpr targetExpr;
+                if (((CellIndexExpr) originalNode).getTarget() instanceof NameExpr) {
+                    targetExpr = (NameExpr) ((CellIndexExpr) originalNode).getTarget().treeCopy();
+                } else {
+                    /* [expr1]{[expr2]}     <=>     [expr1(transform)]          */
+                    /*                              t0 = [expr1];               */
+                    /*                              targetExpr = t0;            */
+                    Pair<Expr, List<Stmt>> targetTransformResult = targetTransformer.copyAndTransform();
+                    newPrefixStatement.addAll(targetTransformResult.getValue1());
+
+                    String t0Name = alterNamespace.generateNewName();
+                    AssignStmt t0Assign = new AssignStmt();
+                    t0Assign.setLHS(new NameExpr(new Name(t0Name)));
+                    t0Assign.setRHS(targetTransformResult.getValue0().treeCopy());
+                    t0Assign.setOutputSuppressed(true);
+                    newPrefixStatement.add(t0Assign);
+
+                    targetExpr = new NameExpr(new Name(t0Name));
+
+                    AssignStmt t0RetrieveAssign = new AssignStmt();
+                    t0RetrieveAssign.setLHS(targetTransformResult.getValue0().treeCopy());
+                    t0RetrieveAssign.setRHS(new NameExpr(new Name(t0Name)));
+                    t0RetrieveAssign.setOutputSuppressed(true);
+                    assignRetriveStack.push(t0RetrieveAssign);
+                }
+                resolveEndExpr(targetExpr);
+
+                Pair<ast.List<Expr>, List<Stmt>> argumentTransformResult = copyAndTransformArgument();
+                newPrefixStatement.addAll(argumentTransformResult.getValue1());
+
+                retExpr.setTarget(targetExpr);
+                retExpr.setArgList(argumentTransformResult.getValue0());
+
+                return new Pair<>(retExpr, newPrefixStatement);
+            } else {
+                Pair<Expr, List<Stmt>> targetTransformResult = targetTransformer.copyAndTransform();
+                Pair<ast.List<Expr>, List<Stmt>> argumentListTransformResult = copyAndTransformArgument();
+
+                newPrefixStatement.addAll(targetTransformResult.getValue1());
+                newPrefixStatement.addAll(argumentListTransformResult.getValue1());
+
+                retExpr.setTarget(targetTransformResult.getValue0());
+                retExpr.setArgList(argumentListTransformResult.getValue0());
+
+                return new Pair<>(retExpr, newPrefixStatement);
+            }
+        }
+    }
+
     public boolean hasFurtherTransform() {
+        assert originalNode instanceof CellIndexExpr;
+        if (((CellIndexExpr) originalNode).getTarget() instanceof NameExpr) {
+            if (hasTransformOnCurrentNode()) return true;
+            if (hasFurtherTransformArgument()) return true;
+            return false;
+        } else {
+            if (targetTransformer.hasFurtherTransform()) return true;
+            if (hasFurtherTransformArgument()) return true;
+            return false;
+        }
+    }
+
+    public boolean hasFurtherTransformArgument() {
+        assert originalNode instanceof CellIndexExpr;
+        for (ExprTrans argumentTransformer : argumentTransformerList) {
+            if (argumentTransformer.hasFurtherTransform()) return true;
+        }
         return false;
+    }
+
+    private boolean hasEndExpression() {
+        assert originalNode instanceof CellIndexExpr;
+        Function<ASTNode, Boolean> recFinder = new Function<ASTNode, Boolean>() {
+            @Override
+            public Boolean apply(ASTNode astNode) {
+                if (astNode instanceof EndExpr) return true;
+                if (astNode instanceof CellIndexExpr) return false;
+                if (astNode instanceof ParameterizedExpr) return false;
+                boolean currentNodeResult = false;
+                for (int childIndex = 0; childIndex < astNode.getNumChild(); childIndex++) {
+                    boolean childResult = this.apply(astNode.getChild(childIndex));
+                    currentNodeResult = currentNodeResult || childResult;
+                }
+                return currentNodeResult;
+            }
+        };
+        for (Expr argument : ((CellIndexExpr) originalNode).getArgList()) {
+            if (recFinder.apply(argument)) return true;
+        }
+        return false;
+    }
+
+    private boolean hasColonExpression() {
+        assert originalNode instanceof CellIndexExpr;
+        for (Expr argument : ((CellIndexExpr) originalNode).getArgList()) {
+            if (argument instanceof ColonExpr) return true;
+        }
+        return false;
+    }
+
+    private void resolveEndExpr(NameExpr resolvedAs) {
+        assert hasEndExpression();
+        assert originalNode instanceof CellIndexExpr;
+        for (int argIndex = 0; argIndex < ((CellIndexExpr) originalNode).getNumArg(); argIndex++) {
+            final int MATLAB_INDEX = argIndex + 1;
+            final int TOTAL_NUM_ARG = ((CellIndexExpr) originalNode).getNumArg();
+
+            ParameterizedExpr resolvedExpr = new ParameterizedExpr();
+            resolvedExpr.setTarget(new NameExpr(new Name("builtin")));
+            resolvedExpr.addArg(new StringLiteralExpr("end"));
+            resolvedExpr.addArg(resolvedAs.treeCopy());
+            resolvedExpr.addArg(new IntLiteralExpr(new DecIntNumericLiteralValue(String.valueOf(MATLAB_INDEX))));
+            resolvedExpr.addArg(new IntLiteralExpr(new DecIntNumericLiteralValue(String.valueOf(TOTAL_NUM_ARG))));
+
+            Consumer<ASTNode> subWorker = new Consumer<ASTNode>() {
+                @Override
+                public void accept(ASTNode astNode) {
+                    if (astNode instanceof EndExpr) endExpressionResolveMap.put((EndExpr) astNode, resolvedExpr.treeCopy());
+                    if (astNode instanceof CellIndexExpr) return;
+                    if (astNode instanceof ParameterizedExpr) return;
+                    for (int childIndex = 0; childIndex < astNode.getNumChild(); childIndex++) {
+                        ASTNode child = astNode.getChild(childIndex);
+                        this.accept(child);
+                    }
+                }
+            };
+
+            Expr argument = ((CellIndexExpr) originalNode).getArg(argIndex);
+            subWorker.accept(argument);
+        }
     }
 
     private Pair<ast.List<Expr>, List<Stmt>> copyAndTransformArgument() {
-        ast.List<Expr> newArgList = new ast.List<>();
-        List<Stmt> newPrefixStatementList = new LinkedList<>();
-
-        /* first pass transform all arguments, and contain them in variables */
-        for (ExprTrans exprTrans : argumentTransformerList) {
-            Pair<Expr, List<Stmt>> transformResult = exprTrans.copyAndTransform();
-            newPrefixStatementList.addAll(transformResult.getValue1());
-            /* handling colon expr */
-            if (transformResult.getValue0() instanceof ColonExpr) {
-                newArgList.add(new ColonExpr());
-                continue;
-            }
-            /* handling spanning comma separated list */
-            if ((transformResult.getValue0() instanceof CellIndexExpr) || (transformResult.getValue0() instanceof DotExpr)) {
-                /* [expr]{[expr2]}  <=>     [expr2(transform prefix)]       */
-                /*                          t0 = {[expr]{[expr2]}}          */
-                /*                          return t0{:}                    */
-
-                /* [expr].[name]    <=>     [expr(transform)]               */
-                /*                          t0 = {[expr].[name]}            */
-                /*                          return t0{:}                    */
-                String t0Name = alterNamespace.generateNewName();
-                AssignStmt t0Assign = new AssignStmt();
-                t0Assign.setLHS(new NameExpr(new Name(t0Name)));
-                t0Assign.setRHS(new CellArrayExpr(new ast.List<>(
-                        new Row(new ast.List<>(transformResult.getValue0().treeCopy()))
-                )));
-                t0Assign.setOutputSuppressed(true);
-
-                newPrefixStatementList.add(t0Assign);
-                newArgList.add(new CellIndexExpr(new NameExpr(new Name(t0Name)), new ast.List<>(new ColonExpr())));
-
-                continue;
-            }
-            /* otherwise use trivial transformation */
-            /*  [expr]              <=>     t0 = [expr]                 */
-            /*                              return t0                   */
-            String t0Name = alterNamespace.generateNewName();
-            AssignStmt t0Assign = new AssignStmt();
-            t0Assign.setLHS(new NameExpr(new Name(t0Name)));
-            t0Assign.setRHS(transformResult.getValue0().treeCopy());
-            t0Assign.setOutputSuppressed(true);
-
-            newPrefixStatementList.add(t0Assign);
-            newArgList.add(new NameExpr(new Name(t0Name)));
-        }
-
-        /* second pass - calculating total number of arguments */
-        Row lengthMatrixScalar = new Row();
-        for (Expr argument : newArgList) {
-            assert !(argument instanceof DotExpr);
-            if (argument instanceof CellIndexExpr) {    /* variable length */
-                assert ((CellIndexExpr) argument).getTarget() instanceof NameExpr;
-                String wrappedName = ((NameExpr) ((CellIndexExpr) argument).getTarget()).getName().getID();
-
-                ParameterizedExpr calcuatingExpr = new ParameterizedExpr();
-                calcuatingExpr.setTarget(new NameExpr(new Name("length")));
-                calcuatingExpr.addArg(new NameExpr(new Name(wrappedName)));
-                lengthMatrixScalar.addElement(calcuatingExpr);
-            } else {                                    /* fixed length    */
-                lengthMatrixScalar.addElement(new IntLiteralExpr(new DecIntNumericLiteralValue("1")));
-            }
-        }
-        MatrixExpr numArgMatrix = new MatrixExpr(new ast.List<>(lengthMatrixScalar));
-
-        String totalArgName = alterNamespace.generateNewName();
-        AssignStmt totalArgAssign = new AssignStmt();
-        totalArgAssign.setLHS(new NameExpr(new Name(totalArgName)));
-        totalArgAssign.setRHS(new ParameterizedExpr(new NameExpr(
-                new Name("sum")),
-                new ast.List<Expr>(numArgMatrix)
-        ));
-        totalArgAssign.setOutputSuppressed(true);
-        newPrefixStatementList.add(totalArgAssign);
-
-        /* third pass - resolve colon expr */
         assert originalNode instanceof CellIndexExpr;
-        assert ((CellIndexExpr) originalNode).getTarget() instanceof NameExpr;
-        String targetName = ((NameExpr) ((CellIndexExpr) originalNode).getTarget()).getName().getID();
-
-        ast.List<Expr> colonExprResolvedArgList = new ast.List<>();
-        int indexCounter = 0;
-        for (Expr argument : newArgList) {
-            indexCounter = indexCounter + 1;
-            if (argument instanceof ColonExpr) {
-                Row currentIndexCalcExpr = new Row();
-                for (int copyIndex = 0; copyIndex < indexCounter; copyIndex++) {
-                    currentIndexCalcExpr.addElement(lengthMatrixScalar.getElement(copyIndex).treeCopy());
-                }
-                MatrixExpr currentIndexCalcMatrix = new MatrixExpr(new ast.List<>(currentIndexCalcExpr));
-
-                ParameterizedExpr currentIndexResultExpr = new ParameterizedExpr();
-                currentIndexResultExpr.setTarget(new NameExpr(new Name("sum")));
-                currentIndexResultExpr.addArg(currentIndexCalcMatrix);
-
-                RangeExpr resolvedRangeExpr = new RangeExpr();
-                resolvedRangeExpr.setLower(new IntLiteralExpr(new DecIntNumericLiteralValue("1")));
-                resolvedRangeExpr.setUpper(new ParameterizedExpr(
-                        new NameExpr(new Name("builtin")),
-                        new ast.List<Expr>(
-                                new StringLiteralExpr("end"),
-                                new NameExpr(new Name(targetName)),
-                                currentIndexResultExpr,
-                                new NameExpr(new Name(totalArgName))
-                        )
-                ));
-
-                colonExprResolvedArgList.add(resolvedRangeExpr);
-            } else {
-                colonExprResolvedArgList.add(argument);
-            }
-        }
-
-        return new Pair<>(colonExprResolvedArgList, newPrefixStatementList);
-    }
-
-    private Pair<ast.List<Expr>, List<Stmt>> copyAndTransformArgumentNoColonResolve() {
-        ast.List<Expr> newArgList = new ast.List<>();
+        ast.List<Expr> newArgumentList = new ast.List<>();
         List<Stmt> newPrefixStatementList = new LinkedList<>();
 
-        /* first pass transform all arguments, and contain them in variables */
-        for (ExprTrans exprTrans : argumentTransformerList) {
-            Pair<Expr, List<Stmt>> transformResult = exprTrans.copyAndTransform();
-            newPrefixStatementList.addAll(transformResult.getValue1());
-            /* handling colon expr */
-            if (transformResult.getValue0() instanceof ColonExpr) {
-                newArgList.add(new ColonExpr());
-                continue;
-            }
-            /* handling spanning comma separated list */
-            if ((transformResult.getValue0() instanceof CellIndexExpr) || (transformResult.getValue0() instanceof DotExpr)) {
-                /* [expr]{[expr2]}  <=>     [expr2(transform prefix)]       */
-                /*                          t0 = {[expr]{[expr2]}}          */
-                /*                          return t0{:}                    */
-
-                /* [expr].[name]    <=>     [expr(transform)]               */
-                /*                          t0 = {[expr].[name]}            */
-                /*                          return t0{:}                    */
-                String t0Name = alterNamespace.generateNewName();
-                AssignStmt t0Assign = new AssignStmt();
-                t0Assign.setLHS(new NameExpr(new Name(t0Name)));
-                t0Assign.setRHS(new CellArrayExpr(new ast.List<>(
-                        new Row(new ast.List<>(transformResult.getValue0().treeCopy()))
-                )));
-                t0Assign.setOutputSuppressed(true);
-
-                newPrefixStatementList.add(t0Assign);
-                newArgList.add(new CellIndexExpr(new NameExpr(new Name(t0Name)), new ast.List<>(new ColonExpr())));
-
-                continue;
-            }
-            /* otherwise use trivial transformation */
-            /*  [expr]              <=>     t0 = [expr]                 */
-            /*                              return t0                   */
-            String t0Name = alterNamespace.generateNewName();
-            AssignStmt t0Assign = new AssignStmt();
-            t0Assign.setLHS(new NameExpr(new Name(t0Name)));
-            t0Assign.setRHS(transformResult.getValue0().treeCopy());
-            t0Assign.setOutputSuppressed(true);
-
-            newPrefixStatementList.add(t0Assign);
-            newArgList.add(new NameExpr(new Name(t0Name)));
+        if (!hasFurtherTransformArgument()) {
+            newArgumentList = ((CellIndexExpr) originalNode).getArgList().treeCopy();
+            return new Pair<>(newArgumentList, new LinkedList<>());
         }
 
-        return new Pair<>(newArgList, newPrefixStatementList);
+        for (ExprTrans argumentTransformer : argumentTransformerList) {
+            Pair<Expr, List<Stmt>> transformResult = argumentTransformer.copyAndTransform();
+            newPrefixStatementList.addAll(transformResult.getValue1());
+            if (transformResult.getValue0() instanceof ColonExpr) {
+                assert transformResult.getValue1().isEmpty();
+                newArgumentList.add(new ColonExpr());
+                continue;
+            }
+
+            if (hasFixLengthOutput(transformResult.getValue0())) {
+                /* [expr]       <=>     [expr(transform)]           */
+                /*                      t0 = [expr];                */
+                /*                      return t0                   */
+                String alterName = alterNamespace.generateNewName();
+
+                AssignStmt alterAssign = new AssignStmt();
+                alterAssign.setLHS(new NameExpr(new Name(alterName)));
+                alterAssign.setRHS(transformResult.getValue0());
+                alterAssign.setOutputSuppressed(true);
+                newPrefixStatementList.add(alterAssign);
+
+                newArgumentList.add(new NameExpr(new Name(alterName)));
+                continue;
+            } else {
+                /* [expr]       <=>     [expr(transform)]           */
+                /*                      t0 = {[expr]};              */
+                /*                      return t0{:}                */
+                String alterName = alterNamespace.generateNewName();
+
+                AssignStmt alterAssign = new AssignStmt();
+                alterAssign.setLHS(new NameExpr(new Name(alterName)));
+                alterAssign.setRHS(new CellArrayExpr(new ast.List<>(new Row(new ast.List<>(transformResult.getValue0())))));
+                alterAssign.setOutputSuppressed(true);
+                newPrefixStatementList.add(alterAssign);
+
+                newArgumentList.add(new CellIndexExpr(
+                        new NameExpr(new Name(alterName)),
+                        new ast.List<Expr>(new ColonExpr())
+                ));
+                continue;
+            }
+        }
+        return new Pair<>(newArgumentList, newPrefixStatementList);
     }
 
-    private boolean hasFurtherTransformArgument() {
-        for (ExprTrans exprTrans : argumentTransformerList) {
-            if (exprTrans.hasFurtherTransform()) return true;
+    private Pair<ast.List<Expr>, List<Stmt>> resolveColonExpr(ast.List<Expr> arguments, NameExpr resolvedAs) {
+        ast.List<Expr> newArgumentList = new ast.List<>();
+        List<Stmt> newPrefixStatementList = new LinkedList<>();
+
+        String totalNumArgName = alterNamespace.generateNewName();
+
+        List<Expr> totalLengthCalcScalar = new LinkedList<>();
+        for (Expr argument : arguments) {
+            if (hasFixLengthOutput(argument)) {
+                totalLengthCalcScalar.add(new IntLiteralExpr(new DecIntNumericLiteralValue("1")));
+            } else {
+                ParameterizedExpr lengthCalcExpr = new ParameterizedExpr();
+                lengthCalcExpr.setTarget(new NameExpr(new Name("length")));
+                lengthCalcExpr.addArg(new CellArrayExpr(new ast.List<>(new Row(new ast.List<>(argument.treeCopy())))));
+
+                totalLengthCalcScalar.add(lengthCalcExpr);
+            }
         }
-        return false;
+
+        AssignStmt totalNumArgAssign = new AssignStmt();
+        totalNumArgAssign.setLHS(new NameExpr(new Name(totalNumArgName)));
+        totalNumArgAssign.setRHS(new ParameterizedExpr(
+                new NameExpr(new Name("sum")),
+                new ast.List<Expr>(builtMATLABScalarMatrix(totalLengthCalcScalar))
+        ));
+        totalNumArgAssign.setOutputSuppressed(true);
+        newPrefixStatementList.add(totalNumArgAssign);
+
+        for (int argIndex = 0; argIndex < arguments.getNumChild(); argIndex++) {
+            Expr argument = arguments.getChild(argIndex);
+
+            if (argument instanceof ColonExpr) {
+                List<Expr> lengthSlice = totalLengthCalcScalar.subList(0, argIndex + 1);
+
+                ParameterizedExpr endPosCalcExpr = new ParameterizedExpr();
+                endPosCalcExpr.setTarget(new NameExpr(new Name("builtin")));
+                endPosCalcExpr.addArg(new StringLiteralExpr("end"));
+                endPosCalcExpr.addArg(resolvedAs.treeCopy());
+                endPosCalcExpr.addArg(new ParameterizedExpr(
+                        new NameExpr(new Name("sum")),
+                        new ast.List<Expr>(builtMATLABScalarMatrix(lengthSlice))
+                ));
+                endPosCalcExpr.addArg(new NameExpr(new Name(totalNumArgName)));
+
+                RangeExpr resolvedExpr = new RangeExpr();
+                resolvedExpr.setLower(new IntLiteralExpr(new DecIntNumericLiteralValue("1")));
+                resolvedExpr.setUpper(endPosCalcExpr);
+
+                newArgumentList.add(resolvedExpr);
+            } else {
+                newArgumentList.add(argument.treeCopy());
+            }
+        }
+
+        return new Pair<>(newArgumentList, newPrefixStatementList);
+    }
+
+    /* helper functions */
+    private MatrixExpr builtMATLABScalarMatrix(List<Expr> scalar) {
+        Row row = new Row();
+        for (Expr element : scalar) row.addElement(element.treeCopy());
+        return new MatrixExpr(new ast.List<>(row));
+    }
+
+    private boolean hasFixLengthOutput(Expr expr) {
+        if (expr instanceof CellIndexExpr) return false;
+        if (expr instanceof DotExpr) return false;
+        return true;
     }
 }

@@ -54,6 +54,7 @@ public class ExprTransformDebug {
         return parsedResult;
     }
 
+    @SuppressWarnings("deprecation")
     public static void main(String argv[]) {
         CompilationUnits aspect = parseFile(ASPECT_FILE);
         CompilationUnits function = parseFile(FUNCTION_FILE);
@@ -61,16 +62,17 @@ public class ExprTransformDebug {
         assert aspect.getProgram(0) instanceof AspectDef;
         assert function.getProgram(0) instanceof FunctionList;
 
-        Action action = new Action(
-                ((AspectDef) aspect.getProgram(0)).getAction(0).getAction(0),
-                new HashMap<>(),
-                ASPECT_FILE
-        );
+        Collection<Action> actions = new HashSet<>();
+
+        for (ast.Action astNodes : ((AspectDef) aspect.getProgram(0)).getAction(0).getActionList()) {
+            Action newAction = new Action(astNodes, new HashMap<>(), ASPECT_FILE);
+            actions.add(newAction);
+        }
 
         Collection<AMJointPoint> jointpoints = new HashSet<>();
 
         RuntimeInfo runtimeInfo = new RuntimeInfo();
-        runtimeInfo.accessMode = AccessMode.Read;
+        runtimeInfo.accessMode = AccessMode.Write;
         runtimeInfo.annotationMap = new HashMap<>();
         runtimeInfo.kindAnalysis = new VFAnalysisOverride(function, function.getFunctionOrScriptQuery());
         runtimeInfo.kindAnalysis.analyze();
@@ -78,7 +80,7 @@ public class ExprTransformDebug {
         runtimeInfo.scopeTraceStack = new Stack<>();
 
         TransformerArgument argument = new TransformerArgument(
-                Arrays.asList(action),
+                actions,
                 runtimeInfo,
                 new VarNamespace(),
                 (ASTNode node) -> false,
@@ -102,6 +104,11 @@ public class ExprTransformDebug {
         System.out.println("Joint Points :");
         for (AMJointPoint jointPoint : jointpoints) {
             System.out.println(jointPoint);
+        }
+
+        System.out.println("Trace Stack :");
+        for (AssignStmt iter : argument.assignRetriveStack) {
+            System.out.println(iter.getPrettyPrinted().trim());
         }
     }
 }

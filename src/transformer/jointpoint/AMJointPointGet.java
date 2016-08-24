@@ -41,12 +41,13 @@ public final class AMJointPointGet extends AMJointPoint{
     @Override
     public String toString() {
         return String.format(
-                "[%10s] [%3d:%3d] %s with indices: %s",
+                "[%10s] [%3d:%3d] %s with indices: %s, actions: %s",
                 getMatchedPatternType(),
                 getStartLine(),
                 getStartColumn(),
                 getInlineStatement().getPrettyPrinted().trim(),
-                getIndicesExpr().getPrettyPrinted().trim()
+                getIndicesExpr().getPrettyPrinted().trim(),
+                getMatchedActions().toString()
         );
     }
 }

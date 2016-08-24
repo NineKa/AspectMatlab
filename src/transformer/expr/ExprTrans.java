@@ -16,10 +16,8 @@ import transformer.util.IsPossibleJointPointResult;
 import transformer.util.RuntimeInfo;
 import util.Namespace;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -37,6 +35,9 @@ public abstract class ExprTrans implements Transformer<Expr>{
     @Deprecated
     protected TransformerArgument originalArgument = null;
 
+    @Deprecated
+    protected Stack<AssignStmt> assignRetriveStack = null;
+
     @SuppressWarnings("deprecation")
     public ExprTrans (TransformerArgument argument, Expr expr) {
         this.actions            = argument.actions;
@@ -50,6 +51,8 @@ public abstract class ExprTrans implements Transformer<Expr>{
         this.enclosingFilename  = argument.enclosingFilename;
 
         this.originalNode       = expr;
+
+        this.assignRetriveStack   = argument.assignRetriveStack;
     }
 
     public abstract Pair<Expr, List<Stmt>> copyAndTransform();

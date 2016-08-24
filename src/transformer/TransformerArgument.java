@@ -2,6 +2,7 @@ package transformer;
 
 import abstractPattern.Action;
 import ast.ASTNode;
+import ast.AssignStmt;
 import ast.EndExpr;
 import ast.ParameterizedExpr;
 import transformer.jointpoint.AMJointPoint;
@@ -11,6 +12,7 @@ import util.Namespace;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -29,6 +31,9 @@ public class TransformerArgument {
     public String enclosingFilename = null;
 
     public Map<EndExpr, ParameterizedExpr> endExpressionResolveMap = new HashMap<>();
+
+    @Deprecated
+    public Stack<AssignStmt> assignRetriveStack = new Stack<>();
 
     public TransformerArgument(
             Collection<Action> actions,

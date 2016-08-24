@@ -13,6 +13,7 @@ import abstractPattern.type.WeaveType;
 import ast.*;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
 import natlab.toolkits.analysis.varorfun.VFDatum;
+import transformer.util.AccessMode;
 import transformer.util.IsPossibleJointPointResult;
 import transformer.util.RuntimeInfo;
 
@@ -255,6 +256,11 @@ public class Call extends Primitive {
     private IsPossibleJointPointResult isPossibleJointPointParameterizedExpr(ParameterizedExpr astNode, RuntimeInfo runtimeInfo) {
         /* structure check */
         if (!(astNode.getTarget() instanceof NameExpr)) {
+            IsPossibleJointPointResult result = new IsPossibleJointPointResult();
+            result.reset();
+            return result;
+        }
+        if (runtimeInfo.accessMode == AccessMode.Write) {
             IsPossibleJointPointResult result = new IsPossibleJointPointResult();
             result.reset();
             return result;

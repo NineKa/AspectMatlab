@@ -6,6 +6,7 @@ import org.javatuples.Pair;
 import transformer.TransformerArgument;
 import transformer.expr.ExprTrans;
 import transformer.jointpoint.AMJointPointGet;
+import transformer.jointpoint.AMJointPointSet;
 import transformer.util.AccessMode;
 
 import java.util.LinkedList;
@@ -169,7 +170,7 @@ public final class CellIndexTrans extends LValueTrans {
             /*                              end                             */
             /*                              [expr2(transform)]              */
             /*                              t0{[expr2]}                 =   */
-            /*                              [expr1] = t0;                   */
+            /*                              [expr1]{[expr2]} = t0{[expr2]}; */
 
             IfBlock existingCheckBlock = new IfBlock();
             existingCheckBlock.setCondition(new ParameterizedExpr(
@@ -201,10 +202,29 @@ public final class CellIndexTrans extends LValueTrans {
             retExpr.setArgList(colonResolveTransformResult.getValue0());
 
             AssignStmt t0RetrieveAssign = new AssignStmt();
-            t0RetrieveAssign.setLHS(new NameExpr(new Name(targetName)));
-            t0RetrieveAssign.setRHS(new NameExpr(new Name(t0Name)));
+            t0RetrieveAssign.setLHS(new CellIndexExpr(
+                    new NameExpr(new Name(targetName)),
+                    colonResolveTransformResult.getValue0().treeCopy()
+            ));
+            t0RetrieveAssign.setRHS(new CellIndexExpr(
+                    new NameExpr(new Name(t0Name)),
+                    colonResolveTransformResult.getValue0().treeCopy()
+            ));
             t0RetrieveAssign.setOutputSuppressed(true);
             assignRetriveStack.push(t0RetrieveAssign);
+
+            /* invoke joint point delegate */
+            AMJointPointSet jointPoint = new AMJointPointSet(
+                    t0RetrieveAssign, originalNode.getStartLine(),
+                    originalNode.getStartColumn(), enclosingFilename
+            );
+            jointPoint.addAllMatchedAction(getPossibleAttachedActionsSet());
+            jointPoint.setIndicesExpr(new CellArrayExpr(new ast.List<Row>(new Row(
+                    colonResolveTransformResult.getValue0().treeCopy()
+            ))));
+            jointPoint.setNewVarExpr(new NameExpr(new Name(t0Name)));
+            jointPoint.setOldVarExpr(new NameExpr(new Name(targetName)));
+            jointPointDelegate.accept(jointPoint);
 
             return new Pair<>(retExpr, newPrefixStatement);
         } else {
@@ -249,13 +269,20 @@ public final class CellIndexTrans extends LValueTrans {
 
                 return new Pair<>(retExpr, newPrefixStatement);
             } else {
-                Pair<Expr, List<Stmt>> targetTransformResult = targetTransformer.copyAndTransform();
-                Pair<ast.List<Expr>, List<Stmt>> argumentListTransformResult = copyAndTransformArgument();
+                Expr targetExp;
+                if (((CellIndexExpr) originalNode).getTarget() instanceof NameExpr) {
+                    targetExp = ((CellIndexExpr) originalNode).getTarget().treeCopy();
+                } else {
+                    Pair<Expr, List<Stmt>> targetTransformResult = targetTransformer.copyAndTransform();
+                    newPrefixStatement.addAll(targetTransformResult.getValue1());
+                    targetExp = targetTransformResult.getValue0();
+                }
 
-                newPrefixStatement.addAll(targetTransformResult.getValue1());
+
+                Pair<ast.List<Expr>, List<Stmt>> argumentListTransformResult = copyAndTransformArgument();
                 newPrefixStatement.addAll(argumentListTransformResult.getValue1());
 
-                retExpr.setTarget(targetTransformResult.getValue0());
+                retExpr.setTarget(targetExp);
                 retExpr.setArgList(argumentListTransformResult.getValue0());
 
                 return new Pair<>(retExpr, newPrefixStatement);

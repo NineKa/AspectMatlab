@@ -9,6 +9,7 @@ import org.javatuples.Pair;
 import transformer.TransformerArgument;
 import transformer.jointpoint.AMJointPointCall;
 import transformer.jointpoint.AMJointPointGet;
+import transformer.jointpoint.AMJointPointSet;
 import transformer.util.AccessMode;
 
 import java.util.Collection;
@@ -31,6 +32,7 @@ public final class NameTrans extends LValueTrans {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public Pair<Expr, List<Stmt>> copyAndTransform() {
         if (hasTransformOnCurrentNode()) {
             if (runtimeInfo.accessMode == AccessMode.Write) {
@@ -55,6 +57,23 @@ public final class NameTrans extends LValueTrans {
 
                 IfStmt prefixIfStmt = new IfStmt(new ast.List<>(existingAssignBlock), new Opt<>());
                 newPrefixStatementList.add(prefixIfStmt);
+
+                AssignStmt t0RetrieveAssign = new AssignStmt();
+                t0RetrieveAssign.setLHS(new NameExpr(new Name(targetName)));
+                t0RetrieveAssign.setRHS(new NameExpr(new Name(t0Name)));
+                t0RetrieveAssign.setOutputSuppressed(true);
+                assignRetriveStack.push(t0RetrieveAssign);
+
+                /* invoke joint point delegate */
+                AMJointPointSet jointPoint = new AMJointPointSet(
+                        t0RetrieveAssign, originalNode.getStartLine(),
+                        originalNode.getStartColumn(), enclosingFilename
+                );
+                jointPoint.addAllMatchedAction(getPossibleAttachedActionsSet());
+                jointPoint.setIndicesExpr(new CellArrayExpr(new ast.List<Row>(new Row(new ast.List<Expr>()))));
+                jointPoint.setOldVarExpr(new NameExpr(new Name(targetName)));
+                jointPoint.setNewVarExpr(new NameExpr(new Name(t0Name)));
+                jointPointDelegate.accept(jointPoint);
 
                 return new Pair<>(new NameExpr(new Name(t0Name)), newPrefixStatementList);
             }

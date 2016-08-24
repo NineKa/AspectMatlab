@@ -191,9 +191,14 @@ public final class CellIndexTrans extends LValueTrans {
 
             Pair<ast.List<Expr>, List<Stmt>> argumentTransformResult = copyAndTransformArgument();
             newPrefixStatement.addAll(argumentTransformResult.getValue1());
+            Pair<ast.List<Expr>, List<Stmt>> colonResolveTransformResult = resolveColonExpr(
+                    argumentTransformResult.getValue0(),
+                    new NameExpr(new Name(t0Name))
+            );
+            newPrefixStatement.addAll(colonResolveTransformResult.getValue1());
 
             retExpr.setTarget(new NameExpr(new Name(t0Name)));
-            retExpr.setArgList(argumentTransformResult.getValue0());
+            retExpr.setArgList(colonResolveTransformResult.getValue0());
 
             AssignStmt t0RetrieveAssign = new AssignStmt();
             t0RetrieveAssign.setLHS(new NameExpr(new Name(targetName)));

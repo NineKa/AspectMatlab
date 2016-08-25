@@ -165,12 +165,12 @@ public final class CellIndexTrans extends LValueTrans {
             assert ((CellIndexExpr) originalNode).getTarget() instanceof NameExpr;
             String targetName = ((NameExpr) ((CellIndexExpr) originalNode).getTarget()).getName().getID();
             resolveEndExpr(new NameExpr(new Name(targetName)));
-            /* [expr1]{[expr2]}     <=>     if exist('[expr1]','var')       */
-            /*                                  t0 = [expr1];               */
-            /*                              end                             */
-            /*                              [expr2(transform)]              */
-            /*                              t0{[expr2]}                 =   */
-            /*                              [expr1]{[expr2]} = t0{[expr2]}; */
+            /* [expr1]{[expr2]}     <=>     if exist('[expr1]','var')               */
+            /*                                  t0 = [expr1];                       */
+            /*                              end                                     */
+            /*                              [expr2(transform)]                      */
+            /*                              t0{[expr2]}                 =           */
+            /*                              [[expr1]{[expr2]}] = deal(t0{[expr2]};) */
 
             IfBlock existingCheckBlock = new IfBlock();
             existingCheckBlock.setCondition(new ParameterizedExpr(
@@ -202,13 +202,16 @@ public final class CellIndexTrans extends LValueTrans {
             retExpr.setArgList(colonResolveTransformResult.getValue0());
 
             AssignStmt t0RetrieveAssign = new AssignStmt();
-            t0RetrieveAssign.setLHS(new CellIndexExpr(
+            t0RetrieveAssign.setLHS(new MatrixExpr(new ast.List<Row>(new Row(new ast.List<Expr>(new CellIndexExpr(
                     new NameExpr(new Name(targetName)),
                     colonResolveTransformResult.getValue0().treeCopy()
-            ));
-            t0RetrieveAssign.setRHS(new CellIndexExpr(
-                    new NameExpr(new Name(t0Name)),
-                    colonResolveTransformResult.getValue0().treeCopy()
+            ))))));
+            t0RetrieveAssign.setRHS(new ParameterizedExpr(
+                    new NameExpr(new Name("deal")),
+                    new ast.List<Expr>(new CellIndexExpr(
+                            new NameExpr(new Name(t0Name)),
+                            colonResolveTransformResult.getValue0().treeCopy()
+                    ))
             ));
             t0RetrieveAssign.setOutputSuppressed(true);
             assignRetriveStack.push(t0RetrieveAssign);
@@ -342,7 +345,7 @@ public final class CellIndexTrans extends LValueTrans {
     }
 
     private void resolveEndExpr(NameExpr resolvedAs) {
-        assert hasEndExpression();
+        if (!hasEndExpression()) return;
         assert originalNode instanceof CellIndexExpr;
         for (int argIndex = 0; argIndex < ((CellIndexExpr) originalNode).getNumArg(); argIndex++) {
             final int MATLAB_INDEX = argIndex + 1;

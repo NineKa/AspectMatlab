@@ -5,7 +5,7 @@ import ast.ASTNode;
 import ast.AssignStmt;
 import ast.EndExpr;
 import ast.ParameterizedExpr;
-import transformer.jointpoint.AMJointPoint;
+import transformer.joinpoint.AMJoinPoint;
 import transformer.util.RuntimeInfo;
 import util.Namespace;
 
@@ -26,7 +26,7 @@ public class TransformerArgument {
     /* A function decide if a node transformation is ignored (TRUE -> ignored) */
     public Function<ASTNode, Boolean> ignoreDelegate = null;
     /* A call back function, if a joint point is appearing, a call back is issued */
-    public Consumer<AMJointPoint> jointPointDelegate = null;
+    public Consumer<AMJoinPoint> jointPointDelegate = null;
 
     public String enclosingFilename = null;
 
@@ -40,7 +40,7 @@ public class TransformerArgument {
             RuntimeInfo runtimeInfo,
             Namespace alterNamespace,
             Function<ASTNode, Boolean> ignoreDelegate,
-            Consumer<AMJointPoint> jointPointDelegate,
+            Consumer<AMJoinPoint> jointPointDelegate,
             String enclosingFilename
     ) {
         this.actions = actions;

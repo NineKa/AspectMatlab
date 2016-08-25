@@ -8,9 +8,9 @@ import natlab.toolkits.analysis.varorfun.VFDatum;
 import org.javatuples.Pair;
 import transformer.TransformerArgument;
 import transformer.expr.ExprTrans;
-import transformer.jointpoint.AMJointPointCall;
-import transformer.jointpoint.AMJointPointGet;
-import transformer.jointpoint.AMJointPointSet;
+import transformer.joinpoint.AMJoinPointCall;
+import transformer.joinpoint.AMJoinPointGet;
+import transformer.joinpoint.AMJoinPointSet;
 import transformer.util.AccessMode;
 
 import java.util.Collection;
@@ -120,7 +120,7 @@ public final class ParametrizedTrans extends LValueTrans {
             assignRetriveStack.push(t0RetrieveAssign);
 
             /* invoke joint point delegate */
-            AMJointPointSet jointPoint = new AMJointPointSet(
+            AMJoinPointSet jointPoint = new AMJoinPointSet(
                     t0RetrieveAssign, originalNode.getStartLine(),
                     originalNode.getStartColumn(), enclosingFilename
             );
@@ -234,7 +234,7 @@ public final class ParametrizedTrans extends LValueTrans {
                 );
                 Collection<abstractPattern.Action> possibleActionSet = getPossibleAttachedActionsSet();
                 if (!possibleActionSet.isEmpty()) {
-                    AMJointPointGet jointPoint = new AMJointPointGet(
+                    AMJoinPointGet jointPoint = new AMJoinPointGet(
                             alterAssign, originalNode.getStartLine(),
                             originalNode.getStartColumn(), enclosingFilename
                     );
@@ -266,7 +266,7 @@ public final class ParametrizedTrans extends LValueTrans {
                     newPrefixStatementList.add(alterAssign);
 
                     /* invoke joint point delegate */
-                    AMJointPointGet jointPoint = new AMJointPointGet(
+                    AMJoinPointGet jointPoint = new AMJoinPointGet(
                             alterAssign, originalNode.getStartLine(),
                             originalNode.getStartColumn(), enclosingFilename
                     );
@@ -303,7 +303,7 @@ public final class ParametrizedTrans extends LValueTrans {
                     newPrefixStatementList.add(alterAssign);
 
                     /* invoke joint point delegate */
-                    AMJointPointCall jointPoint = new AMJointPointCall(
+                    AMJoinPointCall jointPoint = new AMJoinPointCall(
                             alterAssign, originalNode.getStartLine(),
                             originalNode.getStartColumn(), enclosingFilename
                     );
@@ -375,7 +375,7 @@ public final class ParametrizedTrans extends LValueTrans {
                     runtimeInfo.kindAnalysis.removeOverride(((NameExpr) ((ParameterizedExpr) originalNode).getTarget()).getName());
 
                     if (!variableSet.isEmpty()) {
-                        AMJointPointGet jointPoint = new AMJointPointGet(
+                        AMJoinPointGet jointPoint = new AMJoinPointGet(
                                 varAlterAssign, originalNode.getStartLine(),
                                 originalNode.getStartColumn(), enclosingFilename
                         );
@@ -385,7 +385,7 @@ public final class ParametrizedTrans extends LValueTrans {
                         jointPointDelegate.accept(jointPoint);
                     }
                     if (!subroutineSet.isEmpty()) {
-                        AMJointPointCall jointPoint = new AMJointPointCall(
+                        AMJoinPointCall jointPoint = new AMJoinPointCall(
                                 varAlterAssign, originalNode.getStartLine(),
                                 originalNode.getStartColumn(), enclosingFilename
                         );

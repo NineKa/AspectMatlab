@@ -3,7 +3,7 @@ package transformer.expr.unary;
 import ast.*;
 import org.javatuples.Pair;
 import transformer.TransformerArgument;
-import transformer.jointpoint.AMJointPointOperator;
+import transformer.joinpoint.AMJoinPointOperator;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -44,7 +44,7 @@ public final class MTransposeTrans extends UnaryTrans {
             prefixStatementList.add(t1Assign);
 
             /* invoke joint point delegate */
-            AMJointPointOperator jointPoint = new AMJointPointOperator(
+            AMJoinPointOperator jointPoint = new AMJoinPointOperator(
                     t1Assign, originalNode.getStartLine(),
                     originalNode.getStartColumn(), enclosingFilename
             );

@@ -1,4 +1,4 @@
-package transformer.jointpoint;
+package transformer.joinpoint;
 
 import abstractPattern.Action;
 import abstractPattern.analysis.PatternType;
@@ -7,14 +7,14 @@ import ast.Stmt;
 import java.util.Collection;
 import java.util.HashSet;
 
-public abstract class AMJointPoint {
+public abstract class AMJoinPoint {
     protected Stmt inlineStatement = null;
     protected int startLine = -1;
     protected int startColumn = -1;
     protected Collection<Action> matchedActions = new HashSet<>();
     protected String filepath = null;
 
-    public AMJointPoint(Stmt inlineStatement, int startLine, int startColumn, String filepath) {
+    public AMJoinPoint(Stmt inlineStatement, int startLine, int startColumn, String filepath) {
         this.inlineStatement = inlineStatement;
         this.startLine = startLine;
         this.startColumn = startColumn;

@@ -7,9 +7,9 @@ import natlab.toolkits.analysis.varorfun.VFAnalysis;
 import natlab.toolkits.analysis.varorfun.VFDatum;
 import org.javatuples.Pair;
 import transformer.TransformerArgument;
-import transformer.jointpoint.AMJointPointCall;
-import transformer.jointpoint.AMJointPointGet;
-import transformer.jointpoint.AMJointPointSet;
+import transformer.joinpoint.AMJoinPointCall;
+import transformer.joinpoint.AMJoinPointGet;
+import transformer.joinpoint.AMJoinPointSet;
 import transformer.util.AccessMode;
 
 import java.util.Collection;
@@ -65,7 +65,7 @@ public final class NameTrans extends LValueTrans {
                 assignRetriveStack.push(t0RetrieveAssign);
 
                 /* invoke joint point delegate */
-                AMJointPointSet jointPoint = new AMJointPointSet(
+                AMJoinPointSet jointPoint = new AMJoinPointSet(
                         t0RetrieveAssign, originalNode.getStartLine(),
                         originalNode.getStartColumn(), enclosingFilename
                 );
@@ -105,7 +105,7 @@ public final class NameTrans extends LValueTrans {
                 newPrefixStatementList.add(t1Assign);
 
                 /* invoke joint point call back function */
-                AMJointPointCall jointPoint = new AMJointPointCall(
+                AMJoinPointCall jointPoint = new AMJoinPointCall(
                         t1Assign, originalNode.getStartLine(),
                         originalNode.getStartColumn(), enclosingFilename
                 );
@@ -172,7 +172,7 @@ public final class NameTrans extends LValueTrans {
                 Collection<Action> actionsAsVariable = getPossibleAttachedActionsSet();
                 runtimeInfo.kindAnalysis.removeOverride(((NameExpr) originalNode).getName());
                 if (!actionsAsFunction.isEmpty()) { /* invoke as a function call */
-                    AMJointPointCall jointPoint  = new AMJointPointCall(
+                    AMJoinPointCall jointPoint  = new AMJoinPointCall(
                             t1AssignFunc, originalNode.getStartLine(),
                             originalNode.getStartColumn(), enclosingFilename
                     );
@@ -182,7 +182,7 @@ public final class NameTrans extends LValueTrans {
                     jointPointDelegate.accept(jointPoint);
                 }
                 if (!actionsAsVariable.isEmpty()) { /* invoke as a variable get  */
-                    AMJointPointGet jointPoint = new AMJointPointGet(
+                    AMJoinPointGet jointPoint = new AMJoinPointGet(
                             t1AssignVar, originalNode.getStartLine(),
                             originalNode.getStartColumn(), enclosingFilename
                     );
@@ -206,7 +206,7 @@ public final class NameTrans extends LValueTrans {
                 newPrefixStatementList.add(t0Assign);
 
                 /* invoke joint point call back function */
-                AMJointPointGet jointPoint = new AMJointPointGet(
+                AMJoinPointGet jointPoint = new AMJoinPointGet(
                         t0Assign, originalNode.getStartLine(),
                         originalNode.getStartColumn(), enclosingFilename
                 );

@@ -12,7 +12,7 @@ import ast.*;
 import org.javatuples.Pair;
 import transformer.TransformerArgument;
 import transformer.expr.ExprTrans;
-import transformer.jointpoint.AMJointPoint;
+import transformer.joinpoint.AMJoinPoint;
 import transformer.util.AccessMode;
 import transformer.util.RuntimeInfo;
 import transformer.util.VFAnalysisOverride;
@@ -69,7 +69,7 @@ public class ExprTransformDebug {
             actions.add(newAction);
         }
 
-        Collection<AMJointPoint> jointpoints = new HashSet<>();
+        Collection<AMJoinPoint> jointpoints = new HashSet<>();
 
         RuntimeInfo runtimeInfo = new RuntimeInfo();
         runtimeInfo.accessMode = AccessMode.Read;
@@ -84,7 +84,7 @@ public class ExprTransformDebug {
                 runtimeInfo,
                 new VarNamespace(),
                 (ASTNode node) -> false,
-                (AMJointPoint jointpoint) -> jointpoints.add(jointpoint),
+                (AMJoinPoint jointpoint) -> jointpoints.add(jointpoint),
                 FUNCTION_FILE
         );
 
@@ -102,7 +102,7 @@ public class ExprTransformDebug {
         System.out.println(transformResult.getValue0().getPrettyPrinted());
 
         System.out.println("Joint Points :");
-        for (AMJointPoint jointPoint : jointpoints) {
+        for (AMJoinPoint jointPoint : jointpoints) {
             System.out.println(jointPoint);
         }
 

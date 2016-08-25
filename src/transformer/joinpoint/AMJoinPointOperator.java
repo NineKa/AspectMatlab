@@ -1,4 +1,4 @@
-package transformer.jointpoint;
+package transformer.joinpoint;
 
 import abstractPattern.analysis.PatternType;
 import ast.Expr;
@@ -7,10 +7,10 @@ import ast.Stmt;
 import java.util.LinkedList;
 import java.util.List;
 
-public final class AMJointPointOperator extends AMJointPoint {
+public final class AMJoinPointOperator extends AMJoinPoint {
     private List<Expr> operandsList = new LinkedList<>();
 
-    public AMJointPointOperator(Stmt inlineStatement, int startLine, int startColumn, String enclosingFilename) {
+    public AMJoinPointOperator(Stmt inlineStatement, int startLine, int startColumn, String enclosingFilename) {
         super(inlineStatement, startLine, startColumn, enclosingFilename);
     }
 

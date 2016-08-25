@@ -3,7 +3,7 @@ package transformer.expr.binary;
 import ast.*;
 import org.javatuples.Pair;
 import transformer.TransformerArgument;
-import transformer.jointpoint.AMJointPointOperator;
+import transformer.joinpoint.AMJoinPointOperator;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +59,7 @@ public final class MDivTrans extends BinaryTrans {
             newPrefixStatementList.add(t2Assign);
 
             /* invoke joint point delegate */
-            AMJointPointOperator jointPoint = new AMJointPointOperator(
+            AMJoinPointOperator jointPoint = new AMJoinPointOperator(
                     t2Assign, originalNode.getStartLine(),
                     originalNode.getStartColumn(), enclosingFilename
             );

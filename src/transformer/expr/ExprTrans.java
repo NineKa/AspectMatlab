@@ -11,7 +11,7 @@ import transformer.expr.literal.LiteralTrans;
 import transformer.expr.lvalue.LValueTrans;
 import transformer.expr.other.*;
 import transformer.expr.unary.UnaryTrans;
-import transformer.jointpoint.AMJointPoint;
+import transformer.joinpoint.AMJoinPoint;
 import transformer.util.IsPossibleJointPointResult;
 import transformer.util.RuntimeInfo;
 import util.Namespace;
@@ -27,7 +27,7 @@ public abstract class ExprTrans implements Transformer<Expr>{
     protected Collection<Action> actions = null;
     protected Namespace alterNamespace = null;
     protected Function<ASTNode, Boolean> ignoreDelegate = null;
-    protected Consumer<AMJointPoint> jointPointDelegate = null;
+    protected Consumer<AMJoinPoint> jointPointDelegate = null;
 
     protected Map<EndExpr, ParameterizedExpr> endExpressionResolveMap = null;
     protected String enclosingFilename = null;

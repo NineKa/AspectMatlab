@@ -1,16 +1,16 @@
-package transformer.jointpoint;
+package transformer.joinpoint;
 
 import abstractPattern.analysis.PatternType;
 import ast.Expr;
 import ast.NameExpr;
 import ast.Stmt;
 
-public final class AMJointPointSet extends AMJointPoint {
+public final class AMJoinPointSet extends AMJoinPoint {
     private Expr indicesExpr = null;
     private NameExpr oldVarExpr = null;
     private NameExpr newVarExpr = null;
 
-    public AMJointPointSet(Stmt inlineStatement, int startLine, int startColumn, String filepath) {
+    public AMJoinPointSet(Stmt inlineStatement, int startLine, int startColumn, String filepath) {
         super(inlineStatement, startLine, startColumn, filepath);
     }
 

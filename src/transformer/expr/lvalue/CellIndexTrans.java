@@ -5,8 +5,8 @@ import natlab.DecIntNumericLiteralValue;
 import org.javatuples.Pair;
 import transformer.TransformerArgument;
 import transformer.expr.ExprTrans;
-import transformer.jointpoint.AMJointPointGet;
-import transformer.jointpoint.AMJointPointSet;
+import transformer.joinpoint.AMJoinPointGet;
+import transformer.joinpoint.AMJoinPointSet;
 import transformer.util.AccessMode;
 
 import java.util.LinkedList;
@@ -73,7 +73,7 @@ public final class CellIndexTrans extends LValueTrans {
                 newPrefixStatementList.add(alterAssign);
 
                 /* invoke joint point delegate */
-                AMJointPointGet jointPoint = new AMJointPointGet(
+                AMJoinPointGet jointPoint = new AMJoinPointGet(
                         alterAssign, originalNode.getStartLine(),
                         originalNode.getStartColumn(), enclosingFilename
                 );
@@ -98,7 +98,7 @@ public final class CellIndexTrans extends LValueTrans {
                 newPrefixStatementList.add(alterAssign);
 
                 /* invoke joint point delegate */
-                AMJointPointGet jointPoint = new AMJointPointGet(
+                AMJoinPointGet jointPoint = new AMJoinPointGet(
                         alterAssign, originalNode.getStartLine(),
                         originalNode.getStartColumn(), enclosingFilename
                 );
@@ -217,7 +217,7 @@ public final class CellIndexTrans extends LValueTrans {
             assignRetriveStack.push(t0RetrieveAssign);
 
             /* invoke joint point delegate */
-            AMJointPointSet jointPoint = new AMJointPointSet(
+            AMJoinPointSet jointPoint = new AMJoinPointSet(
                     t0RetrieveAssign, originalNode.getStartLine(),
                     originalNode.getStartColumn(), enclosingFilename
             );

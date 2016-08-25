@@ -432,6 +432,14 @@ public final class CellIndexTrans extends LValueTrans {
     }
 
     private Pair<ast.List<Expr>, List<Stmt>> resolveColonExpr(ast.List<Expr> arguments, NameExpr resolvedAs) {
+        boolean hasColonExpr = false;
+        for (Expr argument : arguments) {
+            if (argument instanceof ColonExpr) hasColonExpr = true;
+        }
+        if (!hasColonExpr) {
+            return new Pair<>(arguments.treeCopy(), new LinkedList<>());
+        }
+
         ast.List<Expr> newArgumentList = new ast.List<>();
         List<Stmt> newPrefixStatementList = new LinkedList<>();
 

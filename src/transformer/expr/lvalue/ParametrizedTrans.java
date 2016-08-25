@@ -492,7 +492,8 @@ public final class ParametrizedTrans extends LValueTrans {
     }
 
     private void resolveEndExpr(NameExpr resolvedAs) {
-        assert hasEndExpression();
+        if (!hasEndExpression()) return;
+
         assert originalNode instanceof ParameterizedExpr;
         for (int argIndex = 0; argIndex < ((ParameterizedExpr) originalNode).getNumArg(); argIndex++) {
             final int MATLAB_INDEX = argIndex + 1;
@@ -524,6 +525,13 @@ public final class ParametrizedTrans extends LValueTrans {
     }
 
     private Pair<ast.List<Expr>, List<Stmt>> resolveColonExpr(ast.List<Expr> arguments, NameExpr resolvedAs) {
+        boolean hasColonExpr = false;
+        for (Expr argument : arguments) {
+            if (argument instanceof ColonExpr) hasColonExpr = true;
+        }
+        if (!hasColonExpr) {
+            return new Pair<>(arguments.treeCopy(), new LinkedList<>());
+        }
         ast.List<Expr> newArgumentList = new ast.List<>();
         List<Stmt> newPrefixStatementList = new LinkedList<>();
 

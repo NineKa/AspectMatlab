@@ -35,24 +35,33 @@ public final class CellArrayTrans extends ExprTrans{
                 Row newRow = new Row();
                 for (ExprTrans transIter : rowIter) {
                     Pair<Expr, List<Stmt>> transformResult = transIter.copyAndTransform();
+                    newPrefixStatementList.addAll(transformResult.getValue1());
                     /* special case */
-                    if (transformResult.getValue0() instanceof CellIndexExpr) {
-                        newPrefixStatementList.addAll(transformResult.getValue1());
-                        newRow.addElement(transformResult.getValue0());
-                        continue;
+                    if (hasFixLengthOutput(transformResult.getValue0())) {
+                        String alterName = alterNamespace.generateNewName();
+                        AssignStmt alterAssign = new AssignStmt();
+                        alterAssign.setLHS(new NameExpr(new Name(alterName)));
+                        alterAssign.setRHS(transformResult.getValue0());
+                        alterAssign.setOutputSuppressed(true);
+                        newPrefixStatementList.add(alterAssign);
+
+                        newRow.addElement(new NameExpr(new Name(alterName)));
+                    } else {
+                        String alterName = alterNamespace.generateNewName();
+                        AssignStmt alterAssign = new AssignStmt();
+                        alterAssign.setLHS(new NameExpr(new Name(alterName)));
+                        alterAssign.setRHS(new CellArrayExpr(new ast.List<Row>(new Row(new ast.List<Expr>(
+                                transformResult.getValue0()
+                        )))));
+                        alterAssign.setOutputSuppressed(true);
+                        newPrefixStatementList.add(alterAssign);
+
+                        newRow.addElement(new CellIndexExpr(
+                                new NameExpr(new Name(alterName)),
+                                new ast.List<Expr>(new ColonExpr())
+                        ));
                     }
 
-                    Expr copiedElement = transformResult.getValue0();
-                    newPrefixStatementList.addAll(transformResult.getValue1());
-
-                    String exprAlterName = this.alterNamespace.generateNewName();
-                    AssignStmt exprAlterAssign = new AssignStmt();
-                    exprAlterAssign.setLHS(new NameExpr(new Name(exprAlterName)));
-                    exprAlterAssign.setRHS(copiedElement);
-                    exprAlterAssign.setOutputSuppressed(true);
-
-                    newPrefixStatementList.add(exprAlterAssign);
-                    newRow.addElement(new NameExpr(new Name(exprAlterName)));
                 }
                 newCellArrayExpr.addRow(newRow);
             }
@@ -71,5 +80,11 @@ public final class CellArrayTrans extends ExprTrans{
             }
         }
         return needTransform;
+    }
+
+    private boolean hasFixLengthOutput(Expr expr) {
+        if (expr instanceof CellIndexExpr) return false;
+        if (expr instanceof DotExpr) return false;
+        return true;
     }
 }

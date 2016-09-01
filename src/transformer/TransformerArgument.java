@@ -4,7 +4,7 @@ import abstractPattern.Action;
 import ast.ASTNode;
 import ast.AssignStmt;
 import ast.EndExpr;
-import ast.ParameterizedExpr;
+import ast.Expr;
 import transformer.joinpoint.AMJoinPoint;
 import transformer.util.RuntimeInfo;
 import util.Namespace;
@@ -30,7 +30,7 @@ public class TransformerArgument {
 
     public String enclosingFilename = null;
 
-    public Map<EndExpr, ParameterizedExpr> endExpressionResolveMap = new HashMap<>();
+    public Map<EndExpr, Expr> endExpressionResolveMap = new HashMap<>();
 
     @Deprecated
     public Stack<AssignStmt> assignRetriveStack = new Stack<>();

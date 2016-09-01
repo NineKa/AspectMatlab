@@ -29,7 +29,7 @@ public abstract class ExprTrans implements Transformer<Expr>{
     protected Function<ASTNode, Boolean> ignoreDelegate = null;
     protected Consumer<AMJoinPoint> jointPointDelegate = null;
 
-    protected Map<EndExpr, ParameterizedExpr> endExpressionResolveMap = null;
+    protected Map<EndExpr, Expr> endExpressionResolveMap = null;
     protected String enclosingFilename = null;
 
     @Deprecated

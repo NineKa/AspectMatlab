@@ -72,7 +72,7 @@ public class ExprTransformDebug {
         Collection<AMJoinPoint> jointpoints = new HashSet<>();
 
         RuntimeInfo runtimeInfo = new RuntimeInfo();
-        runtimeInfo.accessMode = AccessMode.Read;
+        runtimeInfo.accessMode = AccessMode.Write;
         runtimeInfo.annotationMap = new HashMap<>();
         runtimeInfo.kindAnalysis = new VFAnalysisOverride(function, function.getFunctionOrScriptQuery());
         runtimeInfo.kindAnalysis.analyze();

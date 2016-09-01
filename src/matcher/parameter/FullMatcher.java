@@ -309,7 +309,7 @@ public class FullMatcher {
                 Expr resultExpr = null;
                 if (dimValidationExpr == null) {
                     if (typeValidationExpr == null) {
-                        throw new RuntimeException();
+                        resultExpr = new NameExpr(new Name(trueReturn));
                     } else {
                         resultExpr = typeValidationExpr;
                     }

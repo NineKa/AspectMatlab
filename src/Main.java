@@ -5,8 +5,12 @@ import Matlab.Utils.*;
 import abstractPattern.primitive.Call;
 import abstractPattern.primitive.Execution;
 import ast.*;
+import matcher.parameter.AutoMatcher;
 import natlab.toolkits.analysis.varorfun.VFAnalysis;
+import util.FunctionNamespace;
+import util.VarNamespace;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class Main {
@@ -77,17 +81,25 @@ public class Main {
         String functionFilePath = "/Users/k9/Documents/AspectMatlab/src/function.m";
 
         Result<UnitNode> result = MRecognizer.RecognizeFile(
-                functionFilePath,
+                matlabFilePath,
                 true,
                 new Notifier()
         );
         if (!result.GetIsOk()) return;
         CompilationUnits units = NodeToAstTransformer.Transform(result.GetValue());
 
-        assert units.getProgram(0) instanceof FunctionList;
-        assert ((FunctionList) units.getProgram(0)).getFunction(0).getStmt(1) instanceof ExprStmt;
-        Expr target = ((ExprStmt) ((FunctionList) units.getProgram(0)).getFunction(0).getStmt(1)).getExpr();
-        assert target instanceof CellIndexExpr;
+        assert units.getProgram(0) instanceof AspectDef;
+        Action action = ((AspectDef) units.getProgram(0)).getAction(0).getAction(0);
+        abstractPattern.Action absAction = new abstractPattern.Action(
+                action, new HashMap<>(), matlabFilePath
+        );
+
+        assert absAction.getReport().GetIsOk();
+        assert absAction.getPattern() instanceof Call;
+
+        AutoMatcher matcher = new AutoMatcher(((Call) absAction.getPattern()).getInputSignatures(), new VarNamespace(), new FunctionNamespace());
+
+        System.out.println(matcher.getFunction().getPrettyPrinted());
     }
 }
 
